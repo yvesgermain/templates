@@ -57,7 +57,7 @@ Function RegisterRP {
     )
 
     Write-Host "Registering resource provider '$ResourceProviderNamespace'";
-    Register-azResourceProvider -ProviderNamespace $ResourceProviderNamespace;
+    Register-AzResourceProvider -ProviderNamespace $ResourceProviderNamespace;
 }
 
 #******************************************************************************
@@ -68,14 +68,14 @@ $ErrorActionPreference = "Stop"
 
 # sign in
 Write-Host "Logging in...";
-# Login-azAccount;
+# Connect-AzAccount;
 
 # select subscription
 Write-Host "Selecting subscription '$subscriptionId'";
-# Select-azSubscription -SubscriptionID $subscriptionId;
+# Select-AzSubscription -SubscriptionID $subscriptionId;
 
 # Register RPs
-$resourceProviders = @("microsoft.insights","microsoft.web");
+$resourceProviders = @("microsoft.insights","microsoft.storage","microsoft.web");
 if($resourceProviders.length) {
     Write-Host "Registering resource providers"
     foreach($resourceProvider in $resourceProviders) {
@@ -84,7 +84,7 @@ if($resourceProviders.length) {
 }
 
 #Create or check for existing resource group
-$resourceGroup = Get-azResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
+$resourceGroup = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
 if(!$resourceGroup)
 {
     Write-Host "Resource group '$resourceGroupName' does not exist. To create a new resource group, please enter a location.";
@@ -92,7 +92,7 @@ if(!$resourceGroup)
         $resourceGroupLocation = Read-Host "resourceGroupLocation";
     }
     Write-Host "Creating resource group '$resourceGroupName' in location '$resourceGroupLocation'";
-    New-azResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation
+    New-AzResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation
 }
 else{
     Write-Host "Using existing resource group '$resourceGroupName'";
@@ -101,7 +101,7 @@ else{
 # Start the deployment
 Write-Host "Starting deployment...";
 if(Test-Path $parametersFilePath) {
-    New-azResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath -TemplateParameterFile $parametersFilePath;
+    New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath -TemplateParameterFile $parametersFilePath;
 } else {
-    New-azResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
+    New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
 }

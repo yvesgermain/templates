@@ -2,20 +2,32 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "sites_Veille_name": {
+            "value": "Veille-prd"
+        },
         "sites_AppsInterne_name": {
             "value": "AppsInterne-prd"
+        },
+        "sites_Veille_func_name": {
+            "value": "Veille-func-prd"
         },
         "serverfarms_ASP_Standard_name": {
             "value": "ASP-Standard-prd"
         },
+        "serverfarms_FunctionApp_name": {
+            "value": "ASP-FunctionApp-prd"
+        },
         "components_AppsInterne_name": {
             "value": "AppsInterne-prd"
         },
+        "components_Veille_func_name": {
+            "value": "Veille-func-prd"
+        },
+        "storageAccounts_veillefunc_name": {
+            "value": "storveillefuncprd"
+        },
         "Environnement" : {
             "value": "prd"
-        },
-        "sites_Veille_name": {
-            "value": "Veille-prd"
         }
     }
 }
