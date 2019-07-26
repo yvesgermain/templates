@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sites_AppsInterne_name": {
+            "value": "AppsInterne-prd"
+        },
+        "serverfarms_ASP_Standard_name": {
+            "value": "ASP-Standard-prd"
+        },
+        "components_AppsInterne_name": {
+            "value": "AppsInterne-prd"
+        },
+        "Environnement" : {
+            "value": "prd"
+        },
+        "sites_Veille_name": {
+            "value": "Veille-prd"
+        }
+    }
+}

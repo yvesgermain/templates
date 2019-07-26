@@ -1,0 +1,90 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sites_AppsInterne_name": {
+            "type": "string"
+        },
+        "serverfarms_ASP_Standard_name": {
+            "type": "string"
+        },
+        "components_AppsInterne_name": {
+            "type": "string"
+        },
+        "Environnement": {
+            "type": "string"            
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+        }
+    ]
+       "outputs": {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+       }
+}    
