@@ -105,9 +105,5 @@ if(Test-Path $parametersFilePath) {
 } else {
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
 }
-# Set-AzSqlServerActiveDirectoryAdministrator -ResourceGroupName sqlapps-rg-prd -ServerName sqlguminterne-prd -DisplayName sqladminprd@gumqc.OnMicrosoft.com
 
-# $cred = get-credential -UserName sqladminprd@sqlguminterne-prd.database.windows.net -message SQLadmin
-# invoke-sqlcmd -ServerInstance sqlguminterne-prd.database.windows.net -Database BdAppsInterne-prd -Query "select @@version" -Credential $cred
-
-# invoke-sqlcmd -ServerInstance sqlguminterne-prd.database.windows.net -Database BdAppsInterne-prd -InputFile c:\soquij\SQL\Install\createV8.sql -Credential $cred
+# get-azstorageaccount -resourcegroupName $resourceGroupName | where-object {$_.storageaccountname -like "Storage-rg-*"} |% { $name = $_.storageaccountname; Get-AzStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where { $_.keyname -like "key1"} | % { $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; Set-AzKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"}

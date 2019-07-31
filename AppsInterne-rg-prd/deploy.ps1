@@ -106,4 +106,3 @@ if(Test-Path $parametersFilePath) {
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
 }
 
-# get-azstorageaccount -resourcegroupName $resourceGroupName | where-object {$_.storageaccountname -like "Storage-rg-*"} |% { $name = $_.storageaccountname; Get-AzStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where { $_.keyname -like "key1"} | % { $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; Set-AzKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"}
