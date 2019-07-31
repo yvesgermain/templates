@@ -106,4 +106,8 @@ if(Test-Path $parametersFilePath) {
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
 }
 # Set-AzSqlServerActiveDirectoryAdministrator -ResourceGroupName sqlapps-rg-prd -ServerName sqlguminterne-prd -DisplayName sqladminprd@gumqc.OnMicrosoft.com
-invoke-sqlcmd 
+
+# $cred = get-credential -UserName sqladminprd@sqlguminterne-prd.database.windows.net -message SQLadmin
+# invoke-sqlcmd -ServerInstance sqlguminterne-prd.database.windows.net -Database BdAppsInterne-prd -Query "select @@version" -Credential $cred
+
+# invoke-sqlcmd -ServerInstance sqlguminterne-prd.database.windows.net -Database BdAppsInterne-prd -InputFile c:\soquij\SQL\Install\createV8.sql -Credential $cred

@@ -10,13 +10,17 @@
         },
         "environnement" :{
             "type": "string",
-            "allowedValues": ["prd","qa","dev"]
+            "allowedValues": ["prd","qa","dev","devops"]
         }
     },
     "variables": {
         "BdAppsInterne" : "[concat('BdAppsInterne-', parameters('environnement'))]" ,
-        "DbVeille" : "[concat('DbVeille-', parameters('environnement'))]" ,
-        "administratorLogin" : "[concat('sqladmin', parameters('environnement'))]"
+        "BdVeille" : "[concat('BdVeille-', parameters('environnement'))]" ,
+        "administratorLogin" : "[concat('sqladmin', parameters('environnement'))]",
+        "SidSQLadmindev" : "ab29cc98-8811-49b1-8e97-ecf60fc6b2b4",
+        "SidSQLadminqa" : "3baa776c-4826-49bf-a216-17254673507a",
+        "SidSQLadminprd" : "c74029db-ee61-4eae-912d-182fab6950f3",
+        "SidSQLadmindevops" : "39670c6b-8290-4499-8f84-031f42d2399e"
     },
     "resources": [
         {
@@ -41,8 +45,8 @@
             ],
             "properties": {
                 "administratorType": "ActiveDirectory",
-                "login": "sqladminprd@gumqc.OnMicrosoft.com",
-                "sid": "c74029db-ee61-4eae-912d-182fab6950f3",
+                "login": "[concat('sqladmin', parameters('environnement') , '@gumqc.OnMicrosoft.com')]",
+                "sid": "[variables( concat('SidSQLadmin' , parameters('Environnement')))]",
                 "tenantId": "33aaf871-69fa-44f2-9edf-e1048cbba3a5"
             }
         },
@@ -96,7 +100,7 @@
         {
             "type": "Microsoft.Sql/servers/databases",
             "apiVersion": "2017-03-01-preview",
-            "name": "[concat(parameters('servers_sqlguminterne_name'), '/', variables('DbVeille'))]",
+            "name": "[concat(parameters('servers_sqlguminterne_name'), '/', variables('BdVeille'))]",
             "location": "canadacentral",
             "dependsOn": [
                 "[resourceId('Microsoft.Sql/servers', parameters('servers_sqlguminterne_name'))]"

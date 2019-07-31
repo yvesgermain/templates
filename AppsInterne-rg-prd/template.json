@@ -25,10 +25,24 @@
         },
         "storageAccounts_veillefunc_name": {
             "type": "string"
-        },        
-        "Environnement" : {
+        },
+        "storageAccounts_appsinterne_name": {
+            "type": "string"
+        },
+        "Environnement": {
             "type": "string",
-            "allowedValues": ["dev","qa","prd","devops"]
+            "allowedValues": [
+                "dev",
+                "qa",
+                "prd",
+                "devops"
+            ]
+        },
+        "AdminPassword": {
+            "type": "securestring"
+        },
+        "Accountkey": {
+            "type":   "securestring"
         }
     },
     "variables": {},
@@ -64,7 +78,7 @@
                 "name": "Standard_LRS",
                 "tier": "Standard"
             },
-            "kind": "Storage",
+            "kind": "StorageV2",
             "properties": {
                 "networkAcls": {
                     "bypass": "AzureServices",
@@ -72,7 +86,7 @@
                     "ipRules": [],
                     "defaultAction": "Allow"
                 },
-                "supportsHttpsTrafficOnly": false,
+                "supportsHttpsTrafficOnly": true,
                 "encryption": {
                     "services": {
                         "file": {
@@ -171,6 +185,25 @@
                     }
                 ],
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_Standard_name'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureBlobFileSystem.ConnectionString:media",
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters( 'storageAccounts_appsinterne_name' ) , parameters( 'environnement'), ';AccountKey=' , parameters('Accountkey'), ';EndpointSuffix=core.windows.net')]"
+                        },
+                        {
+                            "name": "AzureBlobFileSystem.RootUrl:media",
+                            "value": "[concat( 'https://' , parameters('storageAccounts_appsinterne_name'), '.blob.core.windows.net')]"
+                        }
+                    ],
+                    "connectionStrings": [
+                        {
+                            "name": "umbracoDbDSN",
+                            "connectionString": "[concat('Server=tcp:sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdAppsInterne-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\"')]",
+                            "type": "SQLAzure"
+                        }
+                    ]
+                },
                 "reserved": false,
                 "scmSiteAlsoStopped": false,
                 "clientAffinityEnabled": true,
@@ -226,6 +259,15 @@
             "kind": "app",
             "properties": {
                 "enabled": true,
+                "siteConfig": {
+                    "connectionStrings": [
+                        {
+                            "name": "bd_VeilleContenuExterneEntities",
+                            "connectionString": "[concat('Data Source=sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework;Authentication=\"Active Directory Password\"')]",
+                            "type": "SQLServer"
+                        }
+                    ]
+                },
                 "hostNameSslStates": [
                     {
                         "name": "[concat('veille-' , parameters('Environnement'), '.azurewebsites.net')]",
@@ -261,7 +303,7 @@
                 "Environnement": "Production"
             },
             "properties": {
-                "numberOfWorkers": 1,
+                "numberOfWorkers": "1",
                 "defaultDocuments": [
                     "Default.htm",
                     "Default.html",
@@ -278,69 +320,53 @@
                 "pythonVersion": "",
                 "nodeVersion": "",
                 "linuxFxVersion": "",
-                "requestTracingEnabled": false,
-                "remoteDebuggingEnabled": false,
+                "requestTracingEnabled": "false",
+                "remoteDebuggingEnabled": "false",
                 "remoteDebuggingVersion": "VS2017",
-                "httpLoggingEnabled": false,
-                "logsDirectorySizeLimit": 35,
-                "detailedErrorLoggingEnabled": false,
+                "httpLoggingEnabled": "false",
+                "logsDirectorySizeLimit": "35",
+                "detailedErrorLoggingEnabled": "false",
                 "publishingUsername": "[concat('$AppsInterne-',  parameters('Environnement'))]",
                 "scmType": "None",
-                "use32BitWorkerProcess": true,
-                "webSocketsEnabled": false,
-                "alwaysOn": true,
+                "use32BitWorkerProcess": "true",
+                "webSocketsEnabled": "false",
+                "alwaysOn": "true",
                 "appCommandLine": "",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
                     {
                         "virtualPath": "/",
                         "physicalPath": "site\\wwwroot",
-                        "preloadEnabled": true,
+                        "preloadEnabled": "true",
                         "virtualDirectories": null
                     }
                 ],
-                "winAuthAdminState": 0,
-                "winAuthTenantState": 0,
-                "customAppPoolIdentityAdminState": false,
-                "customAppPoolIdentityTenantState": false,
+                "winAuthAdminState": "0",
+                "winAuthTenantState": "0",
+                "customAppPoolIdentityAdminState": "false",
+                "customAppPoolIdentityTenantState": "false",
                 "loadBalancing": "LeastRequests",
                 "routingRules": [],
                 "experiments": {
                     "rampUpRules": []
                 },
-                "autoHealEnabled": false,
+                "autoHealEnabled": "false",
                 "vnetName": "",
-                "siteAuthEnabled": false,
-                "siteAuthSettings": {
-                    "enabled": null,
-                    "unauthenticatedClientAction": null,
-                    "tokenStoreEnabled": null,
-                    "allowedExternalRedirectUrls": null,
-                    "defaultProvider": null,
-                    "clientId": null,
-                    "clientSecret": null,
-                    "clientSecretCertificateThumbprint": null,
-                    "issuer": null,
-                    "allowedAudiences": null,
-                    "additionalLoginParams": null,
-                    "isAadAutoProvisioned": false,
-                    "googleClientId": null,
-                    "googleClientSecret": null,
-                    "googleOAuthScopes": null,
-                    "facebookAppId": null,
-                    "facebookAppSecret": null,
-                    "facebookOAuthScopes": null,
-                    "twitterConsumerKey": null,
-                    "twitterConsumerSecret": null,
-                    "microsoftAccountClientId": null,
-                    "microsoftAccountClientSecret": null,
-                    "microsoftAccountOAuthScopes": null
-                },
-                "localMySqlEnabled": false,
-                "http20Enabled": false,
+                "siteAuthEnabled": "false",
+                "siteAuthSettings": {},
+                "localMySqlEnabled": "false",
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "205.237.253.10",
+                        "subnetMask": "255.255.255.255",
+                        "name": "Soquij",
+                        "description": "Soquij"
+                    }
+                ],
+                "http20Enabled": "false",
                 "minTlsVersion": "1.2",
                 "ftpsState": "AllAllowed",
-                "reservedInstanceCount": 0
+                "reservedInstanceCount": "0"
             }
         },
         {
@@ -352,7 +378,7 @@
                 "[resourceId('Microsoft.Web/sites', parameters('sites_Veille_func_name'))]"
             ],
             "properties": {
-                "numberOfWorkers": 1,
+                "numberOfWorkers": "1",
                 "defaultDocuments": [
                     "Default.htm",
                     "Default.html",
@@ -368,76 +394,60 @@
                 "pythonVersion": "",
                 "nodeVersion": "",
                 "linuxFxVersion": "",
-                "requestTracingEnabled": false,
-                "remoteDebuggingEnabled": false,
-                "httpLoggingEnabled": false,
-                "logsDirectorySizeLimit": 35,
-                "detailedErrorLoggingEnabled": false,
+                "requestTracingEnabled": "false",
+                "remoteDebuggingEnabled": "false",
+                "httpLoggingEnabled": "false",
+                "logsDirectorySizeLimit": "35",
+                "detailedErrorLoggingEnabled": "false",
                 "publishingUsername": "[concat('$Veille-' , parameters('Environnement'))]",
                 "scmType": "None",
-                "use32BitWorkerProcess": true,
-                "webSocketsEnabled": false,
-                "alwaysOn": false,
+                "use32BitWorkerProcess": "true",
+                "webSocketsEnabled": "false",
+                "alwaysOn": "false",
                 "appCommandLine": "",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
                     {
                         "virtualPath": "/",
                         "physicalPath": "site\\wwwroot",
-                        "preloadEnabled": false,
+                        "preloadEnabled": "false",
                         "virtualDirectories": null
                     }
                 ],
-                "winAuthAdminState": 0,
-                "winAuthTenantState": 0,
-                "customAppPoolIdentityAdminState": false,
-                "customAppPoolIdentityTenantState": false,
+                "winAuthAdminState": "0",
+                "winAuthTenantState": "0",
+                "customAppPoolIdentityAdminState": "false",
+                "customAppPoolIdentityTenantState": "false",
                 "loadBalancing": "LeastRequests",
                 "routingRules": [],
                 "experiments": {
                     "rampUpRules": []
                 },
-                "autoHealEnabled": false,
+                "autoHealEnabled": "false",
                 "vnetName": "",
-                "siteAuthEnabled": false,
-                "siteAuthSettings": {
-                    "enabled": null,
-                    "unauthenticatedClientAction": null,
-                    "tokenStoreEnabled": null,
-                    "allowedExternalRedirectUrls": null,
-                    "defaultProvider": null,
-                    "clientId": null,
-                    "clientSecret": null,
-                    "clientSecretCertificateThumbprint": null,
-                    "issuer": null,
-                    "allowedAudiences": null,
-                    "additionalLoginParams": null,
-                    "isAadAutoProvisioned": false,
-                    "googleClientId": null,
-                    "googleClientSecret": null,
-                    "googleOAuthScopes": null,
-                    "facebookAppId": null,
-                    "facebookAppSecret": null,
-                    "facebookOAuthScopes": null,
-                    "twitterConsumerKey": null,
-                    "twitterConsumerSecret": null,
-                    "microsoftAccountClientId": null,
-                    "microsoftAccountClientSecret": null,
-                    "microsoftAccountOAuthScopes": null
-                },
+                "siteAuthEnabled": "false",
+                "siteAuthSettings": {},
                 "cors": {
                     "allowedOrigins": [
                         "https://functions.azure.com",
                         "https://functions-staging.azure.com",
                         "https://functions-next.azure.com"
                     ],
-                    "supportCredentials": false
+                    "supportCredentials": "false"
                 },
-                "localMySqlEnabled": false,
-                "http20Enabled": false,
+                "localMySqlEnabled": "false",
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "205.237.253.10",
+                        "subnetMask": "255.255.255.255",
+                        "name": "Soquij",
+                        "description": "Soquij"
+                    }
+                ],
+                "http20Enabled": "false",
                 "minTlsVersion": "1.2",
                 "ftpsState": "AllAllowed",
-                "reservedInstanceCount": 0
+                "reservedInstanceCount": "0"
             }
         },
         {
@@ -449,7 +459,7 @@
                 "[resourceId('Microsoft.Web/sites', parameters('sites_Veille_name'))]"
             ],
             "properties": {
-                "numberOfWorkers": 1,
+                "numberOfWorkers": "1",
                 "defaultDocuments": [
                     "Default.htm",
                     "Default.html",
@@ -466,69 +476,45 @@
                 "pythonVersion": "",
                 "nodeVersion": "",
                 "linuxFxVersion": "",
-                "requestTracingEnabled": false,
-                "remoteDebuggingEnabled": false,
+                "requestTracingEnabled": "false",
+                "remoteDebuggingEnabled": "false",
                 "remoteDebuggingVersion": "VS2017",
-                "httpLoggingEnabled": false,
+                "httpLoggingEnabled": "false",
                 "logsDirectorySizeLimit": 35,
-                "detailedErrorLoggingEnabled": false,
+                "detailedErrorLoggingEnabled": "false",
                 "publishingUsername": "[concat('$Veille-' , parameters('Environnement'))]",
                 "scmType": "None",
-                "use32BitWorkerProcess": true,
-                "webSocketsEnabled": false,
-                "alwaysOn": true,
+                "use32BitWorkerProcess": "true",
+                "webSocketsEnabled": "false",
+                "alwaysOn": "true",
                 "appCommandLine": "",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
                     {
                         "virtualPath": "/",
                         "physicalPath": "site\\wwwroot",
-                        "preloadEnabled": true,
+                        "preloadEnabled": "true",
                         "virtualDirectories": null
                     }
                 ],
-                "winAuthAdminState": 0,
-                "winAuthTenantState": 0,
-                "customAppPoolIdentityAdminState": false,
-                "customAppPoolIdentityTenantState": false,
+                "winAuthAdminState": "0",
+                "winAuthTenantState": "0",
+                "customAppPoolIdentityAdminState": "false",
+                "customAppPoolIdentityTenantState": "false",
                 "loadBalancing": "LeastRequests",
                 "routingRules": [],
                 "experiments": {
                     "rampUpRules": []
                 },
-                "autoHealEnabled": false,
+                "autoHealEnabled": "false",
                 "vnetName": "",
-                "siteAuthEnabled": false,
-                "siteAuthSettings": {
-                    "enabled": null,
-                    "unauthenticatedClientAction": null,
-                    "tokenStoreEnabled": null,
-                    "allowedExternalRedirectUrls": null,
-                    "defaultProvider": null,
-                    "clientId": null,
-                    "clientSecret": null,
-                    "clientSecretCertificateThumbprint": null,
-                    "issuer": null,
-                    "allowedAudiences": null,
-                    "additionalLoginParams": null,
-                    "isAadAutoProvisioned": false,
-                    "googleClientId": null,
-                    "googleClientSecret": null,
-                    "googleOAuthScopes": null,
-                    "facebookAppId": null,
-                    "facebookAppSecret": null,
-                    "facebookOAuthScopes": null,
-                    "twitterConsumerKey": null,
-                    "twitterConsumerSecret": null,
-                    "microsoftAccountClientId": null,
-                    "microsoftAccountClientSecret": null,
-                    "microsoftAccountOAuthScopes": null
-                },
-                "localMySqlEnabled": false,
-                "http20Enabled": false,
+                "siteAuthEnabled": "false",
+                "siteAuthSettings": {},
+                "localMySqlEnabled": "false",
+                "http20Enabled": "false",
                 "minTlsVersion": "1.2",
                 "ftpsState": "AllAllowed",
-                "reservedInstanceCount": 0
+                "reservedInstanceCount": "0"
             }
         },
         {
