@@ -24,18 +24,18 @@
             }
         },
         {
-        "type": "Microsoft.Storage/storageAccounts/blobServices",
-        "apiVersion": "2019-04-01",
-        "name": "[concat(parameters('storageAccounts_appsinterne_name'), '/default')]",
-        "dependsOn": [
-            "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccounts_appsinterne_name'))]"
-        ],
-        "properties": {
-            "deleteRetentionPolicy": {
-                "enabled": true,
-                "days": 7
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2019-04-01",
+            "name": "[concat(parameters('storageAccounts_appsinterne_name'), '/default')]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccounts_appsinterne_name'))]"
+            ],
+            "properties": {
+                "deleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                }
             }
         }
-    },
     ]
 }

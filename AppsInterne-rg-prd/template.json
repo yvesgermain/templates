@@ -189,7 +189,7 @@
                     "appSettings": [
                         {
                             "name": "AzureBlobFileSystem.ConnectionString:media",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters( 'storageAccounts_appsinterne_name' ) , parameters( 'environnement'), ';AccountKey=' , parameters('Accountkey'), ';EndpointSuffix=core.windows.net')]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters( 'storageAccounts_appsinterne_name' ) ,';AccountKey=' , parameters('Accountkey'), ';EndpointSuffix=core.windows.net')]"
                         },
                         {
                             "name": "AzureBlobFileSystem.RootUrl:media",

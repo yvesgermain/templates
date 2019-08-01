@@ -109,10 +109,11 @@ if(Test-Path $parametersFilePath) {
 
 # $cred = get-credential -UserName sqladminprd@sqlguminterne-prd.database.windows.net -message SQLadmin
 
-# $username = "sqladmindevops@sqlguminterne-devops.database.windows.net"
-# $password = (Get-AzKeyVaultSecret -VaultName gumkeyvault  -Name sqladmindevops ).SecretValue
-# $Cred = New-Object System.Management.Automation.PSCredential -ArgumentList ($username, $password)
+$environnement = $resourceGroupName.split("-")[-1]
+$username = "sqladmin$environnement@sqlguminterne-$environnement.database.windows.net"
+$password = (Get-AzKeyVaultSecret -VaultName gumkeyvault -Name sqladmin$environnement  ).SecretValue
+$Cred = New-Object System.Management.Automation.PSCredential -ArgumentList ($username, $password)
 
-# invoke-sqlcmd -ServerInstance sqlguminterne-prd.database.windows.net -Database BdAppsInterne-prd -Query "select @@version" -Credential $cred
+# invoke-sqlcmd -ServerInstance sqlguminterne-devops.database.windows.net -Database BdAppsInterne-devops -Query "select @@version" -Credential $cred
 
-# invoke-sqlcmd -ServerInstance sqlguminterne-prd.database.windows.net -Database BdAppsInterne-prd -InputFile c:\soquij\SQL\Install\createV8.sql -Credential $cred
+invoke-sqlcmd -ServerInstance sqlguminterne-$environnement.database.windows.net -Database BdAppsInterne-$environnement -InputFile c:\soquij\SQL\Install\createV8.sql -Credential $cred
