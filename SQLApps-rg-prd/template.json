@@ -51,33 +51,6 @@
             }
         },
         {
-            "type": "Microsoft.Sql/servers/auditingPolicies",
-            "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sqlguminterne_name'), '/Default')]",
-            "location": "Canada Central",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sqlguminterne_name'))]"
-            ],
-            "properties": {
-                "auditingState": "Disabled"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/auditingSettings",
-            "apiVersion": "2017-03-01-preview",
-            "name": "[concat(parameters('servers_sqlguminterne_name'), '/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sqlguminterne_name'))]"
-            ],
-            "properties": {
-                "state": "Disabled",
-                "retentionDays": 0,
-                "auditActionsAndGroups": [],
-                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000",
-                "isStorageSecondaryKeyInUse": false
-            }
-        },
-        {
             "type": "Microsoft.Sql/servers/databases",
             "apiVersion": "2017-03-01-preview",
             "name": "[concat(parameters('servers_sqlguminterne_name'), '/', variables('BdAppsInterne'))]",
@@ -138,25 +111,6 @@
             "properties": {
                 "startIpAddress": "205.237.253.10",
                 "endIpAddress": "205.237.253.10"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/securityAlertPolicies",
-            "apiVersion": "2017-03-01-preview",
-            "name": "[concat(parameters('servers_sqlguminterne_name'), '/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sqlguminterne_name'))]"
-            ],
-            "properties": {
-                "state": "Disabled",
-                "disabledAlerts": [
-                    ""
-                ],
-                "emailAddresses": [
-                    ""
-                ],
-                "emailAccountAdmins": false,
-                "retentionDays": 0
             }
         }
     ]
