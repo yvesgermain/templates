@@ -167,7 +167,7 @@
                 "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_Standard_name'))]"
             ],
             "tags": {
-                "Environnement": "Production"
+                "Environnement": "[parameters('Environnement')]"
             },
             "kind": "app",
             "properties": {
@@ -194,6 +194,14 @@
                         {
                             "name": "AzureBlobFileSystem.RootUrl:media",
                             "value": "[concat( 'https://' , parameters('storageAccounts_appsinterne_name'), '.blob.core.windows.net')]"
+                        },
+                        {
+                            "name": "VeilleDeLien.UrlBase",
+                            "value": "[concat('https://veille-', parameters('Environnement'), '.azurewebsites.net')]"
+                        },
+                        {
+                            "name": "GuichetUnique.UrlBase",
+                            "value": "[concat('https://gummaster-', parameters('environnement'), '.azurewebsites.net/umbraco')]"
                         }
                     ],
                     "connectionStrings": [
@@ -293,7 +301,7 @@
         },
         {
             "type": "Microsoft.Web/sites/config",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2018-02-01",
             "name": "[concat(parameters('sites_AppsInterne_name'), '/web')]",
             "location": "Canada Central",
             "dependsOn": [
@@ -357,12 +365,11 @@
                 "localMySqlEnabled": "false",
                 "ipSecurityRestrictions": [
                     {
-                        "ipAddress": "205.237.253.10",
-                        "subnetMask": "255.255.255.255",
-                        "name": "Soquij",
-                        "description": "Soquij"
+                        "ipAddress": "205.237.253.10/32",
+                        "name": "Allow_Soquij"
                     }
                 ],
+                "scmIpSecurityRestrictionsUseMain": "true",
                 "http20Enabled": "false",
                 "minTlsVersion": "1.2",
                 "ftpsState": "AllAllowed",
@@ -371,7 +378,7 @@
         },
         {
             "type": "Microsoft.Web/sites/config",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2018-02-01",
             "name": "[concat(parameters('sites_Veille_func_name'), '/web')]",
             "location": "Canada Central",
             "dependsOn": [
@@ -438,12 +445,11 @@
                 "localMySqlEnabled": "false",
                 "ipSecurityRestrictions": [
                     {
-                        "ipAddress": "205.237.253.10",
-                        "subnetMask": "255.255.255.255",
-                        "name": "Soquij",
-                        "description": "Soquij"
+                        "ipAddress": "205.237.253.10/32",
+                        "name": "Allow_Soquij"
                     }
                 ],
+                "scmIpSecurityRestrictionsUseMain": "true",
                 "http20Enabled": "false",
                 "minTlsVersion": "1.2",
                 "ftpsState": "AllAllowed",
@@ -452,7 +458,7 @@
         },
         {
             "type": "Microsoft.Web/sites/config",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2018-02-01",
             "name": "[concat(parameters('sites_Veille_name'), '/web')]",
             "location": "Canada Central",
             "dependsOn": [
@@ -511,6 +517,13 @@
                 "siteAuthEnabled": "false",
                 "siteAuthSettings": {},
                 "localMySqlEnabled": "false",
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "205.237.253.10/32",
+                        "name": "Allow_Soquij"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": "true",
                 "http20Enabled": "false",
                 "minTlsVersion": "1.2",
                 "ftpsState": "AllAllowed",

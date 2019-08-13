@@ -1,0 +1,625 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Environnement" : {
+      "type": "string"
+    },
+    "AccountKey":{
+      "type": "securestring"
+    },
+    "AdminPassword":{
+      "type": "securestring"
+    }
+  },
+  "variables": {
+    "sites_Veille_name": "[concat('Veille-', parameters('Environnement'))]",
+    "sites_AppsInterne_name": "[concat('AppsInterne-', parameters('Environnement'))]",
+    "sites_Veille_func_name": "[concat('Veille-func-', parameters('Environnement'))]",
+    "serverfarms_ASP_Standard_name": "[concat('ASP-Standard-', parameters('Environnement'))]",
+    "components_AppsInterne_name": "[concat('AppsInterne-', parameters('Environnement'))]",
+    "components_Veille_func_name": "[concat('Veille-func-', parameters('Environnement'))]",
+    "serverfarms_ASP_FunctionApp_name": "[concat('ASP-FunctionApp-', parameters('Environnement'))]",
+    "storageAccounts_storveillefunc_name": "[concat('storveillefunc', parameters('Environnement'))]",
+    "storageAccounts_appsinterne_name": "[concat('storappsinterne', parameters('Environnement'))]",
+    "virtualNetworks_Vnet_externalid": "[concat('/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/Vnet-rg-', parameters('Environnement'), '/providers/Microsoft.Network/virtualNetworks/Vnet-', parameters('Environnement'))]",
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2015-05-01",
+      "name": "[variables('components_AppsInterne_name')]",
+      "location": "canadacentral",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web",
+        "Request_Source": "IbizaWebAppExtensionCreate"
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2015-05-01",
+      "name": "[variables('components_Veille_func_name')]",
+      "location": "canadacentral",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web",
+        "Request_Source": "IbizaWebAppExtensionCreate"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2019-04-01",
+      "name": "[variables('storageAccounts_storveillefunc_name')]",
+      "location": "canadacentral",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [],
+          "ipRules": [],
+          "defaultAction": "Allow"
+        },
+        "supportsHttpsTrafficOnly": true,
+        "encryption": {
+          "services": {
+            "file": {
+              "enabled": true
+            },
+            "blob": {
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        },
+        "accessTier": "Hot"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2016-09-01",
+      "name": "[variables('serverfarms_ASP_FunctionApp_name')]",
+      "location": "Canada Central",
+      "sku": {
+        "name": "Y1",
+        "tier": "Dynamic",
+        "size": "Y1",
+        "family": "Y",
+        "capacity": 0
+      },
+      "kind": "functionapp",
+      "properties": {
+        "name": "[variables('serverfarms_ASP_FunctionApp_name')]",
+        "perSiteScaling": false,
+        "reserved": false,
+        "targetWorkerCount": 0,
+        "targetWorkerSizeId": 0
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2016-09-01",
+      "name": "[variables('serverfarms_ASP_Standard_name')]",
+      "location": "Canada Central",
+      "sku": {
+        "name": "S1",
+        "tier": "Standard",
+        "size": "S1",
+        "family": "S",
+        "capacity": 1
+      },
+      "kind": "app",
+      "properties": {
+        "name": "[variables('serverfarms_ASP_Standard_name')]",
+        "perSiteScaling": false,
+        "reserved": false,
+        "targetWorkerCount": 0,
+        "targetWorkerSizeId": 0
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "apiVersion": "2019-04-01",
+      "name": "[concat(variables('storageAccounts_storveillefunc_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_storveillefunc_name'))]"
+      ],
+      "properties": {
+        "cors": {
+          "corsRules": []
+        },
+        "deleteRetentionPolicy": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2016-08-01",
+      "name": "[variables('sites_AppsInterne_name')]",
+      "location": "Canada Central",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]"
+      ],
+      "tags": {
+        "Environnement": "[parameters('Environnement')]"
+      },
+      "kind": "app",
+      "properties": {
+        "enabled": true,
+        "hostNameSslStates": [
+          {
+            "name": "[concat('appsinterne-' , parameters('Environnement'), '.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Standard"
+          },
+          {
+            "name": "[concat('appsinterne-' , parameters('Environnement'), '.scm.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Repository"
+          }
+        ],
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]",
+        "siteConfig": {
+          "appSettings": [
+              {
+                  "name": "AzureBlobFileSystem.ConnectionString:media",
+                  "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_appsinterne_name') ,';AccountKey=' , parameters('Accountkey'), ';EndpointSuffix=core.windows.net')]"
+              },
+              {
+                  "name": "AzureBlobFileSystem.RootUrl:media",
+                  "value": "[concat( 'https://' , variables('storageAccounts_appsinterne_name'), '.blob.core.windows.net')]"
+              },
+              {
+                  "name": "VeilleDeLien.UrlBase",
+                  "value": "[concat('https://veille-', parameters('Environnement'), '.azurewebsites.net')]"
+              },
+              {
+                  "name": "GuichetUnique.UrlBase",
+                  "value": "[concat('https://gummaster-', parameters('environnement'), '.azurewebsites.net/umbraco')]"
+              },
+              {
+                  "name": "AzureBlobFileSystem.ContainerName:media",
+                  "value": "[concat('appsinterne', parameters('Environnement'))]"
+              }
+          ],
+          "connectionStrings": [
+              {
+                  "name": "umbracoDbDSN",
+                  "connectionString": "[concat('Server=tcp:sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdAppsInterne-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\"')]",
+                  "type": "SQLAzure"
+              }
+          ]
+      },
+        "reserved": false,
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": true,
+        "clientCertEnabled": false,
+        "hostNamesDisabled": false,
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": false
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2016-08-01",
+      "name": "[variables('sites_Veille_name')]",
+      "location": "Canada Central",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]"
+      ],
+      "kind": "app",
+      "properties": {
+        "enabled": true,
+        "hostNameSslStates": [
+          {
+            "name": "[concat('veille-' , parameters('Environnement'), '.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Standard"
+          },
+          {
+            "name": "[concat('veille-' , parameters('Environnement'), '.scm.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Repository"
+          }
+        ],
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]",
+        "reserved": false,
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": true,
+        "clientCertEnabled": false,
+        "hostNamesDisabled": false,
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": false
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2016-08-01",
+      "name": "[variables('sites_Veille_func_name')]",
+      "location": "Canada Central",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_FunctionApp_name'))]"
+      ],
+      "kind": "functionapp",
+      "properties": {
+        "enabled": true,
+        "hostNameSslStates": [
+          {
+            "name": "[concat('Veille-func-' , parameters('Environnement'), '.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Standard"
+          },
+          {
+            "name": "[concat('veille-func-' , parameters('Environnement'), '.scm.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Repository"
+          }
+        ],
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_FunctionApp_name'))]",
+        "reserved": false,
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": false,
+        "clientCertEnabled": false,
+        "hostNamesDisabled": false,
+        "containerSize": 1536,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": false
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2016-08-01",
+      "name": "[concat(variables('sites_AppsInterne_name'), '/web')]",
+      "location": "Canada Central",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('sites_AppsInterne_name'))]"
+      ],
+      "tags": {
+        "Environnement": "[parameters('Environnement')]"
+      },
+      "properties": {
+        "numberOfWorkers": 1,
+        "defaultDocuments": [
+          "Default.htm",
+          "Default.html",
+          "Default.asp",
+          "index.htm",
+          "index.html",
+          "iisstart.htm",
+          "default.aspx",
+          "index.php",
+          "hostingstart.html"
+        ],
+        "netFrameworkVersion": "v4.0",
+        "phpVersion": "5.6",
+        "pythonVersion": "",
+        "nodeVersion": "",
+        "linuxFxVersion": "",
+        "requestTracingEnabled": "false",
+        "remoteDebuggingEnabled": "false",
+        "remoteDebuggingVersion": "VS2017",
+        "httpLoggingEnabled": "false",
+        "logsDirectorySizeLimit": 35,
+        "detailedErrorLoggingEnabled": "false",
+        "publishingUsername": "[concat('$AppsInterne-' , parameters('Environnement'))]",
+        "scmType": "VSTSRM",
+        "use32BitWorkerProcess": "true",
+        "webSocketsEnabled": "false",
+        "alwaysOn": "true",
+        "appCommandLine": "",
+        "managedPipelineMode": "Integrated",
+        "virtualApplications": [
+          {
+            "virtualPath": "/",
+            "physicalPath": "site\\wwwroot",
+            "preloadEnabled": true,
+            "virtualDirectories": null
+          }
+        ],
+        "winAuthAdminState": 0,
+        "winAuthTenantState": 0,
+        "customAppPoolIdentityAdminState": "false",
+        "customAppPoolIdentityTenantState": "false",
+        "loadBalancing": "LeastRequests",
+        "routingRules": [],
+        "experiments": {
+          "rampUpRules": []
+        },
+        "autoHealEnabled": "false",
+        "vnetName": "[concat('WebSnet-', parameters('Environnement'))]",
+        "siteAuthEnabled": "false",
+        "siteAuthSettings": {},
+        "localMySqlEnabled": "false",
+        "http20Enabled": "false",
+        "minTlsVersion": "1.2",
+        "ftpsState": "AllAllowed",
+        "reservedInstanceCount": 0,
+        "fileChangeAuditEnabled": "false"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2016-08-01",
+      "name": "[concat(variables('sites_Veille_name'), '/web')]",
+      "location": "Canada Central",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('sites_Veille_name'))]"
+      ],
+      "properties": {
+        "numberOfWorkers": 1,
+        "defaultDocuments": [
+          "Default.htm",
+          "Default.html",
+          "Default.asp",
+          "index.htm",
+          "index.html",
+          "iisstart.htm",
+          "default.aspx",
+          "index.php",
+          "hostingstart.html"
+        ],
+        "netFrameworkVersion": "v4.0",
+        "phpVersion": "5.6",
+        "pythonVersion": "",
+        "nodeVersion": "",
+        "linuxFxVersion": "",
+        "requestTracingEnabled": "false",
+        "remoteDebuggingEnabled": "false",
+        "remoteDebuggingVersion": "VS2017",
+        "httpLoggingEnabled": "false",
+        "logsDirectorySizeLimit": 35,
+        "detailedErrorLoggingEnabled": "false",
+        "publishingUsername": "[concat('$Veille-' , parameters('Environnement'))]",
+        "scmType": "VSTSRM",
+        "use32BitWorkerProcess": "true",
+        "webSocketsEnabled": "false",
+        "alwaysOn": "true",
+        "appCommandLine": "",
+        "managedPipelineMode": "Integrated",
+        "virtualApplications": [
+          {
+            "virtualPath": "/",
+            "physicalPath": "site\\wwwroot",
+            "preloadEnabled": "true",
+            "virtualDirectories": null
+          }
+        ],
+        "winAuthAdminState": 0,
+        "winAuthTenantState": 0,
+        "customAppPoolIdentityAdminState": "false",
+        "customAppPoolIdentityTenantState": "false",
+        "loadBalancing": "LeastRequests",
+        "routingRules": [],
+        "experiments": {
+          "rampUpRules": []
+        },
+        "autoHealEnabled": "false",
+        "vnetName": "",
+        "siteAuthEnabled": "false",
+        "siteAuthSettings": {},
+        "localMySqlEnabled": "false",
+        "http20Enabled": "false",
+        "minTlsVersion": "1.2",
+        "ftpsState": "AllAllowed",
+        "reservedInstanceCount": 0,
+        "fileChangeAuditEnabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2016-08-01",
+      "name": "[concat(variables('sites_Veille_func_name'), '/web')]",
+      "location": "Canada Central",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('sites_Veille_func_name'))]"
+      ],
+      "properties": {
+        "numberOfWorkers": 1,
+        "defaultDocuments": [
+          "Default.htm",
+          "Default.html",
+          "Default.asp",
+          "index.htm",
+          "index.html",
+          "iisstart.htm",
+          "default.aspx",
+          "index.php"
+        ],
+        "netFrameworkVersion": "v4.0",
+        "phpVersion": "5.6",
+        "pythonVersion": "",
+        "nodeVersion": "",
+        "linuxFxVersion": "",
+        "requestTracingEnabled": "false",
+        "remoteDebuggingEnabled": "false",
+        "remoteDebuggingVersion": "VS2017",
+        "httpLoggingEnabled": "false",
+        "logsDirectorySizeLimit": 35,
+        "detailedErrorLoggingEnabled": "false",
+        "publishingUsername": "[concat('$Veille-func-', parameters('Environnement'))]",
+        "scmType": "VSTSRM",
+        "use32BitWorkerProcess": "true",
+        "webSocketsEnabled": "false",
+        "alwaysOn": "false",
+        "appCommandLine": "",
+        "managedPipelineMode": "Integrated",
+        "virtualApplications": [
+          {
+            "virtualPath": "/",
+            "physicalPath": "site\\wwwroot",
+            "preloadEnabled": false,
+            "virtualDirectories": null
+          }
+        ],
+        "winAuthAdminState": 0,
+        "winAuthTenantState": 0,
+        "customAppPoolIdentityAdminState": "false",
+        "customAppPoolIdentityTenantState": "false",
+        "loadBalancing": "LeastRequests",
+        "routingRules": [],
+        "experiments": {
+          "rampUpRules": []
+        },
+        "autoHealEnabled": "false",
+        "vnetName": "",
+        "siteAuthEnabled": "false",
+        "siteAuthSettings": {},
+        "cors": {
+          "allowedOrigins": [
+            "https://functions.azure.com",
+            "https://functions-staging.azure.com",
+            "https://functions-next.azure.com"
+          ],
+          "supportCredentials": false
+        },
+        "localMySqlEnabled": "false",
+        "http20Enabled": "false",
+        "minTlsVersion": "1.2",
+        "ftpsState": "AllAllowed",
+        "reservedInstanceCount": 0,
+        "fileChangeAuditEnabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/deployments",
+      "apiVersion": "2016-08-01",
+      "name": "[concat(variables('sites_AppsInterne_name'), '/4451565386618692')]",
+      "location": "Canada Central",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('sites_AppsInterne_name'))]"
+      ],
+      "properties": {
+        "id": "4451565386618692",
+        "status": 4,
+        "author": "Charbonneau, Philippe",
+        "deployer": "VSTS",
+        "message": "{\"type\":\"Deployment\",\"commitId\":\"d0b1a981455f124f32ab025836496eb67b4f6c0f\",\"buildId\":\"2569\",\"releaseId\":\"445\",\"buildNumber\":\"2569\",\"releaseName\":\"Release-41\",\"repoProvider\":\"TfsGit\",\"repoName\":\"GuichetUnique\",\"collectionUrl\":\"http://srvtfs01:8080/tfs/SOQUIJ/\",\"teamProject\":\"GuichetUnique\",\"slotName\":\"Production\"}",
+        "start_time": "2019-08-09T21:36:59.7386086Z",
+        "end_time": "2019-08-09T21:36:59.7386086Z",
+        "active": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/deployments",
+      "apiVersion": "2016-08-01",
+      "name": "[concat(variables('sites_Veille_name'), '/4461565386800318')]",
+      "location": "Canada Central",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('sites_Veille_name'))]"
+      ],
+      "properties": {
+        "id": "4461565386800318",
+        "status": 4,
+        "author": "Boudjemia, Salim",
+        "deployer": "VSTS",
+        "message": "{\"type\":\"Deployment\",\"commitId\":\"0e73848d60d9547d828faf5fd7cd44425e8d3424\",\"buildId\":\"2579\",\"releaseId\":\"446\",\"buildNumber\":\"20190808.3\",\"releaseName\":\"Release-21\",\"repoProvider\":\"TfsGit\",\"repoName\":\"VeilleDeLien\",\"collectionUrl\":\"http://srvtfs01:8080/tfs/SOQUIJ/\",\"teamProject\":\"GuichetUnique\",\"slotName\":\"Production\"}",
+        "start_time": "2019-08-09T21:40:00.7147168Z",
+        "end_time": "2019-08-09T21:40:00.7147168Z",
+        "active": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/deployments",
+      "apiVersion": "2016-08-01",
+      "name": "[concat(variables('sites_Veille_func_name'), '/4461565386835271')]",
+      "location": "Canada Central",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('sites_Veille_func_name'))]"
+      ],
+      "properties": {
+        "id": "4461565386835271",
+        "status": 4,
+        "author": "Boudjemia, Salim",
+        "deployer": "VSTS",
+        "message": "{\"type\":\"Deployment\",\"commitId\":\"0e73848d60d9547d828faf5fd7cd44425e8d3424\",\"buildId\":\"2579\",\"releaseId\":\"446\",\"buildNumber\":\"20190808.3\",\"releaseName\":\"Release-21\",\"repoProvider\":\"TfsGit\",\"repoName\":\"VeilleDeLien\",\"collectionUrl\":\"http://srvtfs01:8080/tfs/SOQUIJ/\",\"teamProject\":\"GuichetUnique\",\"slotName\":\"Production\"}",
+        "start_time": "2019-08-09T21:40:36.8585656Z",
+        "end_time": "2019-08-09T21:40:36.8585656Z",
+        "active": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2016-08-01",
+      "name": "[concat(variables('sites_AppsInterne_name'), '/', variables('sites_AppsInterne_name'), '.azurewebsites.net')]",
+      "location": "Canada Central",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('sites_AppsInterne_name'))]"
+      ],
+      "properties": {
+        "siteName": "[concat('AppsInterne-' , parameters('Environnement'))]",
+        "hostNameType": "Verified"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2016-08-01",
+      "name": "[concat(variables('sites_Veille_name'), '/', variables('sites_Veille_name'), '.azurewebsites.net')]",
+      "location": "Canada Central",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('sites_Veille_name'))]"
+      ],
+      "properties": {
+        "siteName": "[concat('Veille-' , parameters('Environnement'))]",
+        "hostNameType": "Verified"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2016-08-01",
+      "name": "[concat(variables('sites_Veille_func_name'), '/', variables('sites_Veille_func_name'), '.azurewebsites.net')]",
+      "location": "Canada Central",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('sites_Veille_func_name'))]"
+      ],
+      "properties": {
+        "siteName": "[concat('Veille-func-', parameters('Environnement'))]",
+        "hostNameType": "Verified"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/virtualNetworkConnections",
+      "apiVersion": "2016-08-01",
+      "name": "[concat(variables('sites_AppsInterne_name'), '/WebSnet-' , parameters('Environnement'))]",
+      "location": "Canada Central",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('sites_AppsInterne_name'))]"
+      ],
+      "properties": {
+        "vnetResourceId": "[concat(variables('virtualNetworks_Vnet_externalid'), '/subnets/WebSnet-' , parameters('Environnement'))]",
+        "resyncRequired": false,
+        "isSwift": true
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2019-04-01",
+      "name": "[concat(variables('storageAccounts_storveillefunc_name'), '/default/azure-webjobs-hosts')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccounts_storveillefunc_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_storveillefunc_name'))]"
+      ],
+      "properties": {
+        "publicAccess": "None"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2019-04-01",
+      "name": "[concat(variables('storageAccounts_storveillefunc_name'), '/default/azure-webjobs-secrets')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccounts_storveillefunc_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_storveillefunc_name'))]"
+      ],
+      "properties": {
+        "publicAccess": "None"
+      }
+    }
+  ]
+}
