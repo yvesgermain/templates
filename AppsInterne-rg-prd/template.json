@@ -56,6 +56,9 @@
             "properties": {
                 "Application_Type": "web",
                 "Request_Source": "IbizaWebAppExtensionCreate"
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },
         {
@@ -67,6 +70,9 @@
             "properties": {
                 "Application_Type": "web",
                 "Request_Source": "IbizaWebAppExtensionCreate"
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },
         {
@@ -98,6 +104,9 @@
                     },
                     "keySource": "Microsoft.Storage"
                 }
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },
         {
@@ -119,6 +128,9 @@
                 "reserved": false,
                 "targetWorkerCount": 0,
                 "targetWorkerSizeId": 0
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },
         {
@@ -140,6 +152,9 @@
                 "reserved": false,
                 "targetWorkerCount": 0,
                 "targetWorkerSizeId": 0
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },
         {
@@ -156,6 +171,9 @@
                 "deleteRetentionPolicy": {
                     "enabled": false
                 }
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },
         {
@@ -230,6 +248,9 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_FunctionApp_name'))]"
             ],
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
+            },
             "kind": "functionapp",
             "properties": {
                 "enabled": true,
@@ -265,6 +286,9 @@
                 "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_Standard_name'))]"
             ],
             "kind": "app",
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
+            },
             "properties": {
                 "enabled": true,
                 "siteConfig": {
@@ -307,9 +331,6 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('sites_AppsInterne_name'))]"
             ],
-            "tags": {
-                "Environnement": "Production"
-            },
             "properties": {
                 "numberOfWorkers": "1",
                 "defaultDocuments": [

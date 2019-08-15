@@ -4,6 +4,9 @@
     "parameters": {
         "storageAccounts_appsinterne_name": {
             "value": "storappsinternedevops"
+        },
+        "Environnement" : {
+            "value": "devops"
         }
     }
 }

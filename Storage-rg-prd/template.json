@@ -4,6 +4,15 @@
     "parameters": {
         "storageAccounts_appsinterne_name": {
             "type": "string"
+        },
+        "Environnement": {
+            "type": "string",
+            "allowedValues": [
+                "dev",
+                "qa",
+                "prd",
+                "devops"
+            ]
         }
     },
     "variables": {},
@@ -21,6 +30,9 @@
             "properties": {
                 "accessTier": "Hot",
                 "supportsHttpsTrafficOnly": true
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },
         {

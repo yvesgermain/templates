@@ -44,7 +44,11 @@ param(
  $templateFilePath = "template.json",
 
  [string]
- $parametersFilePath = "parameters.json"
+ $parametersFilePath = "parameters.json",
+ 
+ [Parameter(Mandatory=$True)]
+ [string]
+ $Environnement
 )
 
 <#
@@ -92,7 +96,7 @@ if(!$resourceGroup)
         $resourceGroupLocation = Read-Host "resourceGroupLocation";
     }
     Write-Host "Creating resource group '$resourceGroupName' in location '$resourceGroupLocation'";
-    New-AzResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation
+    New-AzResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation -Tag @{Environnement = $Environnement}
 }
 else{
     Write-Host "Using existing resource group '$resourceGroupName'";

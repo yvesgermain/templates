@@ -33,6 +33,9 @@
                 "administratorLogin": "[variables('administratorLogin')]",
                 "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
                 "version": "12.0"
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },
         {
@@ -68,6 +71,9 @@
                 "maxSizeBytes": 214748364800,
                 "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
                 "zoneRedundant": false
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },
         {
@@ -88,6 +94,9 @@
                 "maxSizeBytes": 214748364800,
                 "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
                 "zoneRedundant": false
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },        {
             "type": "Microsoft.Sql/servers/firewallRules",
@@ -99,6 +108,9 @@
             "properties": {
                 "startIpAddress": "0.0.0.0",
                 "endIpAddress": "0.0.0.0"
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },
         {
