@@ -32,7 +32,7 @@ Param
         [string]
         $TargetEnv= "devops"
     )
-import-module az.sql, Az.Websites
+import-module azurerm.sql, AzureRm.Websites
 
 $databaseName = "BdAppsInterne-" + $SourceEnv
 $serverName = "sqlguminterne-" + $SourceEnv
@@ -42,9 +42,11 @@ $TargetDatabaseName = "BdAppsInterne-" + $TargetEnv
 $TargetServerName = "sqlguminterne-" + $TargetEnv
 $TargetResourceGroupName = "sqlapps-rg-" +  $TargetEnv
 
-Remove-AzSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName
-
-New-AzSqlDatabaseCopy -ServerName $serverName -ResourceGroupName $resourceGroupName -DatabaseName $databaseName `
+# removing database $TargetDatabaseName
+if (get-azureRmSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue) {
+Remove-azureRmSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName
+}
+New-azureRmSqlDatabaseCopy -ServerName $serverName -ResourceGroupName $resourceGroupName -DatabaseName $databaseName `
 -CopyResourceGroupName $TargetResourceGroupName -CopyServerName $TargetServerName -CopyDatabaseName $TargetDatabaseName
 
-Restart-AzWebApp -Name Appsinterne-$TargetEnv -ResourceGroupName AppsInterne-rg-$TargetEnv
+Restart-azureRmWebApp -Name Appsinterne-$TargetEnv -ResourceGroupName AppsInterne-rg-$TargetEnv
