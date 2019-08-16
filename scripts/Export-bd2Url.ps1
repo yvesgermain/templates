@@ -39,9 +39,7 @@ $resourceGroupName = "SQLapps-rg-"  + $SourceEnv
 $StorageAccessKey  = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKeyType]::StorageAccessKey
 
 $targetURI= $( $TargetUrl + $Bd + $SourceEnv  + $(get-date -Format "yyyy-MM-dd_hh-mm") + '.bacpac' )
-# $AdministratorLogin = "sqladmin" + $SourceEnv
-# $pass = (Get-azureKeyVaultSecret -VaultName gumkeyvault -name $("sqladmin" + $SourceEnv)).secretvalue
+$AdministratorLogin = "sqladmin" + $SourceEnv
+$pass = ConvertTo-SecureString -string "Soquij715" -Force
 
-New-azureRMSqlDatabaseExport -DatabaseName $databaseName -ServerName $serverName -StorageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $targetURI -ResourceGroupName $resourceGroupName
-
-# -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass 
+New-azureRMSqlDatabaseExport -DatabaseName $databaseName -ServerName $serverName -StorageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $targetURI -ResourceGroupName $resourceGroupName -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass
