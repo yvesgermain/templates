@@ -40,6 +40,6 @@ $StorageAccessKey  = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKey
 
 $targetURI= $( $TargetUrl + $Bd + $SourceEnv  + $(get-date -Format "yyyy-MM-dd_hh-mm") + '.bacpac' )
 $AdministratorLogin = "sqladmin" + $SourceEnv
-$pass = ConvertTo-SecureString -AsPlainText "Soquij715" -force
+$pass = ConvertTo-SecureString -AsPlainText "Cohu3418" -force
 
 New-azureRMSqlDatabaseExport -DatabaseName $databaseName -ServerName $serverName -StorageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $targetURI -ResourceGroupName $resourceGroupName -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass
