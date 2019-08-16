@@ -41,6 +41,6 @@ $targetURI= $( $TargetUrl + $Bd + $SourceEnv  + $(get-date -Format "yyyy-MM-dd_h
 $AdministratorLogin = "sqladmin" + $SourceEnv
 $pass = (Get-azureKeyVaultSecret -VaultName gumkeyvault -name $("sqladmin" + $SourceEnv)).secretvalue
 
-"New-azureRMSqlDatabaseExport -DatabaseName $databaseName -ServerName $serverName –Storagekey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $targetURI -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass -ResourceGroupName $resourceGroupName"
+"New-azureRMSqlDatabaseExport -DatabaseName $databaseName -ServerName $serverName –StorageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $targetURI -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass -ResourceGroupName $resourceGroupName"
 
-New-azureRMSqlDatabaseExport -DatabaseName $databaseName -ServerName $serverName –Storagekey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $targetURI -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass -ResourceGroupName $resourceGroupName
+New-azureRMSqlDatabaseExport -DatabaseName $databaseName -ServerName $serverName –StorageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $targetURI -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass -ResourceGroupName $resourceGroupName
