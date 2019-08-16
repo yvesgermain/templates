@@ -3,41 +3,41 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "sites_Veille_name": {
-            "value": "Veille-devops",
+            "value": "Veille-qa",
         },
         "sites_AppsInterne_name": {
-            "value": "AppsInterne-devops"
+            "value": "AppsInterne-qa"
         },
         "sites_Veille_func_name": {
-            "value": "Veille-func-devops"
+            "value": "Veille-func-qa"
         },
         "serverfarms_ASP_Standard_name": {
-            "value": "ASP-Standard-devops"
+            "value": "ASP-Standard-qa"
         },
         "components_AppsInterne_name": {
-            "value": "AppsInterne-devops"
+            "value": "AppsInterne-qa"
         },
         "components_Veille_func_name": {
-            "value": "Veille-func-devops"
+            "value": "Veille-func-qa"
         },
         "serverfarms_FunctionApp_name": {
-            "value": "ASP-FunctionApp-devops"
+            "value": "ASP-FunctionApp-qa"
         },
         "storageAccounts_veillefunc_name": {
-            "value": "storveillefuncdevops"
+            "value": "storveillefuncqa"
         },
         "storageAccounts_appsinterne_name": {
-            "value":"storappsinternedevops"
+            "value":"storappsinterneqa"
         },
         "Environnement" : {
-            "value": "devops"
+            "value": "qa"
         },
         "AccountKey": {
             "reference": {
                 "keyVault": {
                   "id": "/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/Infrastructure/providers/Microsoft.KeyVault/vaults/gumkeyvault"
                 },
-                "secretName": "storappsinternedevops"
+                "secretName": "storappsinterneqa"
             }
         },
         "AdminPassword": {
@@ -45,7 +45,7 @@
                 "keyVault": {
                   "id": "/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/Infrastructure/providers/Microsoft.KeyVault/vaults/gumkeyvault"
                 },
-                "secretName": "sqladmindevops"
+                "secretName": "sqladminqa"
               }
         }
     }

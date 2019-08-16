@@ -1,24 +1,11 @@
 <#
 .Synopsis
-   Description sommaire
+   Copy BdAppsInterne-xxx vers un autre serveur
 .DESCRIPTION
-   Description détaillée
+   Copy BdAppsInterne-xxx de l'environnement $SourceEnv vers l'environnement $TargetEnv et redémarre le site web $TargetEnv
 .EXAMPLE
-   Exemple d’usage de cette applet de commande
-.EXAMPLE
-   Autre exemple de l’usage de cette applet de commande
-.INPUTS
-   Entrées de cette applet de commande (le cas échéant)
-.OUTPUTS
-   Sortie de cette applet de commande (le cas échéant)
-.NOTES
-   Remarques générales
-.COMPONENT
-   Composant auquel cette applet de commande appartient
-.ROLE
-   Rôle auquel cette applet de commande appartient
-.FUNCTIONALITY
-   Fonctionnalité qui décrit le mieux cette applet de commande
+   copy-database -SourceEnv prd -targetEnv dev
+
 #>
 Param
     (
@@ -30,15 +17,20 @@ Param
         [Parameter(Mandatory=$true)]
         [ValidateSet("dev", "qa", "prd", "devops")]
         [string]
-        $TargetEnv= "devops"
+        $TargetEnv = "devops",
+
+        [Parameter(Mandatory=$true)]
+        [ValidateSet("BdAppsInterne-", "BdVeille-")]
+        [string] 
+        $Bd = "BdAppsInterne-"
     )
 import-module azurerm.sql, AzureRm.Websites
 
-$databaseName = "BdAppsInterne-" + $SourceEnv
+$databaseName = $Bd + $SourceEnv
 $serverName = "sqlguminterne-" + $SourceEnv
 $resourceGroupName = "sqlapps-rg-" +  $SourceEnv
 
-$TargetDatabaseName = "BdAppsInterne-" + $TargetEnv
+$TargetDatabaseName = $Bd + $TargetEnv
 $TargetServerName = "sqlguminterne-" + $TargetEnv
 $TargetResourceGroupName = "sqlapps-rg-" +  $TargetEnv
 
