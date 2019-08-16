@@ -35,7 +35,7 @@ $databaseName = $Bd + "-" + $SourceEnv
 $serverName = $BDserver + "-" + $SourceEnv
 $resourceGroupName = "SQLapps-rg-"  + $SourceEnv
 [string] $Storagekey = (Get-azureRMStorageAccountKey -ResourceGroupName infrastructure -Name gumbackups ).value[0]
-$StorageAccessKey  = "StorageAccessKey"
+$StorageAccessKey  = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKeyType]::StorageAccessKey
 
 $targetURI= $( $TargetUrl + $Bd + $SourceEnv  + $(get-date -Format "yyyy-MM-dd_hh-mm") + '.bacpac' )
 $AdministratorLogin = "sqladmin" + $SourceEnv
