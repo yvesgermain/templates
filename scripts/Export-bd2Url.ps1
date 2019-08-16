@@ -17,17 +17,17 @@ Param(
 
         [Parameter()]
         [string]
-        $TargetUrl = "https://gumbackups.blob.core.windows.net/sql-backup/",
+        $TargetUrl = 'https://gumbackups.blob.core.windows.net/sql-backup/',
 
         [Parameter()]
         [ValidateSet("BdAppsInterne-", "BdVeille-")]
         [string] 
-        $Bd = "BdAppsInterne-", 
+        $Bd = 'BdAppsInterne-', 
 
         [Parameter()]
         [ValidateSet("sqlguminterne-", "sqlgum-")]
         [string] 
-        $BDserver = "sqlguminterne-"
+        $BDserver = 'sqlguminterne-'
     )
 import-module azureRM.sql, azureRM.keyvault, azureRM.Storage
 
