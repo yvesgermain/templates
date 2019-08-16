@@ -31,8 +31,8 @@ Param(
     )
 import-module azureRM.sql, azureRM.keyvault, azureRM.Storage
 
-$databaseName = ($Bd + $SourceEnv)
-$serverName = ($BDserver + $SourceEnv)
+$databaseName = "$Bd$SourceEnv"
+$serverName = "$BDserver$SourceEnv"
 $resourceGroupName = ("sqlapps-rg-" +  $SourceEnv)
 [string] $Storagekey = (Get-azureRMStorageAccountKey -ResourceGroupName infrastructure -Name gumbackups ).value[0]
 $StorageAccessKey  = "StorageAccessKey"
