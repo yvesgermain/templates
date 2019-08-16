@@ -20,19 +20,19 @@ Param(
         $TargetUrl = 'https://gumbackups.blob.core.windows.net/sql-backup/',
 
         [Parameter()]
-        [ValidateSet("BdAppsInterne-", "BdVeille-")]
+        [ValidateSet("BdAppsInterne", "BdVeille")]
         [string] 
-        $Bd = 'BdAppsInterne-', 
+        $Bd = 'BdAppsInterne', 
 
         [Parameter()]
-        [ValidateSet("sqlguminterne-", "sqlgum-")]
+        [ValidateSet("sqlguminterne", "sqlgum")]
         [string] 
-        $BDserver = 'sqlguminterne-'
+        $BDserver = 'sqlguminterne'
     )
 import-module azureRM.sql, azureRM.keyvault, azureRM.Storage
 
-$databaseName = "$Bd$SourceEnv"
-$serverName = "$BDserver$SourceEnv"
+$databaseName = $Bd + "-" + $SourceEnv
+$serverName = $BDserver + "-" + $SourceEnv
 [string] $Storagekey = (Get-azureRMStorageAccountKey -ResourceGroupName infrastructure -Name gumbackups ).value[0]
 $StorageAccessKey  = "StorageAccessKey"
 
