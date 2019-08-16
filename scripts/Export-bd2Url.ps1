@@ -33,7 +33,6 @@ import-module azureRM.sql, azureRM.keyvault, azureRM.Storage
 
 $databaseName = "$Bd$SourceEnv"
 $serverName = "$BDserver$SourceEnv"
-$resourceGroupName = ("sqlapps-rg-" +  $SourceEnv)
 [string] $Storagekey = (Get-azureRMStorageAccountKey -ResourceGroupName infrastructure -Name gumbackups ).value[0]
 $StorageAccessKey  = "StorageAccessKey"
 
@@ -41,4 +40,4 @@ $targetURI= $( $TargetUrl + $Bd + $SourceEnv  + $(get-date -Format "yyyy-MM-dd_h
 $AdministratorLogin = "sqladmin" + $SourceEnv
 $pass = (Get-azureRMKeyVaultSecret -VaultName gumkeyvault -name $("sqladmin" + $SourceEnv)).secretvalue
 
-New-azureRMSqlDatabaseExport -DatabaseName $databaseName -ServerName $serverName –storageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $targetURI -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass -ResourceGroupName $resourceGroupName 
+New-azureRMSqlDatabaseExport -DatabaseName $databaseName -ServerName $serverName –storageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $targetURI -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass
