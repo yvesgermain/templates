@@ -7,8 +7,7 @@
    copy-database -SourceEnv prd -targetEnv dev
 
 #>
-Param
-    (
+Param(
         [Parameter(Mandatory=$true)]
         [ValidateSet("dev", "qa", "prd", "devops")]
         [string]
