@@ -18,26 +18,30 @@ Param(
         [string]
         $TargetEnv = "devops",
 
-        [Parameter(Mandatory=$true)]
-        [ValidateSet("BdAppsInterne-", "BdVeille-")]
-        [string] 
-        $Bd = "BdAppsInterne-"
+        [Parameter()]
+        [validateset("BdAppsInterne-", "BdVeille-")]
+        [string[]] 
+        $BdArray = ("BdAppsInterne-","BdVeille-")
     )
-import-module azurerm.sql, AzureRm.Websites
+import-module azurerm.sql, azurerm.Websites
 
-$databaseName = $Bd + $SourceEnv
-$serverName = "sqlguminterne-" + $SourceEnv
-$resourceGroupName = "sqlapps-rg-" +  $SourceEnv
+ foreach( $Bd in $Bdarray) {
+   $databaseName = $Bd + $SourceEnv
+   $serverName = "sqlguminterne-" + $SourceEnv
+   $resourceGroupName = "sqlapps-rg-" +  $SourceEnv
 
-$TargetDatabaseName = $Bd + $TargetEnv
-$TargetServerName = "sqlguminterne-" + $TargetEnv
-$TargetResourceGroupName = "sqlapps-rg-" +  $TargetEnv
+   $TargetDatabaseName = $Bd + $TargetEnv
+   $TargetServerName = "sqlguminterne-" + $TargetEnv
+   $TargetResourceGroupName = "sqlapps-rg-" +  $TargetEnv
 
-# removing database $TargetDatabaseName
-if (get-azureRmSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue) {
-Remove-azureRmSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName
+   "Removing database $TargetDatabaseName"
+   if (get-azurermSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue) {
+   Remove-azurermSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName
+   }
+   "Copying database  $databaseName  from server $servername to database $TargetDatabaseName on $TargetServerName"
+   New-azurermSqlDatabaseCopy -ServerName $serverName -ResourceGroupName $resourceGroupName -DatabaseName $databaseName `
+   -CopyResourceGroupName $TargetResourceGroupName -CopyServerName $TargetServerName -CopyDatabaseName $TargetDatabaseName
 }
-New-azureRmSqlDatabaseCopy -ServerName $serverName -ResourceGroupName $resourceGroupName -DatabaseName $databaseName `
--CopyResourceGroupName $TargetResourceGroupName -CopyServerName $TargetServerName -CopyDatabaseName $TargetDatabaseName
 
-Restart-azureRmWebApp -Name Appsinterne-$TargetEnv -ResourceGroupName AppsInterne-rg-$TargetEnv
+"Redémarrer le site web AppsInterne-rg-$TargetEnv"
+Restart-azurermWebApp -Name Appsinterne-$TargetEnv -ResourceGroupName AppsInterne-rg-$TargetEnv

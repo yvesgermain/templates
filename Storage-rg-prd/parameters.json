@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "storageAccounts_appsinterne_name": {
-            "value": "storappsinterneqa"
+            "value": "storappsinternedevops"
         },
         "Environnement" : {
-            "value": "qa"
+            "value": "devops"
         }
     }
 }

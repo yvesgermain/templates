@@ -5,6 +5,10 @@
         "environnement": {
             "type": "string",
             "defaultValue": "prd"
+        },
+        "storageAccounts_veillefunc_name": {
+            "type": "string",
+            "defaultValue": "storveillefuncdevops"
         }
     },
     "variables": {
@@ -13,7 +17,7 @@
         "SidSQLadminqa": "3baa776c-4826-49bf-a216-17254673507a",
         "SidSQLadminprd": "c74029db-ee61-4eae-912d-182fab6950f3",
         "SidSQLadmindevops": "39670c6b-8290-4499-8f84-031f42d2399e"
-    },
+            },
     "resources": [],
     "outputs": {
         "mgmtStatus": {
@@ -23,6 +27,10 @@
         "scrapola": {
             "type": "string",
             "value": "[variables('SidSQLadmindev')]"
+        },
+        "AzureWebJobsStorage":{
+            "type": "string",
+            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
         }
     }
 }

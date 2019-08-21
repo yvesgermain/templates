@@ -49,7 +49,11 @@ param(
  [Parameter(Mandatory=$True)]
  [string]
  [ValidateSet("dev", "qa", "prd", "devops")]
- $Environnement
+ $Environnement,
+
+ [Parameter()]
+ [String]
+ $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 )
 
 <#
@@ -111,4 +115,30 @@ if(Test-Path $parametersFilePath) {
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
 }
 
-get-azstorageaccount -resourcegroupName $resourceGroupName | where-object {$_.storageaccountname -like "storappsinterne*"} |% { $name = $_.storageaccountname; Get-AzStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where { $_.keyname -like "key1"} | % { $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; Set-AzKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"}
+get-azstorageaccount -resourcegroupName $resourceGroupName | where-object {$_.storageaccountname -like "storappsinterne*"} | foreach-object { $name = $_.storageaccountname; Get-AzStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where-object { $_.keyname -like "key1"} | ForEach-Object { $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; Set-AzKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"}
+
+if( (Get-Item $AzCopyPath).Exists)
+{
+   $FileItemVersion = (Get-Item $AzCopyPath).VersionInfo
+   $FilePath = ("{0}.{1}.{2}.{3}" -f  $FileItemVersion.FileMajorPart,  $FileItemVersion.FileMinorPart,  $FileItemVersion.FileBuildPart,  $FileItemVersion.FilePrivatePart)
+
+   # only netcore version AzCopy.exe has version 0.0.0.0, and all netcore version AzCopy works in this script 
+   if(([version] $FilePath -lt "7.0.0.2") -and ([version] $FilePath -ne "0.0.0.0"))
+   {
+       $AzCopyPath = Read-Host "Version of AzCopy found at default install directory is of a lower, unsupported version. Please input the full filePath of the AzCopy.exe that is version 7.0.0.2 or higher, e.g.: C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
+   }
+}
+elseIf( (Get-Item $AzCopyPath).Exists -eq $false)
+{
+   $AzCopyPath = Read-Host "Input the full filePath of the AzCopy.exe, e.g.: C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
+}
+
+push-location
+Set-Location (Get-ChildItem $AzCopyPath).directory.fullname
+
+$SourceKey = (get-azstorageaccountkey -Name storappsinterneprd -ResourceGroupName storage-rg-prd | where-object {$_.keyname -eq "key1"}).value
+$DestKey   = (get-azstorageaccountkey -Name storappsinterne$Environnement -ResourceGroupName storage-rg-$Environnement | where-object {$_.keyname -eq "key1"}).value
+
+. $AzCopyPath /source:https://storappsinterneprd.blob.core.windows.net/appsinterne/ /sourcekey:$SourceKey /dest:https://storappsinterne$Environnement.blob.core.windows.net/appsinterne/ /s /y /destkey:$destkey
+
+pop-location

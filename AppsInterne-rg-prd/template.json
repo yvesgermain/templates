@@ -42,7 +42,7 @@
             "type": "securestring"
         },
         "Accountkey": {
-            "type":   "securestring"
+            "type": "securestring"
         }
     },
     "variables": {},
@@ -214,6 +214,10 @@
                             "value": "[concat( 'https://' , parameters('storageAccounts_appsinterne_name'), '.blob.core.windows.net')]"
                         },
                         {
+                            "Name": "AzureBlobFileSystem.ContainerName:media",
+                            "value": "appsinterne"
+                        },
+                        {
                             "name": "VeilleDeLien.UrlBase",
                             "value": "[concat('https://veille-', parameters('Environnement'), '.azurewebsites.net')]"
                         },
@@ -267,6 +271,26 @@
                     }
                 ],
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_FunctionApp_name'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+                          },
+                          {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+                          }
+                    ],
+                    "connectionStrings": [
+                        {
+                            "name": "bd_VeilleContenuExterneEntities",
+                            "value": "[concat('Data Source=sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=tbl_VeilleDeContenuExterne;Persist Security Info=False;User ID=sqladmin' , parameters('Environnement'), ';Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework')]",
+                            "type": "SQLAzure",
+                            "slotSetting": false
+                          }
+                    ]
+                },
                 "reserved": false,
                 "scmSiteAlsoStopped": false,
                 "clientAffinityEnabled": false,
@@ -357,7 +381,7 @@
                 "detailedErrorLoggingEnabled": "false",
                 "publishingUsername": "[concat('$AppsInterne-',  parameters('Environnement'))]",
                 "scmType": "None",
-                "use32BitWorkerProcess": "true",
+                "use32BitWorkerProcess": "false",
                 "webSocketsEnabled": "false",
                 "alwaysOn": "true",
                 "appCommandLine": "",
@@ -429,7 +453,7 @@
                 "detailedErrorLoggingEnabled": "false",
                 "publishingUsername": "[concat('$Veille-' , parameters('Environnement'))]",
                 "scmType": "None",
-                "use32BitWorkerProcess": "true",
+                "use32BitWorkerProcess": "false",
                 "webSocketsEnabled": "false",
                 "alwaysOn": "false",
                 "appCommandLine": "",
@@ -511,7 +535,7 @@
                 "detailedErrorLoggingEnabled": "false",
                 "publishingUsername": "[concat('$Veille-' , parameters('Environnement'))]",
                 "scmType": "None",
-                "use32BitWorkerProcess": "true",
+                "use32BitWorkerProcess": "false",
                 "webSocketsEnabled": "false",
                 "alwaysOn": "true",
                 "appCommandLine": "",
@@ -614,5 +638,27 @@
                 "publicAccess": "None"
             }
         }
-    ]
+    ],
+    "outputs": {
+        "AzureBlobFileSystem.ConnectionString:media": {
+            "type": "string",
+            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters( 'storageAccounts_appsinterne_name' ) ,';AccountKey=' , parameters('Accountkey'), ';EndpointSuffix=core.windows.net')]"
+        },
+        "AzureBlobFileSystem.RootUrl:media": {
+            "type": "string",
+            "value": "[concat( 'https://' , parameters('storageAccounts_appsinterne_name'), '.blob.core.windows.net')]"
+        },
+        "VeilleDeLien.UrlBase":{
+            "type": "string",
+            "value": "[concat('https://veille-', parameters('Environnement'), '.azurewebsites.net')]"
+        },
+        "GuichetUnique.UrlBase":{
+            "type": "string",
+            "value": "[concat('https://gummaster-', parameters('environnement'), '.azurewebsites.net/umbraco')]"
+        },
+        "AzureWebJobsStorage":{
+            "type": "string",
+            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+        }
+    }
 }
