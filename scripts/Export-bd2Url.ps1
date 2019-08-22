@@ -20,9 +20,9 @@ Param(
         $TargetUrl = 'https://gumbackups.blob.core.windows.net/sql-backup/',
 
         [Parameter()]
-        [ValidateSet("BdAppsInterne", "BdVeille")]
-        [string] 
-        $Bd = 'BdAppsInterne', 
+        [validateset("BdAppsInterne", "BdVeille")]
+        [string[]] 
+        $BdArray = ("BdAppsInterne","BdVeille"), 
 
         [Parameter()]
         [ValidateSet("sqlguminterne", "sqlgum")]
@@ -31,15 +31,16 @@ Param(
     )
 import-module azureRM.sql, azureRM.keyvault, azureRM.Storage
 
-$databaseName = $Bd + "-" + $SourceEnv
-$serverName = $BDserver + "-" + $SourceEnv
-$resourceGroupName = "SQLapps-rg-"  + $SourceEnv
-[string] $Storagekey = (Get-azureRMStorageAccountKey -ResourceGroupName infrastructure -Name gumbackups ).value[0]
-# [string] $Storagekey = 'NwLlF+z1baReT2J49pcDy97T+GfO/1IXdeyX1h0sv0867uEyYP2F/+rso+6z+49nEH9fK0DQI18gTQEHjlXUjw=='
-$StorageAccessKey  = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKeyType]::StorageAccessKey
+foreach( $Bd in $Bdarray) {
+   $databaseName = $Bd + "-" + $SourceEnv
+   $serverName = $BDserver + "-" + $SourceEnv
+   $resourceGroupName = "SQLapps-rg-"  + $SourceEnv
+   [string] $Storagekey = (Get-azureRMStorageAccountKey -ResourceGroupName infrastructure -Name gumbackups ).value[0]
+   $StorageAccessKey  = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKeyType]::StorageAccessKey
 
-$targetURI= $( $TargetUrl + $Bd + $SourceEnv  + $(get-date -Format "yyyy-MM-dd_hh-mm") + '.bacpac' )
-$AdministratorLogin = "sqladmin" + $SourceEnv
-$pass = (Get-azureKeyVaultSecret -VaultName gumkeyvault -name $("sqladmin" + $SourceEnv)).secretvalue
+   $targetURI= $( $TargetUrl + $Bd + $SourceEnv  + $(get-date -Format "yyyy-MM-dd_hh-mm") + '.bacpac' )
+   $AdministratorLogin = "sqladmin" + $SourceEnv
+   $pass = (Get-azureKeyVaultSecret -VaultName gumkeyvault -name $("sqladmin" + $SourceEnv)).secretvalue
 
-New-azureRMSqlDatabaseExport -DatabaseName $databaseName -ServerName $serverName -StorageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $targetURI -ResourceGroupName $resourceGroupName -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass
+   New-azureRMSqlDatabaseExport -DatabaseName $databaseName -ServerName $serverName -StorageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $targetURI -ResourceGroupName $resourceGroupName -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass
+}
