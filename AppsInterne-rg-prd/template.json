@@ -285,9 +285,8 @@
                     "connectionStrings": [
                         {
                             "name": "bd_VeilleContenuExterneEntities",
-                            "value": "[concat('Data Source=sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=tbl_VeilleDeContenuExterne;Persist Security Info=False;User ID=sqladmin' , parameters('Environnement'), ';Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework')]",
-                            "type": "SQLAzure",
-                            "slotSetting": false
+                            "value": "[concat('Data Source=sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin' , parameters('Environnement'), ';Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework')]",
+                            "type": "SQLServer"
                           }
                     ]
                 },
@@ -659,6 +658,11 @@
         "AzureWebJobsStorage":{
             "type": "string",
             "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+        },
+        "bd_VeilleContenuExterneEntities": {
+            "type": "string",
+            "value": "[concat('Data Source=sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=tbl_VeilleDeContenuExterne;Persist Security Info=False;User ID=sqladmin' , parameters('Environnement'), ';Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework')]"
+
         }
     }
 }

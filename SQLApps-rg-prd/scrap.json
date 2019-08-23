@@ -2,13 +2,8 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "environnement": {
-            "type": "string",
-            "defaultValue": "prd"
-        },
-        "storageAccounts_veillefunc_name": {
-            "type": "string",
-            "defaultValue": "storveillefuncdevops"
+        "Environnement":{
+            "type": "string"
         }
     },
     "variables": {
@@ -28,9 +23,9 @@
             "type": "string",
             "value": "[variables('SidSQLadmindev')]"
         },
-        "AzureWebJobsStorage":{
+        "Environnement": {
             "type": "string",
-            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+            "value": "[parameters('Environnement')]"
         }
     }
 }
