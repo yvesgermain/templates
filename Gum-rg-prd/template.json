@@ -191,11 +191,7 @@
         "Environnement": "[parameters('Environnement')]"
       },
       "kind": "app",
-      "identity": {
-        "principalId": "7d785f5a-6e5d-47e6-a657-46c1779f56ec",
-        "tenantId": "33aaf871-69fa-44f2-9edf-e1048cbba3a5",
-        "type": "SystemAssigned"
-      },
+      "identity": {},
       "properties": {
         "enabled": true,
         "hostNameSslStates": [
