@@ -116,10 +116,23 @@ if(Test-Path $parametersFilePath) {
 # $cred = get-credential -UserName sqladminprd@sqlguminterne-prd.database.windows.net -message SQLadmin
 
 $environnement = $resourceGroupName.split("-")[-1]
-$username = "sqladmin$environnement@sqlguminterne-$environnement.database.windows.net"
-$password = (Get-AzKeyVaultSecret -VaultName gumkeyvault -Name sqladmin$environnement  ).SecretValue
-$Cred = New-Object System.Management.Automation.PSCredential -ArgumentList ($username, $password)
 
-# invoke-sqlcmd -ServerInstance sqlguminterne-devops.database.windows.net -Database BdAppsInterne-devops -Query "select @@version" -Credential $cred
+Remove-AzSqlDatabase -resourcegroupname gum-rg-devops -ServerName sqlgum-devops -DatabaseName BdGum-devops
+New-AzSqlDatabaseCopy -ServerName soquijgumsqlserverdev -ResourceGroupName SoquijGUM-DEV -DatabaseName soquijgumumbracodbdev -CopyResourceGroupName gum-rg-$Environnement -CopyServerName sqlgum-$Environnement -CopyDatabaseName BdGum-$Environnement
 
-# invoke-sqlcmd -ServerInstance sqlguminterne-$environnement.database.windows.net -Database BdAppsInterne-$environnement -InputFile c:\soquij\SQL\Install\createV8.sql -Credential $cred
+Push-Location
+set-location "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy"
+
+$Source= Read-host -Prompt "source = soquijgummediastoragedev?" 
+if ($source -eq "" -or $source -eq "soquijgummediastoragedev") { $source = "soquijgummediastoragedev" ; $guichetunique = "guichetuniquedev"} else {$guichetunique = "guichetunique"}
+
+$SourceResourceGroupName = (get-azstorageaccount | Where-Object {$_.StorageAccountName -like $source} ).ResourceGroupName
+$SourceKey =(Get-AzStorageAccountKey -name $source -ResourceGroupName $SourceResourceGroupName)[0].value
+
+$Dest= "storgum$environnement"
+$DestResourceGroupName = (get-azstorageaccount | Where-Object {$_.StorageAccountName -like $Dest} ).ResourceGroupName
+$DestKey =(Get-AzStorageAccountKey -name $Dest -ResourceGroupName $DestResourceGroupName)[0].value
+
+.\azcopy.exe /source:https://$source.blob.core.windows.net/$guichetunique /dest:https://$dest.blob.core.windows.net/guichetunique /SourceKey:$SourceKey /destKey:$destKey /S
+
+Pop-Location

@@ -20,8 +20,12 @@
             "value": "[variables('Conditions')]"
         },
         "scrapola": {
+            "type": "object",
+            "value": "[reference(concat('Microsoft.Sql/servers/sqlgum-devops'), '2014-04-01', 'Full')]"
+        },
+        "Scrap": {
             "type": "string",
-            "value": "[variables('SidSQLadmindev')]"
+            "value": "[subscription().tenantId]"
         },
         "Environnement": {
             "type": "string",

@@ -50,7 +50,7 @@
                 "administratorType": "ActiveDirectory",
                 "login": "[concat('sqladmin', parameters('environnement') , '@gumqc.OnMicrosoft.com')]",
                 "sid": "[variables( concat('SidSQLadmin' , parameters('Environnement')))]",
-                "tenantId": "33aaf871-69fa-44f2-9edf-e1048cbba3a5"
+                "tenantId": "[subscription().tenantid]"
             }
         },
         {
