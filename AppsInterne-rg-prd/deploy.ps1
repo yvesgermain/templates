@@ -25,31 +25,31 @@
 #>
 
 param(
- [Parameter()]
- [string]
- $subscriptionId,
+    [Parameter()]
+    [string]
+    $subscriptionId,
 
- [Parameter(Mandatory=$True)]
- [string]
- $resourceGroupName,
+    [Parameter(Mandatory = $True)]
+    [string]
+    $resourceGroupName,
 
- [string]
- $resourceGroupLocation,
+    [string]
+    $resourceGroupLocation,
 
- [Parameter(Mandatory=$True)]
- [string]
- $deploymentName,
+    [Parameter(Mandatory = $True)]
+    [string]
+    $deploymentName,
 
- [string]
- $templateFilePath = "template.json",
+    [string]
+    $templateFilePath = "template.json",
 
- [string]
- $parametersFilePath = "parameters.json",
+    [string]
+    $parametersFilePath = "parameters.json",
  
- [Parameter(Mandatory=$True)]
- [string]
- [ValidateSet("dev", "qa", "prd", "devops")] 
- $Environnement
+    [Parameter(Mandatory = $True)]
+    [string]
+    [ValidateSet("dev", "qa", "prd", "devops")] 
+    $Environnement
  
 )
 
@@ -81,34 +81,50 @@ Write-Host "Selecting subscription '$subscriptionId'";
 # Select-AzSubscription -SubscriptionID $subscriptionId;
 
 # Register RPs
-$resourceProviders = @("microsoft.insights","microsoft.storage","microsoft.web");
-if($resourceProviders.length) {
+$resourceProviders = @("microsoft.insights", "microsoft.storage", "microsoft.web");
+if ($resourceProviders.length) {
     Write-Host "Registering resource providers"
-    foreach($resourceProvider in $resourceProviders) {
+    foreach ($resourceProvider in $resourceProviders) {
         RegisterRP($resourceProvider);
     }
 }
 
 #Create or check for existing resource group
 $resourceGroup = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
-if(!$resourceGroup)
-{
+if (!$resourceGroup) {
     Write-Host "Resource group '$resourceGroupName' does not exist. To create a new resource group, please enter a location.";
-    if(!$resourceGroupLocation) {
+    if (!$resourceGroupLocation) {
         $resourceGroupLocation = Read-Host "resourceGroupLocation";
     }
     Write-Host "Creating resource group '$resourceGroupName' in location '$resourceGroupLocation'";
-    New-AzResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation -Tag @{Environnement= $Environnement}
+    New-AzResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation -Tag @{Environnement = $Environnement }
 }
-else{
+else {
     Write-Host "Using existing resource group '$resourceGroupName'";
 }
 
 # Start the deployment
 Write-Host "Starting deployment...";
-if(Test-Path $parametersFilePath) {
+if (Test-Path $parametersFilePath) {
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath -TemplateParameterFile $parametersFilePath;
-} else {
+}
+else {
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
 }
 
+$APIVersion = ((Get-AzResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
+
+$WebAppConfig = (Get-AzResource -ResourceType Microsoft.Web/sites/config -ResourceName Appsinterne-rg-$Environnement -ResourceGroupName Appsinterne-rg-$Environnement -ApiVersion $APIVersion)
+
+$priority = 180;  
+$IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
+[System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
+(Get-azwebapp -name Appsinterne-rg-$Environnement).PossibleOutboundIpAddresses.split(",") | ForEach-Object { 
+    $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
+    $webip.ipAddress = $_ + '/32';  
+    $webip.action = "Allow"; 
+    $priority = $priority + 20 ; 
+    $webIP.priority = $priority;  
+    $ArrayList.Add($webIP); 
+    Remove-Variable webip
+}

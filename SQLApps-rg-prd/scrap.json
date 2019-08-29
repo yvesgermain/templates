@@ -19,13 +19,13 @@
             "type": "string",
             "value": "[variables('Conditions')]"
         },
-        "scrapola": {
-            "type": "object",
-            "value": "[reference(concat('Microsoft.Sql/servers/sqlgum-devops'), '2014-04-01', 'Full')]"
-        },
-        "Scrap": {
+         "Scrap": {
             "type": "string",
             "value": "[subscription().tenantId]"
+        },
+        "AllowedIP":{
+            "type": "array",
+            "value": "[split(reference(concat('Microsoft.Web/sites/AppsInterne-qa'), '2018-02-01', 'Full').properties.outboundIpAddresses , ',')]"
         },
         "Environnement": {
             "type": "string",
