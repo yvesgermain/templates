@@ -128,3 +128,5 @@ $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions;
     $ArrayList.Add($webIP); 
     Remove-Variable webip
 }
+
+$WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose

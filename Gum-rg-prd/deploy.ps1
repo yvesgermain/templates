@@ -111,9 +111,9 @@ if(Test-Path $parametersFilePath) {
 } else {
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
 }
-# Set-AzSqlServerActiveDirectoryAdministrator -ResourceGroupName sqlapps-rg-prd -ServerName sqlguminterne-prd -DisplayName sqladminprd@gumqc.OnMicrosoft.com
 
-# $cred = get-credential -UserName sqladminprd@sqlguminterne-prd.database.windows.net -message SQLadmin
+
+<# $cred = get-credential -UserName sqladminprd@sqlguminterne-prd.database.windows.net -message SQLadmin
 
 Remove-AzSqlDatabase -resourcegroupname gum-rg-$environnement -ServerName sqlgum-$environnement -DatabaseName BdGum-$environnement
 New-AzSqlDatabaseCopy -ServerName soquijgumsqlserverdev -ResourceGroupName SoquijGUM-DEV -DatabaseName soquijgumumbracodbdev -CopyResourceGroupName gum-rg-$Environnement -CopyServerName sqlgum-$Environnement -CopyDatabaseName BdGum-$Environnement
@@ -134,3 +134,31 @@ $DestKey =(Get-AzStorageAccountKey -name $Dest -ResourceGroupName $DestResourceG
 .\azcopy.exe /source:https://$source.blob.core.windows.net/$guichetunique /dest:https://$dest.blob.core.windows.net/guichetunique /SourceKey:$SourceKey /destKey:$destKey /S
 
 Pop-Location
+
+#  Config pour Gum Iprestriction
+
+
+$APIVersion = ((Get-AzResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
+
+$Sites = "Gum-", "GumMaster-"
+Foreach ( $Site in $Sites) {
+    $WebAppConfig = (Get-AzResource -ResourceType Microsoft.Web/sites/config -ResourceName $site$Environnement -ResourceGroupName Gum-rg-$Environnement -ApiVersion $APIVersion)
+
+    $priority = 180;  
+    $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
+    [System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
+    (Get-azwebapp -name $site$Environnement).PossibleOutboundIpAddresses.split(",") | ForEach-Object { 
+        $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
+        $webip.ipAddress = $_ + '/32';  
+        $webip.action = "Allow"; 
+        $priority = $priority + 20 ; 
+        $webIP.priority = $priority;  
+        $ArrayList.Add($webIP); 
+        Remove-Variable webip
+    }
+
+    $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
+    $WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
+}
+
+#>
