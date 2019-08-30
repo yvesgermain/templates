@@ -115,9 +115,7 @@ if(Test-Path $parametersFilePath) {
 
 # $cred = get-credential -UserName sqladminprd@sqlguminterne-prd.database.windows.net -message SQLadmin
 
-$environnement = $resourceGroupName.split("-")[-1]
-
-Remove-AzSqlDatabase -resourcegroupname gum-rg-devops -ServerName sqlgum-devops -DatabaseName BdGum-devops
+Remove-AzSqlDatabase -resourcegroupname gum-rg-$environnement -ServerName sqlgum-$environnement -DatabaseName BdGum-$environnement
 New-AzSqlDatabaseCopy -ServerName soquijgumsqlserverdev -ResourceGroupName SoquijGUM-DEV -DatabaseName soquijgumumbracodbdev -CopyResourceGroupName gum-rg-$Environnement -CopyServerName sqlgum-$Environnement -CopyDatabaseName BdGum-$Environnement
 
 Push-Location
