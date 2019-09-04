@@ -25,13 +25,6 @@
 #>
 
 param(
- [Parameter()]
- [string]
- $subscriptionId,
-
- [Parameter()]
- [string]
- $resourceGroupName,
 
  [string]
  $resourceGroupLocation = "CanadaCentral",
@@ -88,7 +81,7 @@ if($resourceProviders.length) {
     }
 }
 
-$resourceGroupName = $pwd.path.replace('C:\templates\devops\','').replace("prd","") + $Environnement
+$resourceGroupName = "Gum-rg-" + $Environnement
 #Create or check for existing resource group
 $resourceGroup = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
 if(!$resourceGroup)

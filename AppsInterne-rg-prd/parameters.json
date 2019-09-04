@@ -27,15 +27,15 @@
             "value": "storveillefuncdevops"
         },
         "storageAccounts_appsinterne_name": {
-            "value":"storappsinternedevops"
+            "value": "storappsinternedevops"
         },
-        "Environnement" : {
+        "Environnement": {
             "value": "devops"
         },
         "AccountKey": {
             "reference": {
                 "keyVault": {
-                  "id": "/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/Infrastructure/providers/Microsoft.KeyVault/vaults/gumkeyvault"
+                    "id": "/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/Infrastructure/providers/Microsoft.KeyVault/vaults/gumkeyvault"
                 },
                 "secretName": "storappsinternedevops"
             }
@@ -43,10 +43,10 @@
         "AdminPassword": {
             "reference": {
                 "keyVault": {
-                  "id": "/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/Infrastructure/providers/Microsoft.KeyVault/vaults/gumkeyvault"
+                    "id": "/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/Infrastructure/providers/Microsoft.KeyVault/vaults/gumkeyvault"
                 },
                 "secretName": "sqladmindevops"
-              }
+            }
         }
     }
 }

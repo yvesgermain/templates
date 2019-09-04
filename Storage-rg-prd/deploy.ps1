@@ -29,16 +29,12 @@ param(
  [string]
  $subscriptionId,
 
- [Parameter(Mandatory=$True)]
  [string]
- $resourceGroupName,
+ $resourceGroupLocation = "CanadaCentral",
 
+ [Parameter()]
  [string]
- $resourceGroupLocation,
-
- [Parameter(Mandatory=$True)]
- [string]
- $deploymentName,
+ $deploymentName = (get-date -format "yyyy-MM-dd_hh-mm"),
 
  [string]
  $templateFilePath = "template.json",
@@ -93,6 +89,7 @@ if($resourceProviders.length) {
 }
 
 #Create or check for existing resource group
+$resourceGroupName = "Storage-rg-$environnement"
 $resourceGroup = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
 if(!$resourceGroup)
 {

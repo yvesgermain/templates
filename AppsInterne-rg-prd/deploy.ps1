@@ -25,20 +25,12 @@
 #>
 
 param(
+    [string]
+    $resourceGroupLocation = "CanadaCentral",
+
     [Parameter()]
     [string]
-    $subscriptionId,
-
-    [Parameter(Mandatory = $True)]
-    [string]
-    $resourceGroupName,
-
-    [string]
-    $resourceGroupLocation,
-
-    [Parameter(Mandatory = $True)]
-    [string]
-    $deploymentName,
+    $deploymentName = (get-date -format "yyyy-MM-dd_hh-mm"),
 
     [string]
     $templateFilePath = "template.json",
@@ -90,6 +82,8 @@ if ($resourceProviders.length) {
 }
 
 #Create or check for existing resource group
+
+$resourceGroupName = "AppsInterne-rg-$environnement"
 $resourceGroup = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
 if (!$resourceGroup) {
     Write-Host "Resource group '$resourceGroupName' does not exist. To create a new resource group, please enter a location.";
@@ -112,14 +106,15 @@ else {
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
 }
 
+<#
 $APIVersion = ((Get-AzResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
 
-$WebAppConfig = (Get-AzResource -ResourceType Microsoft.Web/sites/config -ResourceName Appsinterne-rg-$Environnement -ResourceGroupName Appsinterne-rg-$Environnement -ApiVersion $APIVersion)
+$WebAppConfig = (Get-AzResource -ResourceType Microsoft.Web/sites/config -ResourceName Appsinterne-$Environnement -ResourceGroupName Appsinterne-rg-$Environnement -ApiVersion $APIVersion)
 
 $priority = 180;  
 $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
 [System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
-(Get-azwebapp -name Appsinterne-rg-$Environnement).PossibleOutboundIpAddresses.split(",") | ForEach-Object { 
+(Get-azwebapp -name Appsinterne-$Environnement).PossibleOutboundIpAddresses.split(",") | ForEach-Object { 
     $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
     $webip.ipAddress = $_ + '/32';  
     $webip.action = "Allow"; 
@@ -129,4 +124,29 @@ $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions;
     Remove-Variable webip
 }
 
+$WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
 $WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
+
+$SourceEnv = "prd"
+$TargetEnv = $Environnement
+$BdArray = ("BdAppsInterne-","BdVeille-")
+import-module az.sql, az.Websites
+
+foreach( $Bd in $Bdarray) {
+   $databaseName = $Bd + $SourceEnv
+   $serverName = "sqlguminterne-" + $SourceEnv
+   $resourceGroupName = "sqlapps-rg-" +  $SourceEnv
+
+   $TargetDatabaseName = $Bd + $TargetEnv
+   $TargetServerName = "sqlguminterne-" + $TargetEnv
+   $TargetResourceGroupName = "sqlapps-rg-" +  $TargetEnv
+
+   "Removing database $TargetDatabaseName"
+   if (get-azSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue) {
+   Remove-azSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName
+   }
+   "Copying database  $databaseName  from server $servername to database $TargetDatabaseName on $TargetServerName"
+   New-azSqlDatabaseCopy -ServerName $serverName -ResourceGroupName $resourceGroupName -DatabaseName $databaseName `
+   -CopyResourceGroupName $TargetResourceGroupName -CopyServerName $TargetServerName -CopyDatabaseName $TargetDatabaseName
+}
+#>

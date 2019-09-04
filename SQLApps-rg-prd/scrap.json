@@ -23,13 +23,13 @@
             "type": "string",
             "value": "[subscription().tenantId]"
         },
-        "AllowedIP":{
-            "type": "array",
-            "value": "[split(reference(concat('Microsoft.Web/sites/AppsInterne-qa'), '2018-02-01', 'Full').properties.outboundIpAddresses , ',')]"
-        },
         "Environnement": {
             "type": "string",
             "value": "[parameters('Environnement')]"
+        },
+        "Accountkey": {
+            "type": "string",
+            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=scrap', ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', 'storgumdevops'), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
         }
     }
 }
