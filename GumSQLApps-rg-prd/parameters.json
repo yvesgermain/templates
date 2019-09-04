@@ -1,0 +1,17 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Environnement": {
+            "value": "devops"
+        },
+        "administratorLoginPassword": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/Infrastructure/providers/Microsoft.KeyVault/vaults/gumkeyvault"
+                },
+                "secretName": "sqladmindevops"
+            }
+        }
+    }
+}

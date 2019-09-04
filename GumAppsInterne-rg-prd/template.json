@@ -1,0 +1,383 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Environnement": {
+            "type": "string"
+        },
+        "AccountKey":{
+            "type": "securestring"
+        },
+        "AdminPassword": {
+            "type": "securestring"
+        }
+    },
+    "variables": {
+        "sites_gummaster_name": "[concat('GumMaster-', parameters('Environnement'))]",
+        "sites_gumfrontend_name": "[concat('Gum-', parameters('Environnement'))]",
+        "serverfarms_gummaster_name": "[concat('ASP-Standard-', parameters('Environnement'))]",
+        "serverfarms_gumfrontend_name": "[concat('ASP-FrontEnd-', parameters('Environnement'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2016-09-01",
+            "name": "[variables('serverfarms_gumfrontend_name')]",
+            "location": "Canada Central",
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
+            },
+            "sku": {
+                "name": "B1",
+                "tier": "Basic",
+                "size": "B1",
+                "family": "B",
+                "capacity": 1
+            },
+            "kind": "app",
+            "properties": {
+                "name": "[variables('serverfarms_gumfrontend_name')]",
+                "perSiteScaling": false,
+                "reserved": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2016-09-01",
+            "name": "[variables('serverfarms_gummaster_name')]",
+            "location": "Canada Central",
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
+            },
+            "sku": {
+                "name": "B1",
+                "tier": "Basic",
+                "size": "B1",
+                "family": "B",
+                "capacity": 1
+            },
+            "kind": "app",
+            "properties": {
+                "name": "[variables('serverfarms_gummaster_name')]",
+                "perSiteScaling": false,
+                "reserved": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "name": "[variables('sites_gumfrontend_name')]",
+            "location": "Canada Central",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gumfrontend_name'))]"
+            ],
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
+            },
+            "kind": "app",
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(variables('sites_gumfrontend_name'), '.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "[concat(variables('sites_gumfrontend_name'), '.scm.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gumfrontend_name'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureBlobFileSystem.ConnectionString:media",
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=storgum', parameters('Environnement'), ';AccountKey=', parameters('AccountKey'))]"
+                        },
+                        {
+                            "name": "AzureBlobFileSystem.RootUrl:media",
+                            "value": "[concat('https://storgum' , parameters('Environnement'), '.blob.core.windows.net')]"
+                        },
+                        {
+                            "Name": "masterServerUrl",
+                            "value": "[concat('https://gum-' , parameters('Environnement'), 'dev.azurewebsites.net')]"
+                        },
+                        {
+                            "name": "serverRole",
+                            "value": "frontend"
+                        }
+                    ],
+                    "connectionStrings": [
+                        {
+                            "name": "umbracoDbDSN",
+                            "connectionString": "[concat('Server=tcp:SqlGum-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdGum-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\"')]",
+                            "type": "SQLAzure"
+                        }
+                    ]
+                },
+                "reserved": false,
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "name": "[variables('sites_gummaster_name')]",
+            "location": "Canada Central",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gummaster_name'))]"
+            ],
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
+            },
+            "kind": "app",
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(variables('sites_gummaster_name'), '.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "[concat(variables('sites_gummaster_name'), '.scm.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gummaster_name'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureBlobFileSystem.ConnectionString:media",
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=storgum', parameters('Environnement'), ';AccountKey=', parameters('AccountKey'))]"
+                        },
+                        {
+                            "name": "AzureBlobFileSystem.RootUrl:media",
+                            "value": "[concat('https://storgum' , parameters('Environnement'), '.blob.core.windows.net')]"
+                        },
+                        {
+                            "Name": "masterServerUrl",
+                            "value": "[concat('https://gummaster-' , parameters('Environnement'), 'dev.azurewebsites.net')]"
+                        },
+                        {
+                            "name": "serverRole",
+                            "value": "master"
+                        }
+                    ],
+                    "connectionStrings": [
+                        {
+                            "name": "umbracoDbDSN",
+                            "connectionString": "[concat('Server=tcp:SqlGum-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdGum-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\"')]",
+                            "type": "SQLAzure"
+                        }
+                    ]
+                },
+                "reserved": false,
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2016-08-01",
+            "name": "[concat(variables('sites_gumfrontend_name'), '/web')]",
+            "location": "Canada Central",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('sites_gumfrontend_name'))]"
+            ],
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
+            },
+            "properties": {
+                "numberOfWorkers": "1",
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "phpVersion": "5.6",
+                "pythonVersion": "",
+                "nodeVersion": "",
+                "linuxFxVersion": "",
+                "requestTracingEnabled": "false",
+                "remoteDebuggingEnabled": "false",
+                "httpLoggingEnabled": "false",
+                "logsDirectorySizeLimit": "35",
+                "detailedErrorLoggingEnabled": "false",
+                "publishingUsername": "[concat('$', variables('sites_gumfrontend_name'), '-', parameters('Environnement'))]",
+                "scmType": "VSTSRM",
+                "use32BitWorkerProcess": "true",
+                "webSocketsEnabled": "false",
+                "alwaysOn": "false",
+                "appCommandLine": "",
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": false,
+                        "virtualDirectories": null
+                    }
+                ],
+                "winAuthAdminState": "0",
+                "winAuthTenantState": "0",
+                "customAppPoolIdentityAdminState": "false",
+                "customAppPoolIdentityTenantState": "false",
+                "loadBalancing": "LeastRequests",
+                "routingRules": [],
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": "false",
+                "vnetName": "",
+                "siteAuthEnabled": "false",
+                "siteAuthSettings": {},
+                "localMySqlEnabled": "false",
+                "managedServiceIdentityId": "1284",
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "205.237.253.10",
+                        "subnetMask": "255.255.255.255",
+                        "name": "AllowSoquijOnly",
+                        "description": "AllowSoquijOnly"
+                    }
+                ],
+                "http20Enabled": "true",
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": "0",
+                "fileChangeAuditEnabled": "false"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2016-08-01",
+            "name": "[concat(variables('sites_gummaster_name'), '/web')]",
+            "location": "Canada Central",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('sites_gummaster_name'))]"
+            ],
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
+            },
+            "properties": {
+                "numberOfWorkers": "1",
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "phpVersion": "5.6",
+                "pythonVersion": "",
+                "nodeVersion": "",
+                "linuxFxVersion": "",
+                "requestTracingEnabled": "false",
+                "remoteDebuggingEnabled": "false",
+                "httpLoggingEnabled": "false",
+                "logsDirectorySizeLimit": "35",
+                "detailedErrorLoggingEnabled": "false",
+                "publishingUsername": "[concat('$', variables('sites_gumfrontend_name'), '-', parameters('Environnement'))]",
+                "scmType": "VSTSRM",
+                "use32BitWorkerProcess": "true",
+                "webSocketsEnabled": "false",
+                "alwaysOn": "false",
+                "appCommandLine": "",
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": "false",
+                        "virtualDirectories": null
+                    }
+                ],
+                "winAuthAdminState": "0",
+                "winAuthTenantState": "0",
+                "customAppPoolIdentityAdminState": "false",
+                "customAppPoolIdentityTenantState": "false",
+                "loadBalancing": "LeastRequests",
+                "routingRules": [],
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": "false",
+                "vnetName": "",
+                "siteAuthEnabled": "false",
+                "siteAuthSettings": {},
+                "localMySqlEnabled": "false",
+                "managedServiceIdentityId": "1285",
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "205.237.253.10",
+                        "subnetMask": "255.255.255.255",
+                        "name": "AllowSoquijOnly",
+                        "description": "AllowSoquijOnly"
+                    }
+                ],
+                "http20Enabled": "true",
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": "0",
+                "fileChangeAuditEnabled": "false"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2016-08-01",
+            "name": "[concat(variables('sites_gumfrontend_name'), '/', variables('sites_gumfrontend_name'), '.azurewebsites.net')]",
+            "location": "Canada Central",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('sites_gumfrontend_name'))]"
+            ],
+            "properties": {
+                "siteName": "[concat(variables('sites_gumfrontend_name'), parameters('Environnement'))]",
+                "hostNameType": "Verified"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2016-08-01",
+            "name": "[concat(variables('sites_gummaster_name'), '/', variables('sites_gummaster_name'), '.azurewebsites.net')]",
+            "location": "Canada Central",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('sites_gummaster_name'))]"
+            ],
+            "properties": {
+                "siteName": "[concat(variables('sites_gummaster_name'), parameters('Environnement'))]",
+                "hostNameType": "Verified"
+            }
+        }
+    ]
+}

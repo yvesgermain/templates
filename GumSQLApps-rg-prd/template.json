@@ -1,0 +1,96 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Environnement": {
+            "type": "string"
+        },
+        "administratorLoginPassword": {
+            "type": "securestring"
+        }
+    },
+    "variables": {
+        "servers_gumsqlserver_name": "[concat('sqlgum-', parameters('Environnement'))]",
+        "administratorLogin" : "[concat('sqladmin', parameters('environnement'))]",
+        "SidSQLadmindev": "ab29cc98-8811-49b1-8e97-ecf60fc6b2b4",
+        "SidSQLadminqa": "3baa776c-4826-49bf-a216-17254673507a",
+        "SidSQLadminprd": "c74029db-ee61-4eae-912d-182fab6950f3",
+        "SidSQLadmindevops": "39670c6b-8290-4499-8f84-031f42d2399e"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[variables('servers_gumsqlserver_name')]",
+            "location": "canadacentral",
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
+            },
+            "kind": "v12.0",
+            "properties": {
+                "administratorLogin": "[variables('administratorLogin')]",
+                "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
+                "version": "12.0"
+            }
+        },
+            {
+            "type": "Microsoft.Sql/servers/administrators",
+            "apiVersion": "2014-04-01-preview",
+            "name": "[concat(variables('servers_gumsqlserver_name'), '/ActiveDirectory')]",
+            "location": "Canada Central",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
+            ],
+            "properties": {
+                "administratorType": "ActiveDirectory",
+                "login": "[concat('sqladmin', parameters('environnement') , '@gumqc.OnMicrosoft.com')]",
+                "sid": "[variables( concat('SidSQLadmin' , parameters('Environnement')))]",
+                "tenantId": "[subscription().tenantid]"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[concat(variables('servers_gumsqlserver_name'), '/BdGum-', parameters('Environnement'))]",
+            "location": "canadacentral",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
+            ],
+            "sku": {
+                "name": "Basic",
+                "tier": "Basic"
+            },
+            "kind": "v12.0,user",
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AI",
+                "maxSizeBytes": 2147483648,
+                "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                "zoneRedundant": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(variables('servers_gumsqlserver_name'), '/AllowAllWindowsAzureIps')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
+            ],
+            "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(variables('servers_gumsqlserver_name'), '/SoquijNetwork')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
+            ],
+            "properties": {
+                "startIpAddress": "205.237.253.10",
+                "endIpAddress": "205.237.253.10"
+            }
+        }
+    ]
+}
