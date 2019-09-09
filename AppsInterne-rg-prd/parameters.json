@@ -3,41 +3,35 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "sites_Veille_name": {
-            "value": "Veille-devops"
+            "value": "Veille-dev"
         },
         "sites_AppsInterne_name": {
-            "value": "AppsInterne-devops"
+            "value": "AppsInterne-dev"
         },
         "sites_Veille_func_name": {
-            "value": "Veille-func-devops"
+            "value": "Veille-func-dev"
         },
         "serverfarms_ASP_Standard_name": {
-            "value": "ASP-Standard-devops"
-        },
-        "components_AppsInterne_name": {
-            "value": "AppsInterne-devops"
-        },
-        "components_Veille_func_name": {
-            "value": "Veille-func-devops"
+            "value": "ASP-Standard-dev"
         },
         "serverfarms_FunctionApp_name": {
-            "value": "ASP-FunctionApp-devops"
+            "value": "ASP-FunctionApp-dev"
         },
         "storageAccounts_veillefunc_name": {
-            "value": "storveillefuncdevops"
+            "value": "storveillefuncdev"
         },
         "storageAccounts_appsinterne_name": {
-            "value": "storappsinternedevops"
+            "value": "storappsinternedev"
         },
         "Environnement": {
-            "value": "devops"
+            "value": "dev"
         },
         "AccountKey": {
             "reference": {
                 "keyVault": {
                     "id": "/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/Infrastructure/providers/Microsoft.KeyVault/vaults/gumkeyvault"
                 },
-                "secretName": "storappsinternedevops"
+                "secretName": "storappsinternedev"
             }
         },
         "AdminPassword": {
@@ -45,7 +39,7 @@
                 "keyVault": {
                     "id": "/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/Infrastructure/providers/Microsoft.KeyVault/vaults/gumkeyvault"
                 },
-                "secretName": "sqladmindevops"
+                "secretName": "sqladmindev"
             }
         }
     }

@@ -17,12 +17,6 @@
         "serverfarms_FunctionApp_name": {
             "type": "string"
         },
-        "components_AppsInterne_name": {
-            "type": "string"
-        },
-        "components_Veille_func_name": {
-            "type": "string"
-        },
         "storageAccounts_veillefunc_name": {
             "type": "string"
         },
@@ -47,34 +41,6 @@
     },
     "variables": {},
     "resources": [
-        {
-            "type": "Microsoft.Insights/components",
-            "apiVersion": "2015-05-01",
-            "name": "[parameters('components_AppsInterne_name')]",
-            "location": "canadacentral",
-            "kind": "web",
-            "properties": {
-                "Application_Type": "web",
-                "Request_Source": "IbizaWebAppExtensionCreate"
-            },
-            "tags": {
-                "Environnement": "[parameters('Environnement')]"
-            }
-        },
-        {
-            "type": "Microsoft.Insights/components",
-            "apiVersion": "2015-05-01",
-            "name": "[parameters('components_Veille_func_name')]",
-            "location": "canadacentral",
-            "kind": "web",
-            "properties": {
-                "Application_Type": "web",
-                "Request_Source": "IbizaWebAppExtensionCreate"
-            },
-            "tags": {
-                "Environnement": "[parameters('Environnement')]"
-            }
-        },
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-04-01",

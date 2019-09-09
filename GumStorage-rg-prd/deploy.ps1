@@ -37,6 +37,7 @@ param(
 
     [Parameter(Mandatory = $True)]
     [string]
+    [ValidateSet("dev", "qa", "prd", "devops")] 
     $environnement,
 
     [Parameter()]
@@ -113,7 +114,7 @@ else {
     New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $TemplateFilePath;
 }
 
-get-azstorageaccount -resourcegroupName $resourceGroupName | where-object { $_.storageaccountname -like "gumstor*" } | foreach-object { 
+get-azstorageaccount -resourcegroupName $resourceGroupName | where-object { $_.storageaccountname -like "storgum*" } | foreach-object { 
     $name = $_.storageaccountname; 
     Get-AzStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where-object { $_.keyname -like "key1" } | ForEach-Object {
     $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; 
@@ -142,4 +143,5 @@ Set-Location (Get-ChildItem $AzCopyPath).directory.fullname
 $SourceKey = (get-azstorageaccountkey -Name soquijgummediastoragedev -ResourceGroupName SoquijGUM-DEV | where-object {$_.keyname -eq "key1"}).value
 $DestKey   = (get-azstorageaccountkey -Name storgum$Environnement -ResourceGroupName gumstorage-rg-$Environnement | where-object {$_.keyname -eq "key1"}).value
 
-. $AzCopyPath /source:https://soquijgummediastoragedev.blob.core.windows.net/guichetunique/ /sourcekey:$SourceKey /dest:https://storgum$Environnement.blob.core.windows.net/guichetunique/ /s /y /destkey:$destkey
+. $AzCopyPath /source:https://soquijgummediastoragedev.blob.core.windows.net/guichetuniquedev/ /sourcekey:$SourceKey /dest:https://storgum$Environnement.blob.core.windows.net/guichetunique/ /s /y /destkey:$destkey
+pop-location

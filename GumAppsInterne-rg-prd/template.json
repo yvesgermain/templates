@@ -106,7 +106,7 @@
                         },
                         {
                             "Name": "masterServerUrl",
-                            "value": "[concat('https://gum-' , parameters('Environnement'), 'dev.azurewebsites.net')]"
+                            "value": "[concat('https://gum-' , parameters('Environnement'), '.azurewebsites.net')]"
                         },
                         {
                             "name": "serverRole",
@@ -170,7 +170,7 @@
                         },
                         {
                             "Name": "masterServerUrl",
-                            "value": "[concat('https://gummaster-' , parameters('Environnement'), 'dev.azurewebsites.net')]"
+                            "value": "[concat('https://gummaster-' , parameters('Environnement'), '.azurewebsites.net')]"
                         },
                         {
                             "name": "serverRole",
@@ -197,7 +197,7 @@
         },
         {
             "type": "Microsoft.Web/sites/config",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2018-02-01",
             "name": "[concat(variables('sites_gumfrontend_name'), '/web')]",
             "location": "Canada Central",
             "dependsOn": [
@@ -261,12 +261,13 @@
                 "managedServiceIdentityId": "1284",
                 "ipSecurityRestrictions": [
                     {
-                        "ipAddress": "205.237.253.10",
-                        "subnetMask": "255.255.255.255",
-                        "name": "AllowSoquijOnly",
-                        "description": "AllowSoquijOnly"
+                        "ipAddress": "205.237.253.10/32",
+                        "name": "AllowSoquij",
+                        "description": "AllowSoquij",
+                        "priority": "100"
                     }
                 ],
+                "scmIpSecurityRestrictionsUseMain": "true",
                 "http20Enabled": "true",
                 "minTlsVersion": "1.2",
                 "ftpsState": "AllAllowed",
@@ -276,7 +277,7 @@
         },
         {
             "type": "Microsoft.Web/sites/config",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2018-02-01",
             "name": "[concat(variables('sites_gummaster_name'), '/web')]",
             "location": "Canada Central",
             "dependsOn": [
@@ -340,12 +341,13 @@
                 "managedServiceIdentityId": "1285",
                 "ipSecurityRestrictions": [
                     {
-                        "ipAddress": "205.237.253.10",
-                        "subnetMask": "255.255.255.255",
-                        "name": "AllowSoquijOnly",
-                        "description": "AllowSoquijOnly"
+                        "ipAddress": "205.237.253.10/32",
+                        "name": "AllowSoquij",
+                        "description": "AllowSoquij",
+                        "priority": "100"
                     }
                 ],
+                "scmIpSecurityRestrictionsUseMain": "true",
                 "http20Enabled": "true",
                 "minTlsVersion": "1.2",
                 "ftpsState": "AllAllowed",

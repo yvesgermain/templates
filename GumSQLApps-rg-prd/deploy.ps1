@@ -25,23 +25,23 @@
 #>
 
 param(
- [Parameter(Mandatory=$True)]
- [string]
- [ValidateSet("dev", "qa", "prd", "devops")] 
- $Environnement,
+    [Parameter(Mandatory = $True)]
+    [string]
+    [ValidateSet("dev", "qa", "prd", "devops")] 
+    $Environnement,
 
- [string]
- $ResourceGroupLocation = "CanadaCentral",
+    [string]
+    $ResourceGroupLocation = "CanadaCentral",
 
- [Parameter()]
- [string]
- $deploymentName = (get-date -format "yyyy-MM-dd_hh-mm"),
+    [Parameter()]
+    [string]
+    $deploymentName = (get-date -format "yyyy-MM-dd_hh-mm"),
 
- [string]
- $TemplateFilePath = "template.json",
+    [string]
+    $TemplateFilePath = "template.json",
 
- [string]
- $ParametersFilePath = "parameters.json"
+    [string]
+    $ParametersFilePath = "parameters.json"
 )
 
 $AzModuleVersion = "2.0.0"
@@ -81,35 +81,53 @@ Write-Host "Selecting subscription '$Subscription'";
 # Select-AzSubscription -Subscription $Subscription;
 
 # Register RPs
-$resourceProviders = @("microsoft.sql","microsoft.storage","microsoft.web");
-if($resourceProviders.length) {
+$resourceProviders = @("microsoft.sql", "microsoft.storage", "microsoft.web");
+if ($resourceProviders.length) {
     Write-Host "Registering resource providers"
-    foreach($resourceProvider in $resourceProviders) {
+    foreach ($resourceProvider in $resourceProviders) {
         RegisterRP($resourceProvider);
     }
 }
 
 #Create or check for existing resource group
-$ResourceGroupName  = "GumSQLApps-rg-" + $Environnement
+$ResourceGroupName = "GumSQLApps-rg-" + $Environnement
 $resourceGroup = Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
-if(!$resourceGroup)
-{
-    if(!$ResourceGroupLocation) {
+if (!$resourceGroup) {
+    if (!$ResourceGroupLocation) {
         Write-Host "Resource group '$ResourceGroupName' does not exist. To create a new resource group, please enter a location.";
         $resourceGroupLocation = Read-Host "ResourceGroupLocation";
     }
     Write-Host "Creating resource group '$ResourceGroupName' in location '$ResourceGroupLocation'";
     New-AzResourceGroup -Name $ResourceGroupName -Location $ResourceGroupLocation
 }
-else{
+else {
     Write-Host "Using existing resource group '$ResourceGroupName'";
 }
 
 # Start the deployment
 Write-Host "Starting deployment...";
-if(Test-Path $ParametersFilePath) {
+if (Test-Path $ParametersFilePath) {
     New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $TemplateFilePath -TemplateParameterFile $ParametersFilePath;
-} else {
+}
+else {
     New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $TemplateFilePath;
 }
+
+$TargetEnv = $Environnement
+
+$databaseName = "soquijgumumbracodbdev"
+$serverName = "soquijgumsqlserverdev"
+$resourceGroupName = "SoquijGUM-DEV"
+
+$TargetDatabaseName = "BdGum-" + $TargetEnv
+$TargetServerName = "SqlGum-" + $TargetEnv
+$TargetResourceGroupName = "GumSQLApps-rg-" + $TargetEnv
+
+"Removing database $TargetDatabaseName"
+if (get-azSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue) {
+    Remove-azSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName
+}
+"Copying database $databaseName from server $servername to database $TargetDatabaseName on $TargetServerName"
+New-azSqlDatabaseCopy -ServerName $serverName -ResourceGroupName $resourceGroupName -DatabaseName $databaseName `
+    -CopyResourceGroupName $TargetResourceGroupName -CopyServerName $TargetServerName -CopyDatabaseName $TargetDatabaseName
 
