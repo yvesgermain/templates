@@ -10,37 +10,25 @@
 
 #>
 Param(
-        [Parameter()]
-        [ValidateSet("dev", "qa", "prd", "devops")]
-        [string]
-        $SourceEnv = "prd",
+    [Parameter()]
+    [ValidateSet("dev", "qa", "prd", "devops")]
+    [string]
+    $Environnement = "prd",
 
-        [Parameter()]
-        [string]
-        $TargetUrl = 'https://gumbackups.blob.core.windows.net/sql-backup/',
-
-        [Parameter()]
-        [validateset("BdAppsInterne", "BdVeille")]
-        [string[]] 
-        $BdArray = ("BdAppsInterne","BdVeille"), 
-
-        [Parameter()]
-        [ValidateSet("sqlguminterne", "sqlgum")]
-        [string] 
-        $BDserver = 'sqlguminterne'
-    )
+    [Parameter()]
+    [string]
+    $TargetUrl = 'https://gumbackups.blob.core.windows.net/sql-backup/'
+)
 import-module azureRM.sql, azureRM.keyvault, azureRM.Storage
 
-foreach( $Bd in $Bdarray) {
-   $databaseName = $Bd + "-" + $SourceEnv
-   $serverName = $BDserver + "-" + $SourceEnv
-   $resourceGroupName = "SQLapps-rg-"  + $SourceEnv
-   [string] $Storagekey = (Get-azureRMStorageAccountKey -ResourceGroupName infrastructure -Name gumbackups ).value[0]
-   $StorageAccessKey  = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKeyType]::StorageAccessKey
+$servers = "sqlguminterne-$Environnement", "sqlgum-$Environnement"
+[string] $Storagekey = (Get-azureRMStorageAccountKey -ResourceGroupName infrastructure -Name gumbackups ).value[0]
+$StorageAccessKey = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKeyType]::StorageAccessKey
 
-   $targetURI= $( $TargetUrl + $Bd + $SourceEnv  + $(get-date -Format "yyyy-MM-dd_hh-mm") + '.bacpac' )
-   $AdministratorLogin = "sqladmin" + $SourceEnv
-   $pass = (Get-azureKeyVaultSecret -VaultName gumkeyvault -name $("sqladmin" + $SourceEnv)).secretvalue
+$AdministratorLogin = "sqladmin" + $Environnement
+$pass = (Get-azureKeyVaultSecret -VaultName gumkeyvault -name $("sqladmin" + $Environnement )).secretvalue
 
-   New-azureRMSqlDatabaseExport -DatabaseName $databaseName -ServerName $serverName -StorageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $targetURI -ResourceGroupName $resourceGroupName -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass
+foreach ( $server in $Servers ) {
+    $database = get-azureRMsqlserver -ServerName $server | get-azureRMsqldatabase | where-object { $_.Databasename -notlike "master" } 
+    $database | New-azureRMSqlDatabaseExport -StorageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $( $TargetUrl + $database.DatabaseName + $Environnement + $(get-date -Format "yyyy-MM-dd_hh-mm") + '.bacpac' ) -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass
 }
