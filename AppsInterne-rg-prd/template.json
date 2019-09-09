@@ -2,49 +2,30 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "sites_Veille_name": {
-            "type": "string"
-        },
-        "sites_AppsInterne_name": {
-            "type": "string"
-        },
-        "sites_Veille_func_name": {
-            "type": "string"
-        },
-        "serverfarms_ASP_Standard_name": {
-            "type": "string"
-        },
-        "serverfarms_FunctionApp_name": {
-            "type": "string"
-        },
-        "storageAccounts_veillefunc_name": {
-            "type": "string"
-        },
-        "storageAccounts_appsinterne_name": {
-            "type": "string"
-        },
         "Environnement": {
-            "type": "string",
-            "allowedValues": [
-                "dev",
-                "qa",
-                "prd",
-                "devops"
-            ]
+            "type": "string"
+        },
+        "AccountKey":{
+            "type": "securestring"
         },
         "AdminPassword": {
             "type": "securestring"
-        },
-        "Accountkey": {
-            "type": "securestring"
         }
     },
-    "variables": {},
+    "variables": {
+        "sites_Veille_name": "[concat('Veille-', parameters('Environnement'))]",
+        "sites_AppsInterne_name": "[concat('AppsInterne-', parameters('Environnement'))]",
+        "sites_Veille_func_name": "[concat('Veille-func-', parameters('Environnement'))]",
+        "serverfarms_ASP_Standard_name": "[concat('ASP-Standard-', parameters('Environnement'))]",
+        "serverfarms_FunctionApp_name": "[concat('ASP-FunctionApp-', parameters('Environnement'))]",
+        "storageAccounts_veillefunc_name": "[concat('storveillefunc', parameters('Environnement'))]",
+        "storageAccounts_appsinterne_name": "[concat('storappsinterne', parameters('Environnement'))]"
+    },
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-04-01",
-            "name": "[parameters('storageAccounts_veillefunc_name')]",
+            "name": "[variables('storageAccounts_veillefunc_name')]",
             "location": "canadacentral",
             "sku": {
                 "name": "Standard_LRS",
@@ -78,7 +59,7 @@
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
-            "name": "[parameters('serverfarms_ASP_Standard_name')]",
+            "name": "[variables('Serverfarms_ASP_Standard_name')]",
             "location": "Canada Central",
             "sku": {
                 "name": "S1",
@@ -89,7 +70,7 @@
             },
             "kind": "app",
             "properties": {
-                "name": "[parameters('serverfarms_ASP_Standard_name')]",
+                "name": "[variables('Serverfarms_ASP_Standard_name')]",
                 "perSiteScaling": false,
                 "reserved": false,
                 "targetWorkerCount": 0,
@@ -102,7 +83,7 @@
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
-            "name": "[parameters('serverfarms_FunctionApp_name')]",
+            "name": "[variables('Serverfarms_FunctionApp_name')]",
             "location": "Canada Central",
             "sku": {
                 "name": "Y1",
@@ -113,7 +94,7 @@
             },
             "kind": "functionapp",
             "properties": {
-                "name": "[parameters('serverfarms_FunctionApp_name')]",
+                "name": "[variables('serverfarms_FunctionApp_name')]",
                 "perSiteScaling": false,
                 "reserved": false,
                 "targetWorkerCount": 0,
@@ -126,9 +107,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices",
             "apiVersion": "2019-04-01",
-            "name": "[concat(parameters('storageAccounts_veillefunc_name'), '/default')]",
+            "name": "[concat(variables('storageAccounts_veillefunc_name'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_veillefunc_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name'))]"
             ],
             "properties": {
                 "cors": {
@@ -145,10 +126,10 @@
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
-            "name": "[parameters('sites_AppsInterne_name')]",
+            "name": "[variables('Sites_AppsInterne_name')]",
             "location": "Canada Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_Standard_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]"
             ],
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
@@ -168,16 +149,16 @@
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_Standard_name'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]",
                 "siteConfig": {
                     "appSettings": [
                         {
                             "name": "AzureBlobFileSystem.ConnectionString:media",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters( 'storageAccounts_appsinterne_name' ) ,';AccountKey=' , parameters('Accountkey'), ';EndpointSuffix=core.windows.net')]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_appsinterne_name') ,';AccountKey=' , parameters('Accountkey'), ';EndpointSuffix=core.windows.net')]"
                         },
                         {
                             "name": "AzureBlobFileSystem.RootUrl:media",
-                            "value": "[concat( 'https://' , parameters('storageAccounts_appsinterne_name'), '.blob.core.windows.net')]"
+                            "value": "[concat( 'https://' , variables('storageAccounts_appsinterne_name'), '.blob.core.windows.net')]"
                         },
                         {
                             "Name": "AzureBlobFileSystem.ContainerName:media",
@@ -213,10 +194,10 @@
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
-            "name": "[parameters('sites_Veille_func_name')]",
+            "name": "[variables('Sites_Veille_func_name')]",
             "location": "Canada Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_FunctionApp_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_FunctionApp_name'))]"
             ],
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
@@ -236,16 +217,16 @@
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_FunctionApp_name'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_FunctionApp_name'))]",
                 "siteConfig": {
                     "appSettings": [
                         {
                             "name": "AzureWebJobsDashboard",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
                           },
                           {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
                           }
                     ],
                     "connectionStrings": [
@@ -269,10 +250,10 @@
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
-            "name": "[parameters('sites_Veille_name')]",
+            "name": "[variables('Sites_Veille_name')]",
             "location": "Canada Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_Standard_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]"
             ],
             "kind": "app",
             "tags": {
@@ -301,7 +282,7 @@
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_Standard_name'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]",
                 "reserved": false,
                 "scmSiteAlsoStopped": false,
                 "clientAffinityEnabled": true,
@@ -315,10 +296,10 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
-            "name": "[concat(parameters('sites_AppsInterne_name'), '/web')]",
+            "name": "[concat(variables('sites_AppsInterne_name'), '/web')]",
             "location": "Canada Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_AppsInterne_name'))]"
+                "[resourceId('Microsoft.Web/sites', variables('sites_AppsInterne_name'))]"
             ],
             "properties": {
                 "numberOfWorkers": "1",
@@ -389,10 +370,10 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
-            "name": "[concat(parameters('sites_Veille_func_name'), '/web')]",
+            "name": "[concat(variables('sites_Veille_func_name'), '/web')]",
             "location": "Canada Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_Veille_func_name'))]"
+                "[resourceId('Microsoft.Web/sites', variables('sites_Veille_func_name'))]"
             ],
             "properties": {
                 "numberOfWorkers": "1",
@@ -469,10 +450,10 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
-            "name": "[concat(parameters('sites_Veille_name'), '/web')]",
+            "name": "[concat( variables('sites_Veille_name'), '/web')]",
             "location": "Canada Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_Veille_name'))]"
+                "[resourceId('Microsoft.Web/sites', variables('sites_Veille_name'))]"
             ],
             "properties": {
                 "numberOfWorkers": "1",
@@ -543,10 +524,10 @@
         {
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
-            "name": "[concat(parameters('sites_AppsInterne_name'), '/', parameters('sites_AppsInterne_name'), '.azurewebsites.net')]",
+            "name": "[concat(variables('sites_AppsInterne_name'), '/', variables('sites_AppsInterne_name'), '.azurewebsites.net')]",
             "location": "Canada Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_AppsInterne_name'))]"
+                "[resourceId('Microsoft.Web/sites', variables('sites_AppsInterne_name'))]"
             ],
             "properties": {
                 "siteName": "[concat('appsinterne-',  parameters('environnement'))]",
@@ -556,10 +537,10 @@
         {
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
-            "name": "[concat(parameters('sites_Veille_func_name'), '/', parameters('sites_Veille_func_name'), '.azurewebsites.net')]",
+            "name": "[concat(variables('sites_Veille_func_name'), '/', variables('sites_Veille_func_name'), '.azurewebsites.net')]",
             "location": "Canada Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_Veille_func_name'))]"
+                "[resourceId('Microsoft.Web/sites', variables('sites_Veille_func_name'))]"
             ],
             "properties": {
                 "siteName": "[concat('veille-func-' , parameters('Environnement'))]",
@@ -569,10 +550,10 @@
         {
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
-            "name": "[concat(parameters('sites_Veille_name'), '/', parameters('sites_Veille_name'), '.azurewebsites.net')]",
+            "name": "[concat(variables('sites_Veille_name'), '/', variables('sites_Veille_name'), '.azurewebsites.net')]",
             "location": "Canada Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_Veille_name'))]"
+                "[resourceId('Microsoft.Web/sites', variables('sites_Veille_name'))]"
             ],
             "properties": {
                 "siteName": "[concat('veille-' , parameters('Environnement'))]",
@@ -582,10 +563,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2019-04-01",
-            "name": "[concat(parameters('storageAccounts_veillefunc_name'), '/default/azure-webjobs-hosts')]",
+            "name": "[concat(variables('storageAccounts_veillefunc_name'), '/default/azure-webjobs-hosts')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_veillefunc_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_veillefunc_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccounts_veillefunc_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name'))]"
             ],
             "properties": {
                 "publicAccess": "None"
@@ -594,10 +575,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2019-04-01",
-            "name": "[concat(parameters('storageAccounts_veillefunc_name'), '/default/azure-webjobs-secrets')]",
+            "name": "[concat(variables('storageAccounts_veillefunc_name'), '/default/azure-webjobs-secrets')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_veillefunc_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_veillefunc_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccounts_veillefunc_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name'))]"
             ],
             "properties": {
                 "publicAccess": "None"
@@ -607,11 +588,11 @@
     "outputs": {
         "AzureBlobFileSystem.ConnectionString:media": {
             "type": "string",
-            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters( 'storageAccounts_appsinterne_name' ) ,';AccountKey=' , parameters('Accountkey'), ';EndpointSuffix=core.windows.net')]"
+            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_appsinterne_name' ) ,';AccountKey=' , parameters('Accountkey'), ';EndpointSuffix=core.windows.net')]"
         },
         "AzureBlobFileSystem.RootUrl:media": {
             "type": "string",
-            "value": "[concat( 'https://' , parameters('storageAccounts_appsinterne_name'), '.blob.core.windows.net')]"
+            "value": "[concat( 'https://' , variables('storageAccounts_appsinterne_name'), '.blob.core.windows.net')]"
         },
         "VeilleDeLien.UrlBase":{
             "type": "string",
@@ -623,7 +604,7 @@
         },
         "AzureWebJobsStorage":{
             "type": "string",
-            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
         },
         "bd_VeilleContenuExterneEntities": {
             "type": "string",

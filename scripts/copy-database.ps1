@@ -19,9 +19,9 @@ Param(
         $TargetEnv = "devops",
 
         [Parameter()]
-        [validateset("BdAppsInterne-", "BdVeille-", "tbl_VeilleDeContenuExterne")]
+        [validateset("BdAppsInterne-", "BdVeille-")]
         [string[]] 
-        $BdArray = ("BdAppsInterne-","BdVeille-", "tbl_VeilleDeContenuExterne")
+        $BdArray = ("BdAppsInterne-","BdVeille-")
     )
 import-module azurerm.sql, azurerm.Websites
 

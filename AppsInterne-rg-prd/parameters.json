@@ -2,27 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "sites_Veille_name": {
-            "value": "Veille-dev"
-        },
-        "sites_AppsInterne_name": {
-            "value": "AppsInterne-dev"
-        },
-        "sites_Veille_func_name": {
-            "value": "Veille-func-dev"
-        },
-        "serverfarms_ASP_Standard_name": {
-            "value": "ASP-Standard-dev"
-        },
-        "serverfarms_FunctionApp_name": {
-            "value": "ASP-FunctionApp-dev"
-        },
-        "storageAccounts_veillefunc_name": {
-            "value": "storveillefuncdev"
-        },
-        "storageAccounts_appsinterne_name": {
-            "value": "storappsinternedev"
-        },
         "Environnement": {
             "value": "dev"
         },
