@@ -25,20 +25,19 @@
 #>
 
 param(
-    [Parameter(Mandatory=$True)]
-    [string]
-    [ValidateSet("dev", "qa", "prd", "devops")] 
-    $Environnement,
-   
-    [string]
-    $ResourceGroupLocation = "CanadaCentral",
 
-    [string]
-    $TemplateFilePath = "template.json",
-   
-    [string]
-    $ParametersFilePath = "parameters.json"
-   )
+ [string]
+ $ResourceGroupName = "apps_satellites-DEV",
+
+ [string]
+ $ResourceGroupLocation  = "Canada Central",
+
+ [string]
+ $TemplateFilePath = "template.json",
+
+ [string]
+ $ParametersFilePath = "parameters.json"
+)
 
 $AzModuleVersion = "2.0.0"
 
@@ -77,7 +76,7 @@ Write-Host "Selecting subscription '$Subscription'";
 # Select-AzSubscription -Subscription $Subscription;
 
 # Register RPs
-$resourceProviders = @("microsoft.sql","microsoft.storage","microsoft.web");
+$resourceProviders = @("microsoft.web");
 if($resourceProviders.length) {
     Write-Host "Registering resource providers"
     foreach($resourceProvider in $resourceProviders) {
@@ -86,7 +85,6 @@ if($resourceProviders.length) {
 }
 
 #Create or check for existing resource group
-$ResourceGroupName  = "GumAppsInterne-rg-" + $Environnement
 $resourceGroup = Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
 if(!$resourceGroup)
 {
@@ -108,33 +106,3 @@ if(Test-Path $ParametersFilePath) {
 } else {
     New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $TemplateFilePath;
 }
-
-
-$Sites = "Gum-$environnement", "gummaster-$environnement"
-foreach ( $site in $sites) {
-    $APIVersion = ((Get-AzResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
-    $WebAppConfig = (Get-AzResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName GumAppsinterne-rg-$Environnement -ApiVersion $APIVersion)
-    $priority = 180;  
-    $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
-    $IpSecurityRestrictions
-
-    [System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
-
-    (Get-azwebapp -name $site).PossibleOutboundIpAddresses.split(",") | ForEach-Object { 
-        $Ip = $_;
-        if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
-            $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
-            $webip.ipAddress = $_ + '/32';  
-            $webip.action = "Allow"; 
-            $webip.name = "Allow_Address_Interne"
-            $priority = $priority + 20 ; 
-            $webIP.priority = $priority;  
-            $ArrayList.Add($webIP); 
-            Remove-Variable webip
-        }
-    }
-    $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-    $WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
-    
-}
-

@@ -5,7 +5,10 @@
         "Environnement": {
             "type": "string"
         },
-        "AccountKey":{
+        "storappsinterneAccountKey":{
+            "type": "securestring"
+        },
+        "storveillefuncAccountKey": {
             "type": "securestring"
         },
         "AdminPassword": {
@@ -22,40 +25,6 @@
         "storageAccounts_appsinterne_name": "[concat('storappsinterne', parameters('Environnement'))]"
     },
     "resources": [
-        {
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2019-04-01",
-            "name": "[variables('storageAccounts_veillefunc_name')]",
-            "location": "canadacentral",
-            "sku": {
-                "name": "Standard_LRS",
-                "tier": "Standard"
-            },
-            "kind": "StorageV2",
-            "properties": {
-                "networkAcls": {
-                    "bypass": "AzureServices",
-                    "virtualNetworkRules": [],
-                    "ipRules": [],
-                    "defaultAction": "Allow"
-                },
-                "supportsHttpsTrafficOnly": true,
-                "encryption": {
-                    "services": {
-                        "file": {
-                            "enabled": true
-                        },
-                        "blob": {
-                            "enabled": true
-                        }
-                    },
-                    "keySource": "Microsoft.Storage"
-                }
-            },
-            "tags": {
-                "Environnement": "[parameters('Environnement')]"
-            }
-        },
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
@@ -105,25 +74,6 @@
             }
         },
         {
-            "type": "Microsoft.Storage/storageAccounts/blobServices",
-            "apiVersion": "2019-04-01",
-            "name": "[concat(variables('storageAccounts_veillefunc_name'), '/default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name'))]"
-            ],
-            "properties": {
-                "cors": {
-                    "corsRules": []
-                },
-                "deleteRetentionPolicy": {
-                    "enabled": false
-                }
-            },
-            "tags": {
-                "Environnement": "[parameters('Environnement')]"
-            }
-        },
-        {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "name": "[variables('Sites_AppsInterne_name')]",
@@ -154,7 +104,7 @@
                     "appSettings": [
                         {
                             "name": "AzureBlobFileSystem.ConnectionString:media",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_appsinterne_name') ,';AccountKey=' , parameters('Accountkey'), ';EndpointSuffix=core.windows.net')]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_appsinterne_name') ,';AccountKey=' , parameters('storappsinterneAccountKey'), ';EndpointSuffix=core.windows.net')]"
                         },
                         {
                             "name": "AzureBlobFileSystem.RootUrl:media",
@@ -222,11 +172,11 @@
                     "appSettings": [
                         {
                             "name": "AzureWebJobsDashboard",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', parameters('storveillefuncAccountKey'))]"
                           },
                           {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', parameters('storveillefuncAccountKey'))]"
                           }
                     ],
                     "connectionStrings": [
@@ -559,36 +509,12 @@
                 "siteName": "[concat('veille-' , parameters('Environnement'))]",
                 "hostNameType": "Verified"
             }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2019-04-01",
-            "name": "[concat(variables('storageAccounts_veillefunc_name'), '/default/azure-webjobs-hosts')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccounts_veillefunc_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name'))]"
-            ],
-            "properties": {
-                "publicAccess": "None"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2019-04-01",
-            "name": "[concat(variables('storageAccounts_veillefunc_name'), '/default/azure-webjobs-secrets')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccounts_veillefunc_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name'))]"
-            ],
-            "properties": {
-                "publicAccess": "None"
-            }
         }
     ],
     "outputs": {
         "AzureBlobFileSystem.ConnectionString:media": {
             "type": "string",
-            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_appsinterne_name' ) ,';AccountKey=' , parameters('Accountkey'), ';EndpointSuffix=core.windows.net')]"
+            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_appsinterne_name' ) ,';AccountKey=' , parameters('storappsinterneAccountKey'), ';EndpointSuffix=core.windows.net')]"
         },
         "AzureBlobFileSystem.RootUrl:media": {
             "type": "string",
@@ -604,7 +530,7 @@
         },
         "AzureWebJobsStorage":{
             "type": "string",
-            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', parameters('storveillefuncAccountKey'))]"
         },
         "bd_VeilleContenuExterneEntities": {
             "type": "string",

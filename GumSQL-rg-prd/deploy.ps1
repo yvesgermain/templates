@@ -90,7 +90,7 @@ if ($resourceProviders.length) {
 }
 
 #Create or check for existing resource group
-$ResourceGroupName = "GumSQLApps-rg-" + $Environnement
+$ResourceGroupName = "GumSQL-rg-" + $Environnement
 $resourceGroup = Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
 if (!$resourceGroup) {
     if (!$ResourceGroupLocation) {

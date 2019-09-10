@@ -3,17 +3,17 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "servers_sqlguminterne_name": {
-            "value": "sqlguminterne-dev"
+            "value": "sqlguminterne-devops"
         },
         "Environnement" : {
-            "value": "dev"
+            "value": "devops"
         },
         "administratorLoginPassword": {
             "reference": {
                 "keyVault": {
                   "id": "/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/Infrastructure/providers/Microsoft.KeyVault/vaults/gumkeyvault"
                 },
-                "secretName": "sqladmindev"
+                "secretName": "sqladmindevops"
               }
         }
     }

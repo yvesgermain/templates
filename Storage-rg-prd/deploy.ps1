@@ -112,8 +112,20 @@ if(Test-Path $parametersFilePath) {
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
 }
 
-get-azstorageaccount -resourcegroupName $resourceGroupName | where-object {$_.storageaccountname -like "storappsinterne*"} | foreach-object { $name = $_.storageaccountname; Get-AzStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where-object { $_.keyname -like "key1"} | ForEach-Object { $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; Set-AzKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"}
+get-azstorageaccount -resourcegroupName $resourceGroupName | where-object {$_.storageaccountname -like "storappsinterne*"} | foreach-object { 
+    $name = $_.storageaccountname; 
+    Get-AzStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where-object { $_.keyname -like "key1"} | ForEach-Object { 
+        $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; 
+        Set-AzKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"
+    }
 
+get-azstorageaccount -resourcegroupName $resourceGroupName | where-object {$_.storageaccountname -like "storveillefunc*"} | foreach-object { 
+    $name = $_.storageaccountname; 
+    Get-AzStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where-object { $_.keyname -like "key1"} | ForEach-Object { 
+        $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; 
+        Set-AzKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"
+    }
+    
 if( (Get-Item $AzCopyPath).Exists)
 {
    $FileItemVersion = (Get-Item $AzCopyPath).VersionInfo

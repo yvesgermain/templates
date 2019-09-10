@@ -1,0 +1,197 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sites_AppsInterne_dev_name": {
+            "defaultValue": "AppsInterne-old",
+            "type": "string"
+        },
+        "serverfarms_AppsInterneServicePlan_externalid": {
+            "defaultValue": "/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/apps_satellites-DEV/providers/Microsoft.Web/serverfarms/AppsInterneServicePlan",
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "name": "[parameters('sites_AppsInterne_dev_name')]",
+            "location": "Canada East",
+            "tags": {},
+            "kind": "app",
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "appsinterne-old.azurewebsites.net",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "appsinterne-old.scm.azurewebsites.net",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[parameters('serverfarms_AppsInterneServicePlan_externalid')]",
+                "siteConfig": {
+                    "connectionStrings": [
+                        {
+                            "name": "umbracoDbDSN",
+                            "connectionString": "Server=tcp:appsinterne-devbdserver.database.windows.net,1433;Initial Catalog=AppsInternebddev;Persist Security Info=False;User ID=ateam@appsinterne-devbdserver;Password=1q2w3e$R;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+                            "type": "SQLAzure"
+                        }
+                    ]
+                },
+                "reserved": false,
+                "scmSiteAlsoStopped": "false",
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2016-08-01",
+            "name": "[concat(parameters('sites_AppsInterne_dev_name'), '/web')]",
+            "location": "Canada East",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_AppsInterne_dev_name'))]"
+            ],
+            "tags": {},
+            "properties": {
+                "numberOfWorkers": "1",
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "phpVersion": "5.6",
+                "pythonVersion": "",
+                "nodeVersion": "",
+                "linuxFxVersion": "",
+                "requestTracingEnabled": "false",
+                "remoteDebuggingEnabled": "false",
+                "remoteDebuggingVersion": "VS2017",
+                "httpLoggingEnabled": "false",
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": "false",
+                "publishingUsername": "$AppsInterne-old",
+                "scmType": "VSTSRM",
+                "use32BitWorkerProcess": "true",
+                "webSocketsEnabled": "false",
+                "alwaysOn": "false",
+                "appCommandLine": "",
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": false,
+                        "virtualDirectories": null
+                    }
+                ],
+                "winAuthAdminState": "0",
+                "winAuthTenantState": "0",
+                "customAppPoolIdentityAdminState": "false",
+                "customAppPoolIdentityTenantState": "false",
+                "loadBalancing": "LeastRequests",
+                "routingRules": [],
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": "false",
+                "vnetName": "",
+                "siteAuthEnabled": "false",
+                "siteAuthSettings": {
+                    "enabled": null,
+                    "unauthenticatedClientAction": null,
+                    "tokenStoreEnabled": null,
+                    "allowedExternalRedirectUrls": null,
+                    "defaultProvider": null,
+                    "clientId": null,
+                    "clientSecret": null,
+                    "clientSecretCertificateThumbprint": null,
+                    "issuer": null,
+                    "allowedAudiences": null,
+                    "additionalLoginParams": null,
+                    "isAadAutoProvisioned": false,
+                    "googleClientId": null,
+                    "googleClientSecret": null,
+                    "googleOAuthScopes": null,
+                    "facebookAppId": null,
+                    "facebookAppSecret": null,
+                    "facebookOAuthScopes": null,
+                    "twitterConsumerKey": null,
+                    "twitterConsumerSecret": null,
+                    "microsoftAccountClientId": null,
+                    "microsoftAccountClientSecret": null,
+                    "microsoftAccountOAuthScopes": null
+                },
+                "localMySqlEnabled": "false",
+                "managedServiceIdentityId": "102564",
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "205.237.253.0",
+                        "subnetMask": "255.255.255.0",
+                        "name": "AllowSoquijOnly",
+                        "description": "AllowSoquijOnly"
+                    },
+                    {
+                        "ipAddress": "40.86.230.81",
+                        "subnetMask": "255.255.255.255",
+                        "name": "appsinterne-old",
+                        "description": "appsinterne-old"
+                    },
+                    {
+                        "ipAddress": "40.86.229.239",
+                        "subnetMask": "255.255.255.255",
+                        "name": " appsinterne-old",
+                        "description": " appsinterne-old"
+                    },
+                    {
+                        "ipAddress": "40.86.230.126",
+                        "subnetMask": "255.255.255.255",
+                        "name": "appsinterne-old",
+                        "description": "appsinterne-old"
+                    },
+                    {
+                        "ipAddress": "40.86.230.105",
+                        "subnetMask": "255.255.255.255",
+                        "name": "appsinterne-old",
+                        "description": "appsinterne-old"
+                    }
+                ],
+                "http20Enabled": "false",
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": "0",
+                "fileChangeAuditEnabled": "false"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2016-08-01",
+            "name": "[concat(parameters('sites_AppsInterne_dev_name'), '/', parameters('sites_AppsInterne_dev_name'), '.azurewebsites.net')]",
+            "location": "Canada East",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_AppsInterne_dev_name'))]"
+            ],
+            "properties": {
+                "siteName": "AppsInterne-old",
+                "hostNameType": "Verified"
+            }
+        }
+    ]
+}
