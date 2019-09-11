@@ -13,6 +13,12 @@
 .SYNOPSIS
     Registers RPs
 #>
+param(
+[Parameter(Mandatory = $True)]
+[string]
+[ValidateSet("dev", "qa", "prd", "devops")] 
+$environnement
+)
 
 #******************************************************************************
 # Script body
@@ -24,7 +30,6 @@ $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 
 #Create or check for existing resource group
 $ResourceGroupName = "gumstorage-rg-" + $environnement
-$resourceGroup = Get-AzureRMResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
 
 get-azureRMstorageaccount -resourcegroupName $resourceGroupName | where-object { $_.storageaccountname -like "storgum*" } | foreach-object { 
     $name = $_.storageaccountname; 
