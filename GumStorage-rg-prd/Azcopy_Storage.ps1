@@ -13,7 +13,8 @@
 .SYNOPSIS
     Registers RPs
 #>
-Remove-Module azureRM
+Remove-Module azureRM*
+whoami
 Import-Module Az.Resources
 Function RegisterRP {
     Param(
