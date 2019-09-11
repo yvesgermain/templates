@@ -2,18 +2,16 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "servers_sqlguminterne_name": {
-            "type": "string"
-        },
-        "administratorLoginPassword": {
-            "type": "securestring"
-        },
         "environnement" :{
             "type": "string",
             "allowedValues": ["prd","qa","dev","devops"]
+        },
+        "administratorLoginPassword": {
+              "type": "securestring"
         }
     },
     "variables": {
+        "servers_sqlguminterne_name": "[concat('sqlguminterne-', parameters('Environnement'))]", 
         "BdAppsInterne" : "[concat('BdAppsInterne-', parameters('environnement'))]" ,
         "BdVeille" : "[concat('BdVeille-', parameters('environnement'))]" ,
         "administratorLogin" : "[concat('sqladmin', parameters('environnement'))]",
@@ -26,7 +24,7 @@
         {
             "type": "Microsoft.Sql/servers",
             "apiVersion": "2015-05-01-preview",
-            "name": "[parameters('servers_sqlguminterne_name')]",
+            "name": "[variables('servers_sqlguminterne_name')]",
             "location": "canadacentral",
             "kind": "v12.0",
             "properties": {
@@ -41,10 +39,10 @@
         {
             "type": "Microsoft.Sql/servers/administrators",
             "apiVersion": "2014-04-01-preview",
-            "name": "[concat(parameters('servers_sqlguminterne_name'), '/ActiveDirectory')]",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/ActiveDirectory')]",
             "location": "Canada Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sqlguminterne_name'))]"
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
             ],
             "properties": {
                 "administratorType": "ActiveDirectory",
@@ -56,10 +54,10 @@
         {
             "type": "Microsoft.Sql/servers/databases",
             "apiVersion": "2017-03-01-preview",
-            "name": "[concat(parameters('servers_sqlguminterne_name'), '/', variables('BdAppsInterne'))]",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdAppsInterne'))]",
             "location": "canadacentral",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sqlguminterne_name'))]"
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
             ],
             "sku": {
                 "name": "S0",
@@ -79,10 +77,10 @@
         {
             "type": "Microsoft.Sql/servers/databases",
             "apiVersion": "2017-03-01-preview",
-            "name": "[concat(parameters('servers_sqlguminterne_name'), '/', variables('BdVeille'))]",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdVeille'))]",
             "location": "canadacentral",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sqlguminterne_name'))]"
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
             ],
             "sku": {
                 "name": "S0",
@@ -101,9 +99,9 @@
         },        {
             "type": "Microsoft.Sql/servers/firewallRules",
             "apiVersion": "2015-05-01-preview",
-            "name": "[concat(parameters('servers_sqlguminterne_name'), '/AllowAllWindowsAzureIps')]",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/AllowAllWindowsAzureIps')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sqlguminterne_name'))]"
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
             ],
             "properties": {
                 "startIpAddress": "0.0.0.0",
@@ -116,9 +114,9 @@
         {
             "type": "Microsoft.Sql/servers/firewallRules",
             "apiVersion": "2015-05-01-preview",
-            "name": "[concat(parameters('servers_sqlguminterne_name'), '/AllowSoquij')]",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/AllowSoquij')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sqlguminterne_name'))]"
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
             ],
             "properties": {
                 "startIpAddress": "205.237.253.10",
