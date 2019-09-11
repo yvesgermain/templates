@@ -13,17 +13,6 @@
 .SYNOPSIS
     Registers RPs
 #>
-Remove-Module azureRM*
-whoami
-Import-Module Az.Resources
-Function RegisterRP {
-    Param(
-        [string]$ResourceProviderNamespace
-    )
-
-    Write-Host "Registering resource provider '$ResourceProviderNamespace'";
-    Register-AzResourceProvider -ProviderNamespace $ResourceProviderNamespace;
-}
 
 #******************************************************************************
 # Script body
@@ -32,23 +21,16 @@ Function RegisterRP {
 $ErrorActionPreference = "Stop"
 $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 # Register RPs
-$resourceProviders = @("microsoft.sql", "microsoft.storage", "microsoft.web");
-if ($resourceProviders.length) {
-    Write-Host "Registering resource providers"
-    foreach ($resourceProvider in $resourceProviders) {
-        RegisterRP($resourceProvider);
-    }
-}
 
 #Create or check for existing resource group
 $ResourceGroupName = "gumstorage-rg-" + $environnement
-$resourceGroup = Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
+$resourceGroup = Get-AzureRMResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
 
-get-azstorageaccount -resourcegroupName $resourceGroupName | where-object { $_.storageaccountname -like "storgum*" } | foreach-object { 
+get-azureRMstorageaccount -resourcegroupName $resourceGroupName | where-object { $_.storageaccountname -like "storgum*" } | foreach-object { 
     $name = $_.storageaccountname; 
-    Get-AzStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where-object { $_.keyname -like "key1" } | ForEach-Object {
+    Get-AzureRMStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where-object { $_.keyname -like "key1" } | ForEach-Object {
     $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; 
-    Set-AzKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"
+    Set-AzureKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"
 }
 
 if( (Get-Item $AzCopyPath).Exists)
@@ -69,8 +51,8 @@ elseIf( (Get-Item $AzCopyPath).Exists -eq $false)
 
 Set-Location (Get-ChildItem $AzCopyPath).directory.fullname
 
-$SourceKey = (get-azstorageaccountkey -Name storgumprd -ResourceGroupName gumstorage-rg-prd | where-object {$_.keyname -eq "key1"}).value
-$DestKey   = (get-azstorageaccountkey -Name storgum$Environnement -ResourceGroupName gumstorage-rg-$Environnement | where-object {$_.keyname -eq "key1"}).value
+$SourceKey = (get-azureRMstorageaccountkey -Name storgumprd -ResourceGroupName gumstorage-rg-prd | where-object {$_.keyname -eq "key1"}).value
+$DestKey   = (get-azureRMstorageaccountkey -Name storgum$Environnement -ResourceGroupName gumstorage-rg-$Environnement | where-object {$_.keyname -eq "key1"}).value
 
 . $AzCopyPath /source:https://storgumprd.blob.core.windows.net/guichetunique/ /sourcekey:$SourceKey /dest:https://storgum$Environnement.blob.core.windows.net/guichetunique/ /s /y /destkey:$destkey
 
