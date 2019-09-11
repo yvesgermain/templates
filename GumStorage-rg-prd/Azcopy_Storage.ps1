@@ -17,7 +17,9 @@ param(
 [Parameter(Mandatory = $True)]
 [string]
 [ValidateSet("dev", "qa", "prd", "devops")] 
-$environnement
+$environnement, 
+
+$AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 )
 
 #******************************************************************************
@@ -25,7 +27,7 @@ $environnement
 # Execution begins here
 #******************************************************************************
 $ErrorActionPreference = "Stop"
-$AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
+
 # Register RPs
 
 #Create or check for existing resource group
