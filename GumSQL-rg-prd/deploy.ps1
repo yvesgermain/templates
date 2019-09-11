@@ -113,21 +113,22 @@ else {
     New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $TemplateFilePath;
 }
 
-$TargetEnv = $Environnement
+if ( $Environnement -eq "prd") { write-warning "Il faut copier la BD manuellement" } else {
 
-$databaseName = "soquijgumumbracodbdev"
-$serverName = "soquijgumsqlserverdev"
-$resourceGroupName = "SoquijGUM-DEV"
+    $databaseName = "BdGum-prd"
+    $serverName = "SqlGum-prd"
+    $resourceGroupName = "GumSQL-rg-prd"
 
-$TargetDatabaseName = "BdGum-" + $TargetEnv
-$TargetServerName = "SqlGum-" + $TargetEnv
-$TargetResourceGroupName = "GumSQLApps-rg-" + $TargetEnv
+    $TargetDatabaseName = "BdGum-" + $Environnement
+    $TargetServerName = "SqlGum-" + $Environnement
+    $TargetResourceGroupName = "GumSQL-rg-" + $Environnement
 
-"Removing database $TargetDatabaseName"
-if (get-azSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue) {
-    Remove-azSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName
+    "Removing database $TargetDatabaseName"
+    if (get-azSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue) {
+        Remove-azSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName
+    }
+    "Copying database $databaseName from server $servername to database $TargetDatabaseName on $TargetServerName"
+    New-azSqlDatabaseCopy -ServerName $serverName -ResourceGroupName $resourceGroupName -DatabaseName $databaseName `
+        -CopyResourceGroupName $TargetResourceGroupName -CopyServerName $TargetServerName -CopyDatabaseName $TargetDatabaseName
+
 }
-"Copying database $databaseName from server $servername to database $TargetDatabaseName on $TargetServerName"
-New-azSqlDatabaseCopy -ServerName $serverName -ResourceGroupName $resourceGroupName -DatabaseName $databaseName `
-    -CopyResourceGroupName $TargetResourceGroupName -CopyServerName $TargetServerName -CopyDatabaseName $TargetDatabaseName
-

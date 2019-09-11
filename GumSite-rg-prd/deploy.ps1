@@ -113,7 +113,7 @@ if(Test-Path $ParametersFilePath) {
 $Sites = "Gum-$environnement", "gummaster-$environnement"
 foreach ( $site in $sites) {
     $APIVersion = ((Get-AzResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
-    $WebAppConfig = (Get-AzResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName GumAppsinterne-rg-$Environnement -ApiVersion $APIVersion)
+    $WebAppConfig = (Get-AzResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName GumSite-rg-$Environnement -ApiVersion $APIVersion)
     $priority = 180;  
     $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
     $IpSecurityRestrictions
