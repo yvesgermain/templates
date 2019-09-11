@@ -13,6 +13,8 @@
 .SYNOPSIS
     Registers RPs
 #>
+
+Import-Module Az.Resources
 Function RegisterRP {
     Param(
         [string]$ResourceProviderNamespace
