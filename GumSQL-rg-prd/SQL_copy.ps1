@@ -33,11 +33,11 @@ $ErrorActionPreference = "Stop"
 if ( $Environnement -eq "prd") { write-warning "Il faut copier la BD manuellement" } else {
 
     $databaseName = "BdGum-prd"
-    $serverName = "SqlGum-prd"
+    $serverName = "sqlgum-prd"
     $resourceGroupName = "GumSQL-rg-prd"
 
     $TargetDatabaseName = "BdGum-" + $Environnement
-    $TargetServerName = "SqlGum-" + $Environnement
+    $TargetServerName = "sqlgum-" + $Environnement
     $TargetResourceGroupName = "GumSQL-rg-" + $Environnement
 
     "Removing database $TargetDatabaseName"
