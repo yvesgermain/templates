@@ -41,7 +41,7 @@ if ( $Environnement -eq "prd") { write-warning "Il faut copier la BD manuellemen
     $TargetResourceGroupName = "GumSQL-rg-" + $Environnement
 
     "Removing database $TargetDatabaseName"
-    if (get-azuerRMSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue) {
+    if (get-azureRMSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue) {
         Remove-azureRMSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName
     }
     "Copying database $databaseName from server $servername to database $TargetDatabaseName on $TargetServerName"
