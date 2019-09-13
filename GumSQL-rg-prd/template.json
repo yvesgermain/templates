@@ -11,14 +11,14 @@
         "enableADS": {
             "defaultValue": false,
             "type": "bool",
-              "metadata": {
-              "description": "Enable Advanced Data Security."
+            "metadata": {
+                "description": "Enable Advanced Data Security."
             }
-        },
+        }
     },
     "variables": {
         "servers_gumsqlserver_name": "[concat('sqlgum-', parameters('Environnement'))]",
-        "DatabaseName" : "[concat('BdGum-', parameters('Environnement'))]",
+        "DatabaseName": "[concat('BdGum-', parameters('Environnement'))]",
         "administratorLogin": "[concat('sqladmin', parameters('environnement'))]",
         "location": "CanadaCentral",
         "storageName": "gumlogs",
