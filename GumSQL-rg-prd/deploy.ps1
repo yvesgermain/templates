@@ -40,8 +40,10 @@ param(
     [string]
     $TemplateFilePath = "template.json",
 
+    [Parameter(Mandatory = $True)]    
     [string]
-    $ParametersFilePath = "parameters.json"
+    [ValidateSet("parameters-dev.json", "parameters-qa.json", "parameters-prd.json", "parameters-devops.json")] 
+    $ParametersFilePath 
 )
 
 $AzModuleVersion = "2.0.0"

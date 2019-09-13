@@ -140,8 +140,8 @@ elseIf( (Get-Item $AzCopyPath).Exists -eq $false)
 push-location
 Set-Location (Get-ChildItem $AzCopyPath).directory.fullname
 
-$SourceKey = (get-azstorageaccountkey -Name soquijgummediastoragedev -ResourceGroupName SoquijGUM-DEV | where-object {$_.keyname -eq "key1"}).value
+$SourceKey = (get-azstorageaccountkey -Name storgumprd -ResourceGroupName gumstorage-rg-prd | where-object {$_.keyname -eq "key1"}).value
 $DestKey   = (get-azstorageaccountkey -Name storgum$Environnement -ResourceGroupName gumstorage-rg-$Environnement | where-object {$_.keyname -eq "key1"}).value
 
-. $AzCopyPath /source:https://soquijgummediastoragedev.blob.core.windows.net/guichetuniquedev/ /sourcekey:$SourceKey /dest:https://storgum$Environnement.blob.core.windows.net/guichetunique/ /s /y /destkey:$destkey
+. $AzCopyPath /source:https://storgumprd.blob.core.windows.net/guichetunique/ /sourcekey:$SourceKey /dest:https://storgum$Environnement.blob.core.windows.net/guichetunique/ /s /y /destkey:$destkey
 pop-location
