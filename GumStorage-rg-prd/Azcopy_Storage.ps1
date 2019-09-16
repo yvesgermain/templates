@@ -33,8 +33,6 @@ $ErrorActionPreference = "Stop"
 #Create or check for existing resource group
 $ResourceGroupName = "gumstorage-rg-" + $environnement
 
-$env:Environnement > C:\testresults\Environnement.txt
-
 get-azureRMstorageaccount -resourcegroupName $resourceGroupName | where-object { $_.storageaccountname -like "storgum*" } | foreach-object { 
     $name = $_.storageaccountname; 
     Get-AzureRMStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where-object { $_.keyname -like "key1" } | ForEach-Object {
