@@ -1,6 +1,6 @@
 param(
  [ValidateSet("dev", "qa", "prd", "devops")] 
- $TargetEnv,
+ $Environnement,
  $SourceEnv = "prd"
 )
 
@@ -14,16 +14,15 @@ $Cred = New-Object System.Management.Automation.PSCredential -ArgumentList ($use
 
 invoke-sqlcmd -ServerInstance sqlguminterne-$environnement.database.windows.net -Database BdAppsInterne-$environnement -InputFile c:\soquij\SQL\Install\createV8.sql -Credential $cred
 
-$TargetEnv = $Environnement
 $BdArray = ("BdAppsInterne-","BdVeille-")
 foreach( $Bd in $Bdarray) {
     $databaseName = $Bd + $SourceEnv
     $serverName = "sqlguminterne-" + $SourceEnv
     $resourceGroupName = "sqlapps-rg-" +  $SourceEnv
 
-    $TargetDatabaseName = $Bd + $TargetEnv
-    $TargetServerName = "sqlguminterne-" + $TargetEnv
-    $TargetResourceGroupName = "sqlapps-rg-" +  $TargetEnv
+    $TargetDatabaseName = $Bd + $Environnement
+    $TargetServerName = "sqlguminterne-" + $Environnement
+    $TargetResourceGroupName = "sqlapps-rg-" +  $Environnement
 
     "Removing database $TargetDatabaseName"
     if (get-azSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue)
