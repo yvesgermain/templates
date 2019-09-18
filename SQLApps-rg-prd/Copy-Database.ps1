@@ -4,14 +4,13 @@ param(
   $Environnement
 )
 
-$environnement = $resourceGroupName.split("-")[-1]
 $username = "sqladmin$environnement@sqlguminterne-$environnement.database.windows.net"
 $password = (Get-AzureKeyVaultSecret -VaultName gumkeyvault -Name sqladmin$environnement  ).SecretValue
 $Cred = New-Object System.Management.Automation.PSCredential -ArgumentList ($username, $password)
 
 # invoke-sqlcmd -ServerInstance sqlguminterne-devops.database.windows.net -Database BdAppsInterne-devops -Query "select @@version" -Credential $cred
 
-invoke-sqlcmd -ServerInstance sqlguminterne-$environnement.database.windows.net -Database BdAppsInterne-$environnement -InputFile c:\soquij\SQL\Install\createV8.sql -Credential $cred
+# invoke-sqlcmd -ServerInstance sqlguminterne-$environnement.database.windows.net -Database BdAppsInterne-$environnement -InputFile c:\soquij\SQL\Install\createV8.sql -Credential $cred
 
 $BdArray = ("BdAppsInterne-","BdVeille-")
 foreach( $Bd in $Bdarray) {
