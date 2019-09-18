@@ -42,7 +42,6 @@ param(
 
     [Parameter(Mandatory = $True)]    
     [string]
-    [ValidateSet("parameters-dev.json", "parameters-qa.json", "parameters-prd.json", "parameters-devops.json")] 
     $ParametersFilePath 
 )
 
