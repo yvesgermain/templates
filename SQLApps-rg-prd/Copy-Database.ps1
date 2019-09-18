@@ -4,9 +4,6 @@ param(
   $Environnement
 )
 
-import-module azurerm.sql 
-import-module SQLPS
-Import-Module Azurerm.KeyVault
 $environnement = $resourceGroupName.split("-")[-1]
 $username = "sqladmin$environnement@sqlguminterne-$environnement.database.windows.net"
 $password = (Get-AzureKeyVaultSecret -VaultName gumkeyvault -Name sqladmin$environnement  ).SecretValue
