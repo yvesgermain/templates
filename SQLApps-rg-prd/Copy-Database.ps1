@@ -23,7 +23,7 @@ foreach( $Bd in $Bdarray) {
     $TargetResourceGroupName = "sqlapps-rg-" +  $Environnement
 
     "Removing database $TargetDatabaseName"
-    if (get-azurermDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue)
+    if (get-azurermSQLDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue)
 {
     Remove-azurermSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName
     }
