@@ -92,7 +92,7 @@ if(!$resourceGroup)
         $resourceGroupLocation = Read-Host "resourceGroupLocation";
     }
     Write-Host "Creating resource group '$resourceGroupName' in location '$resourceGroupLocation'";
-    New-azResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation
+    New-azResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation  -Tag @{Environnement = $Environnement }
 }
 else{
     Write-Host "Using existing resource group '$resourceGroupName'";
