@@ -1,10 +1,11 @@
 param(
  [ValidateSet("dev", "qa", "prd", "devops")] 
- $Environnement,
- $SourceEnv = "prd"
+  $SourceEnv = "prd",
+  $Environnement
 )
 
 import-module az.sql 
+Import-Module Az.KeyVault
 $environnement = $resourceGroupName.split("-")[-1]
 $username = "sqladmin$environnement@sqlguminterne-$environnement.database.windows.net"
 $password = (Get-AzKeyVaultSecret -VaultName gumkeyvault -Name sqladmin$environnement  ).SecretValue
