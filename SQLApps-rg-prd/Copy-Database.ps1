@@ -1,6 +1,6 @@
 param(
  [ValidateSet("dev", "qa", "prd", "devops")] 
- $Environnement,
+ $TargetEnv,
  $SourceEnv = "prd"
 )
 
