@@ -7,10 +7,12 @@ param(
 $username = "sqladmin$environnement@sqlguminterne-$environnement.database.windows.net"
 $password = (Get-AzureKeyVaultSecret -VaultName gumkeyvault -Name sqladmin$environnement  ).SecretValue
 $Cred = New-Object System.Management.Automation.PSCredential -ArgumentList ($username, $password)
+$resourceGroupName = "sqlapps-rg-$environnement"
 
 # invoke-sqlcmd -ServerInstance sqlguminterne-devops.database.windows.net -Database BdAppsInterne-devops -Query "select @@version" -Credential $cred
 
-# invoke-sqlcmd -ServerInstance sqlguminterne-$environnement.database.windows.net -Database BdAppsInterne-$environnement -InputFile c:\soquij\SQL\Install\createV8.sql -Credential $cred
+invoke-sqlcmd -ServerInstance sqlguminterne-$environnement.database.windows.net -Database BdAppsInterne-$environnement -InputFile c:\soquij\SQL\Install\createV8.sql -Credential $cred
+
 
 $BdArray = ("BdAppsInterne-","BdVeille-")
 foreach( $Bd in $Bdarray) {
@@ -32,3 +34,10 @@ foreach( $Bd in $Bdarray) {
     -CopyResourceGroupName $TargetResourceGroupName -CopyServerName $TargetServerName -CopyDatabaseName $TargetDatabaseName
  }
 
+# Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa
+if ( $Environnement -eq "dev" -or $Environnement -eq "qa") {
+    $QA = Get-AzureRmADGroup -SearchString "QA"
+    New-AzureRmRoleAssignment -ObjectId $QA.Id -RoleDefinitionName Contributor -ResourceGroupName $resourceGroupName -AllowDelegation
+    $dev = Get-AzureRmADGroup -SearchString "dev"
+    New-AzureRmRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner  -ResourceGroupName $resourceGroupName -AllowDelegation
+}
