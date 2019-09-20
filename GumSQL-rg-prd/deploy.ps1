@@ -60,10 +60,10 @@ Function RegisterRP {
     Register-AzResourceProvider -ProviderNamespace $ResourceProviderNamespace;
 }
 
-#******************************************************************************
+#*******************************************************************************
 # Script body
 # Execution begins here
-#******************************************************************************
+#*******************************************************************************
 $ErrorActionPreference = "Stop"
 
 # Verify that the Az module is installed 
@@ -78,7 +78,7 @@ Write-Host "Logging in...";
 # Connect-AzAccount; 
 
 # select subscription
-Write-Host "Selecting subscription '$Subscription'";
+Write-Host "Selecting subscription  '$Subscription'";
 # Select-AzSubscription -Subscription $Subscription;
 
 # Register RPs

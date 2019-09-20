@@ -1,27 +1,12 @@
 <#
  .SYNOPSIS
-    Deploys a template to Azure
-
- .DESCRIPTION
-    Deploys an Azure Resource Manager template
+    Restreint les addresses IP qui peuvent atteindre les sites web.
 
  .EXAMPLE
-    ./deploy.ps1 -subscription "Azure Subscription" -resourceGroupName myresourcegroup -resourceGroupLocation centralus
+    ./restreindre-ip.ps1 -environnement devops
 
- .PARAMETER Subscription
-    The subscription name or id where the template will be deployed.
-
- .PARAMETER ResourceGroupName
-    The resource group where the template will be deployed. Can be the name of an existing or a new resource group.
-
- .PARAMETER ResourceGroupLocation
-    Optional, a resource group location. If specified, will try to create a new resource group in this location. If not specified, assumes resource group is existing.
-
- .PARAMETER TemplateFilePath
-    Optional, path to the template file. Defaults to template.json.
-
- .PARAMETER ParametersFilePath
-    Optional, path to the parameters file. Defaults to parameters.json. If file is not found, will prompt for parameter values based on template.
+ .PARAMETER Environnement
+    L'environnement affecté
 #>
 
 param(
