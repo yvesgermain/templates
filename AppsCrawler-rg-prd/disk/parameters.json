@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "disks_AppsCrawler_OsDisk_1_5cbf292ae9fc4ad79dcb614f19750fde_name": {
+            "value": null
+        }
+    }
+}

@@ -1,0 +1,75 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachines_AppsCrawler_name": {
+            "defaultValue": "AppsCrawler",
+            "type": "String"
+        },
+        "disks_AppsCrawler_OsDisk_1_5cbf292ae9fc4ad79dcb614f19750fde_externalid": {
+            "defaultValue": "/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/AppsCrawler-rg-devops/providers/Microsoft.Compute/disks/AppsCrawler_OsDisk_1_5cbf292ae9fc4ad79dcb614f19750fde",
+            "type": "String"
+        },
+        "networkInterfaces_appscrawler729_externalid": {
+            "defaultValue": "/subscriptions/6a04c78c-475c-4872-b897-f85eec86bf02/resourceGroups/AppsCrawler-rg-devops/providers/Microsoft.Network/networkInterfaces/appscrawler729",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-03-01",
+            "name": "[parameters('virtualMachines_AppsCrawler_name')]",
+            "location": "canadacentral",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_DS1_v2"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2016-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Windows",
+                        "name": "[concat(parameters('virtualMachines_AppsCrawler_name'), '_OsDisk_1_5cbf292ae9fc4ad79dcb614f19750fde')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS",
+                            "id": "[parameters('disks_AppsCrawler_OsDisk_1_5cbf292ae9fc4ad79dcb614f19750fde_externalid')]"
+                        },
+                        "diskSizeGB": 127
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_AppsCrawler_name')]",
+                    "adminUsername": "SoquijAdm",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": true
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[parameters('networkInterfaces_appscrawler729_externalid')]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "https://appscrawlerrgdevopsdiag.blob.core.windows.net/"
+                    }
+                }
+            }
+        }
+    ]
+}
