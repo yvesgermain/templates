@@ -2,7 +2,7 @@
     [Parameter(Mandatory = $true)]
     [ValidateSet("dev", "qa", "prd", "devops")]
     [string]
-    $Environnement = "devops"
+    $Environnement 
 )
 
 $VMLocalAdminUser = "Soquijadm"
@@ -28,7 +28,13 @@ $SubnetAddressPrefix = "10.0.$i.0/24"
 $VnetAddressPrefix = "10.0.0.0/16"
 $PublicIPAddressName = "PIP-$environnement"
 $SingleSubnet = New-AzVirtualNetworkSubnetConfig -Name $SubnetName -AddressPrefix $SubnetAddressPrefix
-New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{"Environnement" = $environnement }
+
+if ( get-AzResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { 
+    "Removing resource group $ResourceGroupName"
+    Remove-AzResourceGroup -Name $ResourceGroupName -Force
+}
+ while (get-AzResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { start-sleep 20}
+New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{"Environnement" = $environnement } 
 $Vnet = New-AzVirtualNetwork -Name $NetworkName -ResourceGroupName $ResourceGroupName -Location $Location -AddressPrefix $VnetAddressPrefix -Subnet $SingleSubnet
 
 $PIP = New-AzPublicIpAddress -Name $PublicIPAddressName -DomainNameLabel $DNSNameLabel -ResourceGroupName $ResourceGroupName -Location $Location -AllocationMethod Dynamic
@@ -41,6 +47,7 @@ $VirtualMachine = Add-AzVMNetworkInterface -VM $VirtualMachine -Id $NIC.Id
 $VirtualMachine = Set-AzVMSourceImage -VM $VirtualMachine -PublisherName 'MicrosoftWindowsServer' -Offer 'WindowsServer' -Skus '2016-Datacenter' -Version latest
 $VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
 
+# Création de la VM
 New-AzVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
 
 $DestKey = (get-azStorageAccountKey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
@@ -66,30 +73,21 @@ if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
     $webip.ipAddress = $ip + '/32';  
     $webip.action = "Allow"; 
     $webip.name = "Allow_Crawler"
-    $priority = $priority; 
     $webIP.priority = $priority;  
     $ArrayList.Add($webIP); 
-    Remove-Variable webip
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-    $WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
+    $WebAppConfig | Set-AzResource -ApiVersion $APIVersion -Force -Verbose
 }
 
-
-
-get-AzStorageBlobContent -Container depot-tfs -Context $StorageContext -Blob TriggerExecCrawler.zip -Destination c:\temp\TriggerExecCrawler.zip -Force
-Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath "C:\templates\devops\appscrawler-rg-prd\Install-Chrome.ps1"
+Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath "C:\templates\devops\appscrawler-rg-prd\Install-Chrome.ps1" -Parameter @{"Environnement" = $Environnement}
 
 Get-AzStorageContainer depot-tfs -Context $storageContext | set-AzstorageContainerAcl -Permission  Off
 
 #  Retire accès à l'adresse IP du crawler au site gummaster
-$ArrayList.Remove($webIP); 
+$i = 0;
+$ArrayList | foreach-object { if ($_.Ipaddress -eq "13.88.255.6/32") { $Index = $i } ; $i++ }
+$ArrayList.Remove( $Index ) 
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
 $WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
 
-# Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa
-if ( $Environnement -eq "dev" -or $Environnement -eq "qa" -or $Environnement -eq "devops" ) {
-    $QA = Get-AzADGroup -SearchString "QA"
-    New-AzRoleAssignment -ObjectId $QA.Id -RoleDefinitionName Contributor -ResourceGroupName $resourceGroupName
-    $dev = Get-AzADGroup -SearchString "dev"
-    New-AzRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner  -ResourceGroupName $resourceGroupName
-}
+if ( get-AzResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzResourceGroup -Name $ResourceGroupName -Force}
