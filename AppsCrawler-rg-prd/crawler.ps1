@@ -44,8 +44,11 @@ $VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
 New-AzVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
 
 $DestKey = (get-azStorageAccountKey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
-$source = (Get-ChildItem \\srvtfs01\drop\GuichetUnique\ControleQualite\ControleQualite-IC\*\TestExecCrawler\TriggerExecCrawler.zip | sort-object CreationTime -Descending )[0].fullname
+$source = (Get-ChildItem \\srvtfs01\drop\GuichetUnique\ControleQualite\ControleQualite-IC\*\crawler\publish.zip | sort-object -Property creationdate)[0].fullname
 . $AzCopyPath /source:$source /dest:https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip /destkey:$destkey /Y
+
+$storageContext = New-AzStorageContext -StorageAccountName gumbackups -StorageAccountKey $Destkey
+Get-AzStorageContainer depot-tfs -Context $storageContext | set-AzstorageContainerAcl -Permission Blob
 
 #  Donne accès à l'adresse IP du crawler au site gummaster
 $ip = (Get-AzPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
@@ -60,25 +63,33 @@ $IpSecurityRestrictions
 
 if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
     $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
-    $webip.ipAddress = $_ + '/32';  
+    $webip.ipAddress = $ip + '/32';  
     $webip.action = "Allow"; 
     $webip.name = "Allow_Crawler"
     $priority = $priority; 
     $webIP.priority = $priority;  
     $ArrayList.Add($webIP); 
     Remove-Variable webip
-
+    $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
+    $WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
 }
-$WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-$WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
 
-$storageContext = New-AzStorageContext -StorageAccountName gumbackups -StorageAccountKey $Destkey
-Get-AzStorageContainer depot-tfs -Context $storageContext | set-AzstorageContainerAcl -Permission Blob
 
-get-AzStorageBlobContent -Container depot-tfs -Context $StorageContext -Blob TriggerExecCrawler.zip -Destination c:\temp\TriggerExecCrawler.zip
-Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath "C:\templates\devops\scripts\Install-Chrome.ps1" 
+
+get-AzStorageBlobContent -Container depot-tfs -Context $StorageContext -Blob TriggerExecCrawler.zip -Destination c:\temp\TriggerExecCrawler.zip -Force
+Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath "C:\templates\devops\appscrawler-rg-prd\Install-Chrome.ps1"
+
+Get-AzStorageContainer depot-tfs -Context $storageContext | set-AzstorageContainerAcl -Permission  Off
 
 #  Retire accès à l'adresse IP du crawler au site gummaster
 $ArrayList.Remove($webIP); 
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
 $WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
+
+# Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa
+if ( $Environnement -eq "dev" -or $Environnement -eq "qa" -or $Environnement -eq "devops" ) {
+    $QA = Get-AzADGroup -SearchString "QA"
+    New-AzRoleAssignment -ObjectId $QA.Id -RoleDefinitionName Contributor -ResourceGroupName $resourceGroupName
+    $dev = Get-AzADGroup -SearchString "dev"
+    New-AzRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner  -ResourceGroupName $resourceGroupName
+}
