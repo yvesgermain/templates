@@ -1,4 +1,4 @@
-﻿Param(
+Param(
     [Parameter(Mandatory = $true)]
     [ValidateSet("dev", "qa", "prd", "devops")]
     [string]
@@ -6,7 +6,7 @@
 )
 
 $VMLocalAdminUser = "Soquijadm"
-$VMLocalAdminSecurePassword = (Get-AzKeyVaultsecret -VaultName gumkeyvault -name Soquijadm ).SecretValue
+$VMLocalAdminSecurePassword = (Get-AzureKeyVaultsecret -VaultName gumkeyvault -name Soquijadm ).SecretValue
 $Location = "CanadaCentral"
 $ResourceGroupName = "crawler-rg-$environnement"
 $ComputerName = "VMcrawl-$environnement"
@@ -27,45 +27,45 @@ $i = switch ($environnement) {
 $SubnetAddressPrefix = "10.0.$i.0/24"
 $VnetAddressPrefix = "10.0.0.0/16"
 $PublicIPAddressName = "PIP-$environnement"
-$SingleSubnet = New-AzVirtualNetworkSubnetConfig -Name $SubnetName -AddressPrefix $SubnetAddressPrefix
+$SingleSubnet = New-AzureRMVirtualNetworkSubnetConfig -Name $SubnetName -AddressPrefix $SubnetAddressPrefix
 
-if ( get-AzResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { 
+if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { 
     "Removing resource group $ResourceGroupName"
-    Remove-AzResourceGroup -Name $ResourceGroupName -Force
+    Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force
 }
- while (get-AzResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { start-sleep 20}
+ while (get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { start-sleep 20}
 
  "Création du resourceGroup $ResourceGroupName"
-New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{"Environnement" = $environnement } 
-$Vnet = New-AzVirtualNetwork -Name $NetworkName -ResourceGroupName $ResourceGroupName -Location $Location -AddressPrefix $VnetAddressPrefix -Subnet $SingleSubnet
+New-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{"Environnement" = $environnement } 
+$Vnet = New-AzureRMVirtualNetwork -Name $NetworkName -ResourceGroupName $ResourceGroupName -Location $Location -AddressPrefix $VnetAddressPrefix -Subnet $SingleSubnet
 
-$PIP = New-AzPublicIpAddress -Name $PublicIPAddressName -DomainNameLabel $DNSNameLabel -ResourceGroupName $ResourceGroupName -Location $Location -AllocationMethod Dynamic
-$NIC = New-AzNetworkInterface -Name $NICName -ResourceGroupName $ResourceGroupName -Location $Location -SubnetId $Vnet.Subnets[0].Id -PublicIpAddressId $PIP.Id
+$PIP = New-AzureRMPublicIpAddress -Name $PublicIPAddressName -DomainNameLabel $DNSNameLabel -ResourceGroupName $ResourceGroupName -Location $Location -AllocationMethod Dynamic
+$NIC = New-AzureRMNetworkInterface -Name $NICName -ResourceGroupName $ResourceGroupName -Location $Location -SubnetId $Vnet.Subnets[0].Id -PublicIpAddressId $PIP.Id
 
 $Credential = New-Object System.Management.Automation.PSCredential ($VMLocalAdminUser, $VMLocalAdminSecurePassword);
-$VirtualMachine = New-AzVMConfig -VMName $VMName -VMSize $VMSize
-$VirtualMachine = Set-AzVMOperatingSystem -VM $VirtualMachine -Windows -ComputerName $ComputerName -Credential $Credential -ProvisionVMAgent -EnableAutoUpdate
-$VirtualMachine = Add-AzVMNetworkInterface -VM $VirtualMachine -Id $NIC.Id
-$VirtualMachine = Set-AzVMSourceImage -VM $VirtualMachine -PublisherName 'MicrosoftWindowsServer' -Offer 'WindowsServer' -Skus '2016-Datacenter' -Version latest
-$VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
+$VirtualMachine = New-AzureRMVMConfig -VMName $VMName -VMSize $VMSize
+$VirtualMachine = Set-AzureRMVMOperatingSystem -VM $VirtualMachine -Windows -ComputerName $ComputerName -Credential $Credential -ProvisionVMAgent -EnableAutoUpdate
+$VirtualMachine = Add-AzureRMVMNetworkInterface -VM $VirtualMachine -Id $NIC.Id
+$VirtualMachine = Set-AzureRMVMSourceImage -VM $VirtualMachine -PublisherName 'MicrosoftWindowsServer' -Offer 'WindowsServer' -Skus '2016-Datacenter' -Version latest
+# $VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
 
 "Création de la VM"
-New-AzVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
+New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
 
-$DestKey = (get-azStorageAccountKey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
+$DestKey = (get-AzureRmStorageAccountKey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
 $source = (Get-ChildItem \\srvtfs01\drop\GuichetUnique\ControleQualite\ControleQualite-IC\*\crawler\publish.zip | sort-object -Property creationdate)[0].fullname
 "Copie du TriggerExecCrawler.zip dans https://gumbackups.blob.core.windows.net/depot-tfs"
 . $AzCopyPath /source:$source /dest:https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip /destkey:$destkey /Y
 
-$storageContext = New-AzStorageContext -StorageAccountName gumbackups -StorageAccountKey $Destkey
+$storageContext = New-AzureStorageContext -StorageAccountName gumbackups -StorageAccountKey $Destkey
 "Permettre les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
-Get-AzStorageContainer depot-tfs -Context $storageContext | set-AzstorageContainerAcl -Permission Blob
+Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzurestorageContainerAcl -Permission Blob
 
 "Donne accès à l'adresse IP du crawler au site gummaster"
-$ip = (Get-AzPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
+$ip = (Get-AzureRMPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
 $Site = "gummaster-$environnement"
-$APIVersion = ((Get-AzResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
-$WebAppConfig = (Get-AzResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName GumSite-rg-$Environnement -ApiVersion $APIVersion)
+$APIVersion = ((Get-AzureRMResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
+$WebAppConfig = (Get-AzureRMResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName GumSite-rg-$Environnement -ApiVersion $APIVersion)
 $priority = 500;  
 $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
 $IpSecurityRestrictions
@@ -80,17 +80,17 @@ if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
     $webIP.priority = $priority;  
     $index= $ArrayList.Add($webIP); 
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-    $WebAppConfig | Set-AzResource -ApiVersion $APIVersion -Force -Verbose
+    $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
 }
 "Configurer la vm avec Chrome et installer le crawler"
-Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath "C:\templates\devops\appscrawler-rg-prd\Install-Chrome.ps1" -Parameter @{"Environnement" = $Environnement}
+Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath ".\Install-chrome.ps1" -Parameter @{"Environnement" = $Environnement}
 "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
-Get-AzStorageContainer depot-tfs -Context $storageContext | set-AzstorageContainerAcl -Permission  Off
+Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzureRMstorageContainerAcl -Permission  Off
 
 "Retire accès à l'adresse IP du crawler au site gummaster"
 
 $ArrayList.Removeat( $Index ) 
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-$WebAppConfig | Set-AzResource -ApiVersion $APIVersion -Force -Verbose
+$WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
 
-if ( get-AzResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzResourceGroup -Name $ResourceGroupName -Force}
+if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force}
