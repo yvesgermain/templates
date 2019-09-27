@@ -34,6 +34,8 @@ if ( get-AzResourceGroup -Name $ResourceGroupName -Location $Location -ErrorActi
     Remove-AzResourceGroup -Name $ResourceGroupName -Force
 }
  while (get-AzResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { start-sleep 20}
+
+ "Création du resourceGroup $ResourceGroupName"
 New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{"Environnement" = $environnement } 
 $Vnet = New-AzVirtualNetwork -Name $NetworkName -ResourceGroupName $ResourceGroupName -Location $Location -AddressPrefix $VnetAddressPrefix -Subnet $SingleSubnet
 
@@ -47,17 +49,19 @@ $VirtualMachine = Add-AzVMNetworkInterface -VM $VirtualMachine -Id $NIC.Id
 $VirtualMachine = Set-AzVMSourceImage -VM $VirtualMachine -PublisherName 'MicrosoftWindowsServer' -Offer 'WindowsServer' -Skus '2016-Datacenter' -Version latest
 $VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
 
-# Création de la VM
+"Création de la VM"
 New-AzVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
 
 $DestKey = (get-azStorageAccountKey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
 $source = (Get-ChildItem \\srvtfs01\drop\GuichetUnique\ControleQualite\ControleQualite-IC\*\crawler\publish.zip | sort-object -Property creationdate)[0].fullname
+"Copie du TriggerExecCrawler.zip dans https://gumbackups.blob.core.windows.net/depot-tfs"
 . $AzCopyPath /source:$source /dest:https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip /destkey:$destkey /Y
 
 $storageContext = New-AzStorageContext -StorageAccountName gumbackups -StorageAccountKey $Destkey
+"Permettre les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
 Get-AzStorageContainer depot-tfs -Context $storageContext | set-AzstorageContainerAcl -Permission Blob
 
-#  Donne accès à l'adresse IP du crawler au site gummaster
+"Donne accès à l'adresse IP du crawler au site gummaster"
 $ip = (Get-AzPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
 $Site = "gummaster-$environnement"
 $APIVersion = ((Get-AzResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
@@ -74,20 +78,19 @@ if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
     $webip.action = "Allow"; 
     $webip.name = "Allow_Crawler"
     $webIP.priority = $priority;  
-    $ArrayList.Add($webIP); 
+    $index= $ArrayList.Add($webIP); 
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
     $WebAppConfig | Set-AzResource -ApiVersion $APIVersion -Force -Verbose
 }
-
+"Configurer la vm avec Chrome et installer le crawler"
 Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath "C:\templates\devops\appscrawler-rg-prd\Install-Chrome.ps1" -Parameter @{"Environnement" = $Environnement}
-
+"Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
 Get-AzStorageContainer depot-tfs -Context $storageContext | set-AzstorageContainerAcl -Permission  Off
 
-#  Retire accès à l'adresse IP du crawler au site gummaster
-$i = 0;
-$ArrayList | foreach-object { if ($_.Ipaddress -eq "13.88.255.6/32") { $Index = $i } ; $i++ }
-$ArrayList.Remove( $Index ) 
+"Retire accès à l'adresse IP du crawler au site gummaster"
+
+$ArrayList.Removeat( $Index ) 
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-$WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
+$WebAppConfig | Set-AzResource -ApiVersion $APIVersion -Force -Verbose
 
 if ( get-AzResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzResourceGroup -Name $ResourceGroupName -Force}
