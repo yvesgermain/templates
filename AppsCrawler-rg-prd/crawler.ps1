@@ -100,7 +100,7 @@ Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-locatio
 "Exécution du crawler en mode headless"
 (Get-Content ControleQualite.App.exe.config ).replace('head' , "headless") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 "Exécution du crawler"
-timeout 5m .\ControleQualite.App.exe
+.\ControleQualite.App.exe
 "Done!";
 
 
