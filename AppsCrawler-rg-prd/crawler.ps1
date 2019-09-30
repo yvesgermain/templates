@@ -96,11 +96,12 @@ $ChromeInstaller = "ChromeInstaller.exe";
 "Decompressing file TriggerExecCrawler.zip in c:\crawler"
 Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler
 Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName}
+"Changement de l'environnement"
 (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 "Exécution du crawler en mode headless"
 (Get-Content ControleQualite.App.exe.config ).replace('head' , "headless") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 "Exécution du crawler"
-.\ControleQualite.App.exe
+.\ControleQualite.App.exe /silent
 "Done!";
 
 
