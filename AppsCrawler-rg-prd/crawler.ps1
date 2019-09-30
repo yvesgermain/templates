@@ -66,7 +66,7 @@ $ip = (Get-AzureRMPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $P
 $Site = "gummaster-$environnement"
 $APIVersion = ((Get-AzureRMResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
 $WebAppConfig = (Get-AzureRMResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName GumSite-rg-$Environnement -ApiVersion $APIVersion)
-$priority = 500;  
+$priority = 1;  
 $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
 $IpSecurityRestrictions
 
@@ -95,13 +95,13 @@ $ChromeInstaller = "ChromeInstaller.exe";
 (new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip', "$env:temp\TriggerExecCrawler.zip");
 "Decompressing file TriggerExecCrawler.zip in c:\crawler"
 Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler 
-Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName} -Force
+Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName}
 "Changement de l'environnement"
 (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 "Exécution du crawler en mode headless"
 (Get-Content ControleQualite.App.exe.config ).replace('head' , "headless") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 "Exécution du crawler"
-.\ControleQualite.App.exe /silent
+.\ControleQualite.App.exe
 "Done!"
 
 
