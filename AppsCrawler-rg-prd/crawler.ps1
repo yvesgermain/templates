@@ -42,13 +42,6 @@ $Vnet = New-AzureRMVirtualNetwork -Name $NetworkName -ResourceGroupName $Resourc
 $PIP = New-AzureRMPublicIpAddress -Name $PublicIPAddressName -DomainNameLabel $DNSNameLabel -ResourceGroupName $ResourceGroupName -Location $Location -AllocationMethod Dynamic
 $NIC = New-AzureRMNetworkInterface -Name $NICName -ResourceGroupName $ResourceGroupName -Location $Location -SubnetId $Vnet.Subnets[0].Id -PublicIpAddressId $PIP.Id
 
-if ( $Environnement -eq "dev" -or $Environnement -eq "qa" -or $Environnement -eq "devops" -or $Environnement -eq "prd") {
-    $QA = Get-AzureRmADGroup -SearchString "QA"
-    New-AzureRmRoleAssignment -ObjectId $QA.Id -RoleDefinitionName Contributor -ResourceGroupName $resourceGroupName
-    $dev = Get-AzureRmADGroup -SearchString "dev"
-    New-AzureRmRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner  -ResourceGroupName $resourceGroupName
-}
-
 
 $Credential = New-Object System.Management.Automation.PSCredential ($VMLocalAdminUser, $VMLocalAdminSecurePassword);
 $VirtualMachine = New-AzureRMVMConfig -VMName $VMName -VMSize $VMSize
