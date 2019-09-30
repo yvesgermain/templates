@@ -102,7 +102,7 @@ Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-locatio
 (Get-Content ControleQualite.App.exe.config ).replace('head' , "headless") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 "Exécution du crawler"
 .\ControleQualite.App.exe /silent
-"Done!";
+"Done!"
 
 
 "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
