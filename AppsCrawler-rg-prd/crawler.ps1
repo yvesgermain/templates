@@ -82,9 +82,10 @@ if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
     $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
 }
+"Attente du rafraichissement du site gum"
+Start-Sleep -s 60
+
 "Configurer la vm avec Chrome et installer le crawler"
-
-
 $LocalTempDir = $env:TEMP; 
 "Starting";
 $ChromeInstaller = "ChromeInstaller.exe"; 
