@@ -83,7 +83,7 @@ if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
     $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
 }
 "Attente du rafraichissement du site gum"
-Start-Sleep -s 60
+Start-Sleep -s 120
 
 "Configurer la vm avec Chrome et installer le crawler"
 $LocalTempDir = $env:TEMP; 
@@ -94,8 +94,8 @@ $ChromeInstaller = "ChromeInstaller.exe";
 "Downloading TriggerExecCrawler.zip"
 (new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip', "$env:temp\TriggerExecCrawler.zip");
 "Decompressing file TriggerExecCrawler.zip in c:\crawler"
-Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler
-Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName}
+Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler 
+Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName} -Force
 "Changement de l'environnement"
 (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 "Exécution du crawler en mode headless"
