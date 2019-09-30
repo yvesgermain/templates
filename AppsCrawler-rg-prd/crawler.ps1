@@ -6,7 +6,7 @@ Param(
 )
 
 $VMLocalAdminUser = "Soquijadm"
-$VMLocalAdminSecurePassword = "testPwd123!"#(Get-AzureKeyVaultsecret -VaultName gumkeyvault -name Soquijadm ).SecretValue
+$VMLocalAdminSecurePassword = (Get-AzureKeyVaultsecret -VaultName gumkeyvault -name Soquijadm ).SecretValue
 $Location = "CanadaCentral"
 $ResourceGroupName = "crawler-rg-$environnement"
 $ComputerName = "VMcrawl-$environnement"
@@ -41,7 +41,6 @@ $Vnet = New-AzureRMVirtualNetwork -Name $NetworkName -ResourceGroupName $Resourc
 
 $PIP = New-AzureRMPublicIpAddress -Name $PublicIPAddressName -DomainNameLabel $DNSNameLabel -ResourceGroupName $ResourceGroupName -Location $Location -AllocationMethod Dynamic
 $NIC = New-AzureRMNetworkInterface -Name $NICName -ResourceGroupName $ResourceGroupName -Location $Location -SubnetId $Vnet.Subnets[0].Id -PublicIpAddressId $PIP.Id
-
 
 $Credential = New-Object System.Management.Automation.PSCredential ($VMLocalAdminUser, $VMLocalAdminSecurePassword);
 $VirtualMachine = New-AzureRMVMConfig -VMName $VMName -VMSize $VMSize
