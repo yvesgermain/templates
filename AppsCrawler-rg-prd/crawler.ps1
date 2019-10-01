@@ -50,7 +50,7 @@ $VirtualMachine = Set-AzureRMVMSourceImage -VM $VirtualMachine -PublisherName 'M
 # $VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
 
 $dev = Get-AzureRMADGroup -SearchString "dev"
-New-AzzureRMRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner  -ResourceGroupName $resourceGroupName
+New-AzureRMRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner  -ResourceGroupName $resourceGroupName
 
 # "Création de la VM"
 # New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
