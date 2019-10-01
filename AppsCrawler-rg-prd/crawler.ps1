@@ -19,8 +19,6 @@ $NetworkName = "CrawlNet-$environnement"
 $NICName = "CrawlNIC-$environnement"
 $SubnetName = "CrawlSubnet-$environnement"
 $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
-$chromepath2 = $env:System.DefaultWorkingDirectory +'\DevOps\AppsCrawler-rg-prd\Install-chrome.ps1'
-$chromepath2
 
 $i = switch ($environnement) {
     "dev" { "3" }
