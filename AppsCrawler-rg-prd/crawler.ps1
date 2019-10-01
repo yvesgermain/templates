@@ -16,6 +16,7 @@ $NetworkName = "CrawlNet-$environnement"
 $NICName = "CrawlNIC-$environnement"
 $SubnetName = "CrawlSubnet-$environnement"
 $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
+$chromepath = $env:System.DefaultWorkingDirectory +'\DevOps\AppsCrawler-rg-prd\Install-chrome.ps1'
 
 $i = switch ($environnement) {
     "dev" { "3" }
@@ -82,10 +83,6 @@ if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
     $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
 }
-
-$chromepath = $env:System.DefaultWorkingDirectory +'\DevOps\AppsCrawler-rg-prd\Install-chrome.ps1'
-
-
 
 "Configurer la vm avec Chrome et installer le crawler"
 Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath -Parameter @{"Environnement" = $Environnement }
