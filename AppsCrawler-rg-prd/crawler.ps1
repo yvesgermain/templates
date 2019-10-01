@@ -49,8 +49,8 @@ $VirtualMachine = Add-AzureRMVMNetworkInterface -VM $VirtualMachine -Id $NIC.Id
 $VirtualMachine = Set-AzureRMVMSourceImage -VM $VirtualMachine -PublisherName 'MicrosoftWindowsServer' -Offer 'WindowsServer' -Skus '2016-Datacenter' -Version latest
 # $VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
 
-# "Création de la VM"
- New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
+"Création de la VM"
+New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
 
 $DestKey = (get-AzureRmStorageAccountKey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
 $source = (Get-ChildItem \\srvtfs01\drop\GuichetUnique\ControleQualite\ControleQualite-IC\*\crawler\publish.zip | sort-object -Property creationdate)[0].fullname
@@ -66,7 +66,7 @@ $ip = (Get-AzureRMPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $P
 $Site = "gummaster-$environnement"
 $APIVersion = ((Get-AzureRMResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
 $WebAppConfig = (Get-AzureRMResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName GumSite-rg-$Environnement -ApiVersion $APIVersion)
-$priority = 1;  
+$priority = 500;  
 $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
 $IpSecurityRestrictions
 
@@ -82,36 +82,15 @@ if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
     $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
 }
-"Attente du rafraichissement du site gum"
- Start-Sleep -s 120
-
 "Configurer la vm avec Chrome et installer le crawler"
-$LocalTempDir = $env:TEMP; 
-"Starting";
-$ChromeInstaller = "ChromeInstaller.exe"; 
-(new-object    System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$LocalTempDir\$ChromeInstaller");
-& "$LocalTempDir\$ChromeInstaller" /silent /install;
-"Downloading TriggerExecCrawler.zip"
-(new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip', "$env:temp\TriggerExecCrawler.zip");
-"Decompressing file TriggerExecCrawler.zip in c:\crawler"
-Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler 
-Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName}
-"Changement de l'environnement"
-(Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
-"Exécution du crawler en mode headless"
-(Get-Content ControleQualite.App.exe.config ).replace('head' , "headless") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
-"Exécution du crawler"
-#.\ControleQualite.App.exe
- "Done!"
+Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath ".\Install-chrome.ps1" -Parameter @{"Environnement" = $Environnement}
+"Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
+Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzureRMstorageContainerAcl -Permission  Off
 
+"Retire accès à l'adresse IP du crawler au site gummaster"
 
-# "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
-# Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzureRMstorageContainerAcl -Permission  Off
+$ArrayList.Removeat( $Index ) 
+$WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
+$WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
 
-# "Retire accès à l'adresse IP du crawler au site gummaster"
-
-# $ArrayList.Removeat( $Index ) 
-# $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-# $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
-
-# if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force}
+if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force}
