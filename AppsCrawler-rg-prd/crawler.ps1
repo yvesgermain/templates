@@ -82,10 +82,15 @@ if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
     $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
 }
+
+$chromepath = $(System.DefaultWorkingDirectory)+'\DevOps\AppsCrawler-rg-prd\Install-chrome.ps1'
+
+Write-Debug $chromepath
+
 "Configurer la vm avec Chrome et installer le crawler"
 Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath ".\Install-chrome.ps1" -Parameter @{"Environnement" = $Environnement}
 "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
-Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzureRMstorageContainerAcl -Permission  Off
+#Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzureRMstorageContainerAcl -Permission  Off
 
 "Retire accès à l'adresse IP du crawler au site gummaster"
 
