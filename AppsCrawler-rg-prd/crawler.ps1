@@ -101,18 +101,17 @@ Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-locatio
 "Exécution du crawler en mode headless"
 (Get-Content ControleQualite.App.exe.config ).replace('head' , "headless") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 "Exécution du crawler"
-ls
-# .\ControleQualite.App.exe
+#.\ControleQualite.App.exe
  "Done!"
 
 
-"Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
-Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzureRMstorageContainerAcl -Permission  Off
+# "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
+# Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzureRMstorageContainerAcl -Permission  Off
 
-"Retire accès à l'adresse IP du crawler au site gummaster"
+# "Retire accès à l'adresse IP du crawler au site gummaster"
 
-$ArrayList.Removeat( $Index ) 
-$WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-$WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
+# $ArrayList.Removeat( $Index ) 
+# $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
+# $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
 
-if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force}
+# if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force}
