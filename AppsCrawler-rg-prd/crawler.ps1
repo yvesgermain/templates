@@ -49,63 +49,61 @@ $VirtualMachine = Add-AzureRMVMNetworkInterface -VM $VirtualMachine -Id $NIC.Id
 $VirtualMachine = Set-AzureRMVMSourceImage -VM $VirtualMachine -PublisherName 'MicrosoftWindowsServer' -Offer 'WindowsServer' -Skus '2016-Datacenter' -Version latest
 # $VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
 
-$dev = Get-AzureRMADGroup -SearchString "dev"
-New-AzureRMRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner  -ResourceGroupName $resourceGroupName
-
 # "Création de la VM"
-# New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
+ New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
 
-# $DestKey = (get-AzureRmStorageAccountKey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
-# $source = (Get-ChildItem \\srvtfs01\drop\GuichetUnique\ControleQualite\ControleQualite-IC\*\crawler\publish.zip | sort-object -Property creationdate)[0].fullname
-# "Copie du TriggerExecCrawler.zip dans https://gumbackups.blob.core.windows.net/depot-tfs"
-# . $AzCopyPath /source:$source /dest:https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip /destkey:$destkey /Y
+$DestKey = (get-AzureRmStorageAccountKey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
+$source = (Get-ChildItem \\srvtfs01\drop\GuichetUnique\ControleQualite\ControleQualite-IC\*\crawler\publish.zip | sort-object -Property creationdate)[0].fullname
+"Copie du TriggerExecCrawler.zip dans https://gumbackups.blob.core.windows.net/depot-tfs"
+. $AzCopyPath /source:$source /dest:https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip /destkey:$destkey /Y
 
-# $storageContext = New-AzureStorageContext -StorageAccountName gumbackups -StorageAccountKey $Destkey
-# "Permettre les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
-# Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzurestorageContainerAcl -Permission Blob
+$storageContext = New-AzureStorageContext -StorageAccountName gumbackups -StorageAccountKey $Destkey
+"Permettre les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
+Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzurestorageContainerAcl -Permission Blob
 
-# "Donne accès à l'adresse IP du crawler au site gummaster"
-# $ip = (Get-AzureRMPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
-# $Site = "gummaster-$environnement"
-# $APIVersion = ((Get-AzureRMResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
-# $WebAppConfig = (Get-AzureRMResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName GumSite-rg-$Environnement -ApiVersion $APIVersion)
-# $priority = 1;  
-# $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
-# $IpSecurityRestrictions
+"Donne accès à l'adresse IP du crawler au site gummaster"
+$ip = (Get-AzureRMPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
+$Site = "gummaster-$environnement"
+$APIVersion = ((Get-AzureRMResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
+$WebAppConfig = (Get-AzureRMResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName GumSite-rg-$Environnement -ApiVersion $APIVersion)
+$priority = 1;  
+$IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
+$IpSecurityRestrictions
 
-# [System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
+[System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
 
-# if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
-#     $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
-#     $webip.ipAddress = $ip + '/32';  
-#     $webip.action = "Allow"; 
-#     $webip.name = "Allow_Crawler"
-#     $webIP.priority = $priority;  
-#     $index= $ArrayList.Add($webIP); 
-#     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-#     $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
-# }
-# "Attente du rafraichissement du site gum"
+if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
+    $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
+    $webip.ipAddress = $ip + '/32';  
+    $webip.action = "Allow"; 
+    $webip.name = "Allow_Crawler"
+    $webIP.priority = $priority;  
+    $index= $ArrayList.Add($webIP); 
+    $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
+    $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
+}
+"Attente du rafraichissement du site gum"
  Start-Sleep -s 120
 
-# "Configurer la vm avec Chrome et installer le crawler"
-# $LocalTempDir = $env:TEMP; 
-# "Starting";
-# $ChromeInstaller = "ChromeInstaller.exe"; 
-# (new-object    System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$LocalTempDir\$ChromeInstaller");
-# & "$LocalTempDir\$ChromeInstaller" /silent /install;
-# "Downloading TriggerExecCrawler.zip"
-# (new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip', "$env:temp\TriggerExecCrawler.zip");
-# "Decompressing file TriggerExecCrawler.zip in c:\crawler"
-# Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler 
-# Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName}
-# "Changement de l'environnement"
-# (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
-# "Exécution du crawler en mode headless"
-# (Get-Content ControleQualite.App.exe.config ).replace('head' , "headless") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
-# "Exécution du crawler"
+"Configurer la vm avec Chrome et installer le crawler"
+$LocalTempDir = $env:TEMP; 
+"Starting";
+$ChromeInstaller = "ChromeInstaller.exe"; 
+(new-object    System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$LocalTempDir\$ChromeInstaller");
+& "$LocalTempDir\$ChromeInstaller" /silent /install;
+"Downloading TriggerExecCrawler.zip"
+(new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip', "$env:temp\TriggerExecCrawler.zip");
+"Decompressing file TriggerExecCrawler.zip in c:\crawler"
+Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler 
+Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName}
+"Changement de l'environnement"
+(Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
+"Exécution du crawler en mode headless"
+(Get-Content ControleQualite.App.exe.config ).replace('head' , "headless") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
+"Exécution du crawler"
+ls
 # .\ControleQualite.App.exe
-# "Done!"
+ "Done!"
 
 
 "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
