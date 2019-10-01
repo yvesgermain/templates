@@ -49,8 +49,8 @@ $VirtualMachine = Add-AzureRMVMNetworkInterface -VM $VirtualMachine -Id $NIC.Id
 $VirtualMachine = Set-AzureRMVMSourceImage -VM $VirtualMachine -PublisherName 'MicrosoftWindowsServer' -Offer 'WindowsServer' -Skus '2016-Datacenter' -Version latest
 # $VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
 
-$dev = Get-AzADGroup -SearchString "dev"
-New-AzRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner  -ResourceGroupName $resourceGroupName
+$dev = Get-AzureRMADGroup -SearchString "dev"
+New-AzzureRMRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner  -ResourceGroupName $resourceGroupName
 
 # "Création de la VM"
 # New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
