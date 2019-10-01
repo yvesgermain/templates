@@ -2,9 +2,12 @@ Param(
     [Parameter(Mandatory = $true)]
     [ValidateSet("dev", "qa", "prd", "devops")]
     [string]
-    $Environnement 
+    $Environnement ,
+    [string]
+    $defaultpath
+
 )
-$chromepath = $env:System.DefaultWorkingDirectory +'\DevOps\AppsCrawler-rg-prd\Install-chrome.ps1'
+$chromepath = $defaultpath +'\DevOps\AppsCrawler-rg-prd\Install-chrome.ps1'
 $chromepath
 
 $VMLocalAdminUser = "Soquijadm"
