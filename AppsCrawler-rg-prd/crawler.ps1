@@ -83,7 +83,7 @@
 #     $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
 # }
 
-$chromepath = $(System.DefaultWorkingDirectory)+'\DevOps\AppsCrawler-rg-prd\Install-chrome.ps1'
+$chromepath = $env:System.DefaultWorkingDirectory +'\DevOps\AppsCrawler-rg-prd\Install-chrome.ps1'
 
 Write-Debug $chromepath
 
