@@ -2,9 +2,12 @@ Param(
     [Parameter(Mandatory = $true)]
     [ValidateSet("dev", "qa", "prd", "devops")]
     [string]
-    $Environnement 
-)
+    $Environnement ,
+    [string]
+    $defaultpath
 
+)
+$chromepath = $defaultpath +'\DevOps\AppsCrawler-rg-prd\Install-chrome.ps1'
 $VMLocalAdminUser = "Soquijadm"
 $VMLocalAdminSecurePassword = (Get-AzureKeyVaultsecret -VaultName gumkeyvault -name Soquijadm ).SecretValue
 $Location = "CanadaCentral"
@@ -82,10 +85,11 @@ if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
     $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
 }
+
 "Configurer la vm avec Chrome et installer le crawler"
-Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath ".\Install-chrome.ps1" -Parameter @{"Environnement" = $Environnement}
+Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath -Parameter @{"Environnement" = $Environnement }
 "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
-Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzureRMstorageContainerAcl -Permission  Off
+#Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzureRMstorageContainerAcl -Permission  Off
 
 "Retire accès à l'adresse IP du crawler au site gummaster"
 
@@ -93,4 +97,4 @@ $ArrayList.Removeat( $Index )
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
 $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
 
-if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force}
+if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force }
