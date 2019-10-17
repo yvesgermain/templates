@@ -121,6 +121,14 @@
                         {
                             "name": "GuichetUnique.UrlBase",
                             "value": "[concat('https://gummaster-', parameters('environnement'), '.azurewebsites.net/umbraco')]"
+                        },
+                        {
+                            "name": "UrlMoteurRecherche",
+                            "value": "[concat('http://gumsolr', parameters('environnement'), '.azurewebsites.net/solr/indexProd')]"
+                        },
+                        {
+                            "name": "VeilleDeLien.UrlApi",
+                            "value": "[concat('http://veille-', parameters('environnement'), '.azurewebsites.net/Api/')]"
                         }
                     ],
                     "connectionStrings": [
