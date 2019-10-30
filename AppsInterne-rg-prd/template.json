@@ -5,7 +5,7 @@
         "Environnement": {
             "type": "string"
         },
-        "storappsinterneAccountKey":{
+        "storappsinterneAccountKey": {
             "type": "securestring"
         },
         "storveillefuncAccountKey": {
@@ -22,7 +22,8 @@
         "serverfarms_ASP_Standard_name": "[concat('ASP-Standard-', parameters('Environnement'))]",
         "serverfarms_FunctionApp_name": "[concat('ASP-FunctionApp-', parameters('Environnement'))]",
         "storageAccounts_veillefunc_name": "[concat('storveillefunc', parameters('Environnement'))]",
-        "storageAccounts_appsinterne_name": "[concat('storappsinterne', parameters('Environnement'))]"
+        "storageAccounts_appsinterne_name": "[concat('storappsinterne', parameters('Environnement'))]",
+        "ExportationDesLiensRecensesVersAppVeille": "[concat('ExportationDesLiensRecensesVersAppVeille-', parameters('Environnement'))]"
     },
     "resources": [
         {
@@ -181,18 +182,18 @@
                         {
                             "name": "AzureWebJobsDashboard",
                             "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', parameters('storveillefuncAccountKey'))]"
-                          },
-                          {
+                        },
+                        {
                             "name": "AzureWebJobsStorage",
                             "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', parameters('storveillefuncAccountKey'))]"
-                          }
+                        }
                     ],
                     "connectionStrings": [
                         {
                             "name": "bd_VeilleContenuExterneEntities",
                             "value": "[concat('Data Source=sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin' , parameters('Environnement'), ';Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework')]",
                             "type": "SQLServer"
-                          }
+                        }
                     ]
                 },
                 "reserved": false,
@@ -303,14 +304,17 @@
                 "customAppPoolIdentityAdminState": "false",
                 "customAppPoolIdentityTenantState": "false",
                 "loadBalancing": "LeastRequests",
-                "routingRules": [],
+                "routingRules": [
+                ],
                 "experiments": {
-                    "rampUpRules": []
+                    "rampUpRules": [
+                    ]
                 },
                 "autoHealEnabled": "false",
                 "vnetName": "",
                 "siteAuthEnabled": "false",
-                "siteAuthSettings": {},
+                "siteAuthSettings": {
+                },
                 "localMySqlEnabled": "false",
                 "ipSecurityRestrictions": [
                     {
@@ -375,14 +379,17 @@
                 "customAppPoolIdentityAdminState": "false",
                 "customAppPoolIdentityTenantState": "false",
                 "loadBalancing": "LeastRequests",
-                "routingRules": [],
+                "routingRules": [
+                ],
                 "experiments": {
-                    "rampUpRules": []
+                    "rampUpRules": [
+                    ]
                 },
                 "autoHealEnabled": "false",
                 "vnetName": "",
                 "siteAuthEnabled": "false",
-                "siteAuthSettings": {},
+                "siteAuthSettings": {
+                },
                 "cors": {
                     "allowedOrigins": [
                         "https://functions.azure.com",
@@ -457,14 +464,17 @@
                 "customAppPoolIdentityAdminState": "false",
                 "customAppPoolIdentityTenantState": "false",
                 "loadBalancing": "LeastRequests",
-                "routingRules": [],
+                "routingRules": [
+                ],
                 "experiments": {
-                    "rampUpRules": []
+                    "rampUpRules": [
+                    ]
                 },
                 "autoHealEnabled": "false",
                 "vnetName": "",
                 "siteAuthEnabled": "false",
-                "siteAuthSettings": {},
+                "siteAuthSettings": {
+                },
                 "localMySqlEnabled": "false",
                 "ipSecurityRestrictions": [
                     {
@@ -517,6 +527,44 @@
                 "siteName": "[concat('veille-' , parameters('Environnement'))]",
                 "hostNameType": "Verified"
             }
+        },
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('ExportationDesLiensRecensesVersAppVeille')]",
+            "location": "canadacentral",
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                    },
+                    "triggers": {
+                        "Recurrence": {
+                            "recurrence": {
+                                "frequency": "Day",
+                                "interval": 1,
+                                "startTime": "2019-10-03T00:00:00Z"
+                            },
+                            "type": "Recurrence",
+                            "inputs": {
+                            }
+                        }
+                    },
+                    "actions": {
+                        "HTTP": {
+                            "runAfter": {
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "method": "GET",
+                                "uri": "[concat('https://appsinterne-', parameters('Environnement'), '.azurewebsites.net/Umbraco/Api/VeilleDeLien/ExporterLiensRecensesVersAppVeilleContenu')]"
+                            }
+                        }
+                    }
+                }
+            }
         }
     ],
     "outputs": {
@@ -528,22 +576,21 @@
             "type": "string",
             "value": "[concat( 'https://' , variables('storageAccounts_appsinterne_name'), '.blob.core.windows.net')]"
         },
-        "VeilleDeLien.UrlBase":{
+        "VeilleDeLien.UrlBase": {
             "type": "string",
             "value": "[concat('https://veille-', parameters('Environnement'), '.azurewebsites.net')]"
         },
-        "GuichetUnique.UrlBase":{
+        "GuichetUnique.UrlBase": {
             "type": "string",
             "value": "[concat('https://gummaster-', parameters('environnement'), '.azurewebsites.net/umbraco')]"
         },
-        "AzureWebJobsStorage":{
+        "AzureWebJobsStorage": {
             "type": "string",
             "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', parameters('storveillefuncAccountKey'))]"
         },
         "bd_VeilleContenuExterneEntities": {
             "type": "string",
             "value": "[concat('Data Source=sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=tbl_VeilleDeContenuExterne;Persist Security Info=False;User ID=sqladmin' , parameters('Environnement'), ';Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework')]"
-
         }
     }
 }
