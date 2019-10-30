@@ -109,7 +109,6 @@ if(Test-Path $ParametersFilePath) {
     New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $TemplateFilePath;
 }
 
-
 $Sites = "Gum-$environnement", "gummaster-$environnement"
 foreach ( $site in $sites) {
     $APIVersion = ((Get-AzResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
