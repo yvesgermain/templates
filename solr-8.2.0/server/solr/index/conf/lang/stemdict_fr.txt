@@ -1,0 +1,15 @@
+﻿# Overrides pour solr.StemmerOverrideFilterFactory en Français.
+# Liste des pluriels irréguliers les plus communs tirés du site https://fr.wiktionary.org/wiki/Cat%C3%A9gorie:Pluriels_irr%C3%A9guliers_en_fran%C3%A7ais
+# Note : Les pluriels qui fonctionnent déjà n'ont pas été ajoutés ici.
+aieux	aieul
+aulx	ail
+baux	bail
+caranavals	carnaval
+cieux	ciel
+coraux	corail
+emaux	email
+soupiraux	soupirail
+travaux	travail
+vantaux	vantail
+vitraux	vitrail
+yeux	oeil
