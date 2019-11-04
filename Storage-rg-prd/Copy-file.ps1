@@ -6,7 +6,7 @@ param(
 )
 
 $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
-
+$resourceGroupName = "storage-rg-" + $Environnement
 import-module azurerm.KeyVault
 get-azureRmstorageaccount -resourcegroupName $resourceGroupName | where-object {$_.storageaccountname -like "storappsinterne*"} | foreach-object { 
     $name = $_.storageaccountname; 
