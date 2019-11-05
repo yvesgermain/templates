@@ -32,7 +32,7 @@ $StorageAccessKey = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKeyT
 $AdministratorLogin = "sqladmin" + $Destination
 $pass = (Get-azureKeyVaultSecret -VaultName gumkeyvault -name $("sqladmin" + $Destination )).secretvalue
 
-$gum = Get-AzureStorageAccount -name gumbackups -resourcegroupname infrastructure
+$gum = Get-AzureStorageAccount -StorageAccountname gumbackups -resourcegroupname infrastructure
 
 $DBName = (Get-AzureStorageBlob -Context $gum.context -Container sql-backup | Where-Object { $_.name -like "BdAppsInterne-$source*" } | Sort-Object LastModified -Descending)[0] | Select-Object name
 $database = get-azureRMsqlserver | where-object { $_.ServerName -eq $server } | get-azureRMsqldatabase | where-object { $_.Databasename -like "BdAppsInterne-*" } 
