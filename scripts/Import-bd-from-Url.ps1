@@ -10,18 +10,18 @@
 
 #>
 Param(
-    [Parameter()]
-    [ValidateSet("dev", "qa", "prd", "devops")]
-    [string]
-    $Destination,
+   [Parameter()]
+   [ValidateSet("dev", "qa", "prd", "devops")]
+   [string]
+   $Destination,
 
-    [ValidateSet("dev", "qa", "prd", "devops")]
-    [string]
-    $source = "prd",
+   [ValidateSet("dev", "qa", "prd", "devops")]
+   [string]
+   $source = "prd",
 
-    [Parameter()]
-    [string]
-    $TargetUrl = 'https://gumbackups.blob.core.windows.net/sql-backup/'
+   [Parameter()]
+   [string]
+   $TargetUrl = 'https://gumbackups.blob.core.windows.net/sql-backup/'
 )
 import-module azureRM.sql, azureRM.keyvault, azureRM.Storage
 
@@ -32,22 +32,26 @@ $StorageAccessKey = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKeyT
 $AdministratorLogin = "sqladmin" + $Destination
 $pass = (Get-azureKeyVaultSecret -VaultName gumkeyvault -name $("sqladmin" + $Destination )).secretvalue
 
-$gum = Get-AzureRmStorageAccount -name gumbackups
+$gum = Get-AzureRmStorageAccount -name gumbackups -resourcegroupname infrastructure
 
-$DBName = (Get-AzureRmStorageBlob -Context $gum.context -Container sql-backup | Where-Object {$_.name -like "*BdAppsInterne-$source*"} | Sort-Object LastModified -Descending)[0] | Select-Object name
-$database = get-azureRMsqlserver | where-object {$_.ServerName -eq $server} | get-azureRMsqldatabase | where-object { $_.Databasename -like $DBName } 
+$DBName = (Get-AzureRmStorageBlob -Context $gum.context -Container sql-backup | Where-Object { $_.name -like "BdAppsInterne-$source*" } | Sort-Object LastModified -Descending)[0] | Select-Object name
+$database = get-azureRMsqlserver | where-object { $_.ServerName -eq $server } | get-azureRMsqldatabase | where-object { $_.Databasename -like "BdAppsInterne-*" } 
 $database | Remove-AzureRMsqldatabase
-$database | ForEach-Object { New-azureRMSqlDatabaseExport 
-    -ServerName $_.servername 
-    -DatabaseName $_.databasename 
-    -ResourceGroupName $_.ResourceGroupName 
-    -StorageKey $storageKey 
-    -StorageKeyType $StorageAccessKey 
-    -StorageUri $( $TargetUrl + $DBName) 
-    -AdministratorLogin $AdministratorLogin 
-    -AdministratorLoginPassword $pass 
-    -edition $_.edition 
-    -ServiceObjectiveName S0
-    -DatabaseMaxSizeBytes 30gb
+$Restore = $database | ForEach-Object { New-azureRMSqlDatabaseImport `
+      -ServerName $_.servername `
+      -DatabaseName $_.databasename `
+      -ResourceGroupName $_.ResourceGroupName `
+      -StorageKey $storageKey `
+      -StorageKeyType $StorageAccessKey `
+      -StorageUri $($TargetUrl + $DBName.name) `
+      -AdministratorLogin $AdministratorLogin `
+      -AdministratorLoginPassword $pass `
+      -edition $_.edition `
+      -ServiceObjectiveName S0 `
+      -DatabaseMaxSizeBytes 30gb 
 }
 
+While ( (Get-AzureRmSqlDatabaseImportExportStatus -OperationStatusLink $Restore.OperationStatusLink).status -ne "Succeeded") {
+   Start-sleep -Seconds 20;
+   (Get-AzureRMSqlDatabaseImportExportStatus -OperationStatusLink $Restore.OperationStatusLink)
+}
