@@ -26,6 +26,9 @@ Param(
 import-module azureRM.sql, azureRM.keyvault, azureRM.Storage
 
 $server = "sqlguminterne-$Destination"
+$resourcegroup = ("sqlapps-rg-" + $Destination)
+$bds = "BdAppsInterne-$destination", "BdVeille-$destination"
+
 [string] $Storagekey = (Get-azureRMStorageAccountKey -ResourceGroupName infrastructure -Name gumbackups ).value[0]
 $StorageAccessKey = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKeyType]::StorageAccessKey
 
@@ -34,21 +37,26 @@ $pass = (Get-azureKeyVaultSecret -VaultName gumkeyvault -name $("sqladmin" + $De
 
 $gum = Get-AzureRmStorageAccount -StorageAccountname gumbackups -resourcegroupname infrastructure
 
-$DBName = (Get-AzureStorageBlob -Context $gum.context -Container sql-backup | Where-Object { $_.name -like "BdAppsInterne-$source*" } | Sort-Object LastModified -Descending)[0] | Select-Object name
-$database = get-azureRMsqlserver | where-object { $_.ServerName -eq $server } | get-azureRMsqldatabase | where-object { $_.Databasename -like "BdAppsInterne-*" } 
-$database | Remove-AzureRMsqldatabase
-$Restore = $database | ForEach-Object { New-azureRMSqlDatabaseImport `
-      -ServerName $_.servername `
-      -DatabaseName $_.databasename `
-      -ResourceGroupName $_.ResourceGroupName `
+# $DBName = (Get-AzureStorageBlob -Context $gum.context -Container sql-backup | Where-Object { $_.name -like "BdAppsInterne-$source*" } | Sort-Object LastModified -Descending)[0] | Select-Object name
+$databases = get-azureRMsqlserver -name $server -resourcegroupname $resourcegroup | get-azureRMsqldatabase | where-object { $BDs -contains $_.Databasename } 
+$databases | Remove-AzureRMsqldatabase
+
+$Bds | ForEach-Object { 
+   $database = $_;   
+   $Dbname = (Get-AzureStorageBlob -Context $gum.context -Container sql-backup | Where-Object { $_.name -like ($database.split("-")[0] + "*") } | Sort-Object -Descending LastModified  )[0];
+   $Restore = New-azureRMSqlDatabaseImport `
+      -ServerName $server `
+      -DatabaseName $database `
+      -ResourceGroupName $resourcegroup `
       -StorageKey $storageKey `
       -StorageKeyType $StorageAccessKey `
-      -StorageUri $($TargetUrl + $DBName.name) `
+      -StorageUri ($TargetUrl + $DBName.name) `
       -AdministratorLogin $AdministratorLogin `
       -AdministratorLoginPassword $pass `
-      -edition $_.edition `
+      -edition standard `
       -ServiceObjectiveName S0 `
-      -DatabaseMaxSizeBytes 30gb 
+      -DatabaseMaxSizeBytes 30gb ;
+
+   $restore
 }
 
-$restore
