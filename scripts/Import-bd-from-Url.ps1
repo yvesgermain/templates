@@ -51,7 +51,4 @@ $Restore = $database | ForEach-Object { New-azureRMSqlDatabaseImport `
       -DatabaseMaxSizeBytes 30gb 
 }
 
-While ( (Get-AzureRmSqlDatabaseImportExportStatus -OperationStatusLink $Restore.OperationStatusLink).status -ne "Succeeded") {
-   Start-sleep -Seconds 20;
-   (Get-AzureRMSqlDatabaseImportExportStatus -OperationStatusLink $Restore.OperationStatusLink)
-}
+$restore
