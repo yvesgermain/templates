@@ -7,18 +7,9 @@
         }
     },
     "variables": {
-        "Conditions": "[if( or(equals(parameters('Environnement'), 'dev'), equals(parameters('Environnement'), 'qa')), 'dev', 'prd')]",
-        "SidSQLadmindev": "ab29cc98-8811-49b1-8e97-ecf60fc6b2b4",
-        "SidSQLadminqa": "3baa776c-4826-49bf-a216-17254673507a",
-        "SidSQLadminprd": "c74029db-ee61-4eae-912d-182fab6950f3",
-        "SidSQLadmindevops": "39670c6b-8290-4499-8f84-031f42d2399e"
             },
     "resources": [],
     "outputs": {
-        "mgmtStatus": {
-            "type": "string",
-            "value": "[variables('Conditions')]"
-        },
          "Scrap": {
             "type": "string",
             "value": "[subscription().tenantId]"
@@ -26,10 +17,6 @@
         "Environnement": {
             "type": "string",
             "value": "[parameters('Environnement')]"
-        },
-        "Accountkey": {
-            "type": "string",
-            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=scrap', ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', 'storgumdevops'), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
         }
     }
 }

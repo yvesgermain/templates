@@ -27,7 +27,7 @@ import-module azureRM.sql, azureRM.keyvault, azureRM.Storage
 
 $server = "sqlguminterne-$Destination"
 $resourcegroup = ("sqlapps-rg-" + $Destination)
-$bds = "BdAppsInterne-$destination", "BdVeille-$destination"
+$Bds = "BdAppsInterne-$destination", "BdVeille-$destination"
 
 [string] $Storagekey = (Get-azureRMStorageAccountKey -ResourceGroupName infrastructure -Name gumbackups ).value[0]
 $StorageAccessKey = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKeyType]::StorageAccessKey
