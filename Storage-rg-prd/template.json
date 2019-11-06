@@ -36,59 +36,6 @@
             }
         },
         {
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2019-04-01",
-            "name": "[variables('storageAccounts_veillefunc_name')]",
-            "location": "canadacentral",
-            "sku": {
-                "name": "Standard_LRS",
-                "tier": "Standard"
-            },
-            "kind": "StorageV2",
-            "properties": {
-                "networkAcls": {
-                    "bypass": "AzureServices",
-                    "virtualNetworkRules": [],
-                    "ipRules": [],
-                    "defaultAction": "Allow"
-                },
-                "supportsHttpsTrafficOnly": true,
-                "encryption": {
-                    "services": {
-                        "file": {
-                            "enabled": true
-                        },
-                        "blob": {
-                            "enabled": true
-                        }
-                    },
-                    "keySource": "Microsoft.Storage"
-                }
-            },
-            "tags": {
-                "Environnement": "[parameters('Environnement')]"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/blobServices",
-            "apiVersion": "2019-04-01",
-            "name": "[concat(variables('storageAccounts_veillefunc_name'), '/default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name'))]"
-            ],
-            "properties": {
-                "cors": {
-                    "corsRules": []
-                },
-                "deleteRetentionPolicy": {
-                    "enabled": false
-                }
-            },
-            "tags": {
-                "Environnement": "[parameters('Environnement')]"
-            }
-        },
-        {
             "type": "Microsoft.Storage/storageAccounts/blobServices",
             "apiVersion": "2019-04-01",
             "name": "[concat(variables('storageAccounts_appsinterne_name'), '/default')]",
@@ -100,30 +47,6 @@
                     "enabled": true,
                     "days": 7
                 }
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2019-04-01",
-            "name": "[concat(variables('storageAccounts_veillefunc_name'), '/default/azure-webjobs-hosts')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccounts_veillefunc_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name'))]"
-            ],
-            "properties": {
-                "publicAccess": "None"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2019-04-01",
-            "name": "[concat(variables('storageAccounts_veillefunc_name'), '/default/azure-webjobs-secrets')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccounts_veillefunc_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name'))]"
-            ],
-            "properties": {
-                "publicAccess": "None"
             }
         }
     ]
