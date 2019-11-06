@@ -567,11 +567,14 @@
                 }
             }
         },
-         {
+        {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "name": "[variables('sites_Solrwebapp_name')]",
             "location": "Canada Central",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]"
+            ],
             "kind": "app",
             "properties": {
                 "enabled": true,
@@ -653,9 +656,11 @@
                 "customAppPoolIdentityAdminState": false,
                 "customAppPoolIdentityTenantState": false,
                 "loadBalancing": "LeastRequests",
-                "routingRules": [],
+                "routingRules": [
+                ],
                 "experiments": {
-                    "rampUpRules": []
+                    "rampUpRules": [
+                    ]
                 },
                 "autoHealEnabled": false,
                 "vnetName": "",
@@ -678,7 +683,7 @@
                 "[resourceId('Microsoft.Web/sites', variables('sites_Solrwebapp_name'))]"
             ],
             "properties": {
-                "siteName":  "[variables('sites_Solrwebapp_name')]",
+                "siteName": "[variables('sites_Solrwebapp_name')]",
                 "hostNameType": "Verified"
             }
         }

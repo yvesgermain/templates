@@ -35,9 +35,6 @@ param(
  [string]
  $templateFilePath = "template.json",
 
- [string]
- $parametersFilePath = "parameters.json",
-
  [Parameter(Mandatory=$True)]
  [string]
  [ValidateSet("dev", "qa", "prd", "devops")]
@@ -47,6 +44,8 @@ param(
  [String]
  $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 )
+
+$parametersFilePath = "parameters-" + $Environnement + ".json" 
 
 <#
 .SYNOPSIS

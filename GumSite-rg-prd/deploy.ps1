@@ -32,16 +32,13 @@ param(
    
     [string]
     $ResourceGroupLocation = "CanadaCentral",
-
-    [string]
-    $TemplateFilePath = "template.json",
    
     [string]
     $ParametersFilePath = "parameters.json"
    )
 
 $AzModuleVersion = "2.0.0"
-
+$parametersFilePath = "parameters-" + $Environnement + ".json" 
 <#
 .SYNOPSIS
     Registers RPs

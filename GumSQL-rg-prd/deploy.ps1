@@ -37,16 +37,13 @@ param(
     [string]
     $deploymentName = (get-date -format "yyyy-MM-dd_hh-mm"),
 
-    [string]
-    $TemplateFilePath = "template.json",
-
     [Parameter(Mandatory = $True)]    
     [string]
     $ParametersFilePath 
 )
 
 $AzModuleVersion = "2.0.0"
-
+$parametersFilePath = "parameters-" + $Environnement + ".json" 
 <#
 .SYNOPSIS
     Registers RPs

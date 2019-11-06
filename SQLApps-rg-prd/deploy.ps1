@@ -35,9 +35,6 @@ param(
 
  [string]
  $templateFilePath = "template.json",
-
- [string]
- $parametersFilePath = "parameters.json",
  
  [Parameter(Mandatory=$True)]
  [string]
@@ -45,6 +42,7 @@ param(
  $Environnement
 )
 
+$parametersFilePath = "parameters-" + $Environnement + ".json" 
 <#
 .SYNOPSIS
     Registers RPs

@@ -35,9 +35,6 @@ param(
 
     [string]
     $templateFilePath = "template.json",
-
-    [string]
-    $parametersFilePath = "parameters.json",
  
     [Parameter(Mandatory = $True)]
     [string]
@@ -46,11 +43,12 @@ param(
  
 )
 
+$parametersFilePath = "parameters-" + $Environnement + ".json" 
+
 # Outbound IP addresses - Logic Apps service & managed connectors voir https://docs.microsoft.com/en-us/azure/logic-apps/logic-apps-limits-and-config#configuration  
 if ( $resourceGroupLocation -eq "CanadaCentral" ) {
     $IP_logic_Apps = "13.71.184.150", "13.71.186.1", "40.85.250.135", "40.85.250.212", "40.85.252.47", "52.233.29.92", "52.228.39.241", "52.228.39.244" 
-}
-else {
+} else {
     $IP_logic_Apps = "40.86.203.228", "40.86.216.241", "40.86.217.241", "40.86.226.149", "40.86.228.93", "52.229.120.45", "52.229.126.25", "52.232.128.155"
 }
 
