@@ -20,6 +20,11 @@ $NICName = "CrawlNIC-$environnement"
 $SubnetName = "CrawlSubnet-$environnement"
 $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 
+# Enlève les vieux Boot diagnostics des crawlers précédents 
+
+$storageAccount = Get-AzStorageAccount -ResourceGroupName Storage-rg-dev -Name storappsinternedev
+Get-AzStorageContainer -Container bootdiagnostics-vmcrawl* -Context $storageAccount.context | Remove-AzStorageContainer -Confirm:$false -Force
+
 $i = switch ($environnement) {
     "dev" { "3" }
     "qa" { "4" }
@@ -98,3 +103,4 @@ $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
 $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
 
 if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force }
+
