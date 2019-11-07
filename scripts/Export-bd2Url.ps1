@@ -30,5 +30,5 @@ $pass = (Get-azureKeyVaultSecret -VaultName gumkeyvault -name $("sqladmin" + $En
 
 foreach ( $server in $Servers ) {
     $databases = get-azureRMsqlserver | where-object {$_.ServerName -eq $server} | get-azureRMsqldatabase | where-object { $_.Databasename -notlike "master" } 
-    $databases | ForEach-Object { New-azureRMSqlDatabaseExport -ServerName $_.servername -DatabaseName $_.databasename -ResourceGroupName $_.ResourceGroupName -StorageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $( $TargetUrl + $_.DatabaseName + "_" + $(get-date -Format "yyyy-MM-dd_hh-mm") + '.bacpac' ) -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass}
+    $databases | ForEach-Object { New-azureRMSqlDatabaseExport -ServerName $_.servername -DatabaseName $_.databasename -ResourceGroupName $_.ResourceGroupName -StorageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $( $TargetUrl + $_.DatabaseName + "_" + $(get-date -Format "yyyy-MM-dd_HH-mm") + '.bacpac' ) -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass}
 }
