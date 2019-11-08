@@ -29,16 +29,14 @@ param(
  [string]
  $subscriptionId,
 
- [Parameter(Mandatory=$True)]
- [string]
- $resourceGroupName,
+  [string]
+ $resourceGroupName = "Infrastructure",
 
  [string]
- $resourceGroupLocation,
+ $resourceGroupLocation = "CanadaCentral",
 
- [Parameter(Mandatory=$True)]
- [string]
- $deploymentName,
+  [string]
+ $deploymentName = (get-date -format "yyyy-MM-dd_hh-mm"),
 
  [string]
  $templateFilePath = "template.json",

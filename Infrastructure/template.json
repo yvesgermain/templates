@@ -48,9 +48,6 @@
                 "accessTier": "Hot",
                 "supportsHttpsTrafficOnly": true
             },
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gumfrontend_name'))]"
-            ],
             "sku": {
                 "name": "Standard_LRS"
             },
@@ -76,7 +73,12 @@
             "name": "[variables('sites_GumSolr_name')]",
             "location": "[parameters('location')]",
             "kind": "app",
-            "dependsOn": 
+            "tags": {
+                "Environnement": "[variables('Environnement')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_standard_infra'))]"
+            ],
             "properties": {
                 "enabled": true,
                 "hostNameSslStates": [

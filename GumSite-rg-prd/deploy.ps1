@@ -34,7 +34,7 @@ param(
     $ResourceGroupLocation = "CanadaCentral",
    
     [string]
-    $ParametersFilePath = "parameters.json"
+    $TemplateFilePath = "template.json"
    )
 
 $AzModuleVersion = "2.0.0"

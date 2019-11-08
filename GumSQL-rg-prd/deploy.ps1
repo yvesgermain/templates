@@ -37,9 +37,8 @@ param(
     [string]
     $deploymentName = (get-date -format "yyyy-MM-dd_hh-mm"),
 
-    [Parameter(Mandatory = $True)]    
     [string]
-    $ParametersFilePath 
+    $TemplateFilePath = "template.json"
 )
 
 $AzModuleVersion = "2.0.0"
