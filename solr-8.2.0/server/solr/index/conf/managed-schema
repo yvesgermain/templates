@@ -333,7 +333,7 @@
          finally applies Porter's stemming.  The query time analyzer also applies synonyms from synonyms.txt. -->
     <dynamicField name="*_txt_en" type="text_en"  indexed="true"  stored="true"/>
 	<fieldType name="text_en" class="solr.TextField" positionIncrementGap="100">
-	  <indexAnalyzer>
+	  <analyzer type="index">
 		<!-- HTMLStripCharFilterFactory : ajout
 			 Ce filtre supprime le HTML du texte.-->
 		<charFilter class="solr.HTMLStripCharFilterFactory"/>
@@ -357,8 +357,8 @@
 		<!-- PorterStemFilterFactory : déjà dans la config de base
 			 Ce filtre permet de trouver automatiquement la racine du mot.-->
 		<filter class="solr.PorterStemFilterFactory"/>
-	  </indexAnalyzer>
-	  <queryAnalyzer>
+	  </analyzer>
+	  <analyzer type="query">
 		<!-- HTMLStripCharFilterFactory : ajout
 			 Ce filtre supprime le HTML du texte.-->
 		<charFilter class="solr.HTMLStripCharFilterFactory"/>
@@ -385,7 +385,7 @@
 		<!-- PorterStemFilterFactory : déjà dans la config de base
 			 Ce filtre permet de trouver automatiquement la racine du mot.-->
 		<filter class="solr.PorterStemFilterFactory"/>
-	  </queryAnalyzer>
+	  </analyzer>
 	</fieldType>
 
     <!-- A text field with defaults appropriate for English, plus
