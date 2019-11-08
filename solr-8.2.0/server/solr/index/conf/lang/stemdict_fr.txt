@@ -4,7 +4,7 @@
 aieux	aieul
 aulx	ail
 baux	bail
-caranavals	carnaval
+carnavals	carnaval
 cieux	ciel
 coraux	corail
 emaux	email
