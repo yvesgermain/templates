@@ -126,7 +126,7 @@
                         },
                         {
                             "name": "UrlMoteurRecherche",
-                            "value": "[concat('http://solr-', parameters('environnement'), '.azurewebsites.net/solr/indexProd')]"
+                            "value": "[concat('http://gumsolr-', parameters('environnement'), '.azurewebsites.net/solr/index')]"
                         },
                         {
                             "name": "VeilleDeLien.UrlApi",
