@@ -162,6 +162,19 @@ $IpSecurityRestrictions
 
 [System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
 
+(Get-azwebapp -name ("AppsInterne-" + $Environnement )).PossibleOutboundIpAddresses.split(",") | ForEach-Object { 
+    $Ip = $_;
+    if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
+        $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
+        $webip.ipAddress = $_ + '/32';  
+        $webip.action = "Allow"; 
+        $webip.name = "Allow_AppsInterne"
+        $priority = $priority + 20 ; 
+        $webIP.priority = $priority;  
+        $ArrayList.Add($webIP); 
+        Remove-Variable webip
+    }
+}
 $IP_logic_Apps | ForEach-Object { 
     $Ip = $_;
     if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
