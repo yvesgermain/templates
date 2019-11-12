@@ -71,7 +71,7 @@ function restore-storage {
     }
 
     if (!( get-AzStorageContainer -Context $GumBackupContext -name "$storage-$Environnement-$date" -ErrorAction SilentlyContinue)) {
-        write-warning "Le blob n'existe pas";
+        write-warning "Le backup n'existe pas";
         break 
     }
 
