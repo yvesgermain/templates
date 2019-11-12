@@ -31,7 +31,7 @@
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
             "name": "[variables('Serverfarms_ASP_Standard_name')]",
-           "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",
             "sku": {
                 "name": "S1",
                 "tier": "Standard",
@@ -55,7 +55,7 @@
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
             "name": "[variables('Serverfarms_FunctionApp_name')]",
-           "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",
             "sku": {
                 "name": "Y1",
                 "tier": "Dynamic",
@@ -79,7 +79,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "name": "[variables('Sites_AppsInterne_name')]",
-           "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]"
             ],
@@ -131,6 +131,10 @@
                         {
                             "name": "VeilleDeLien.UrlApi",
                             "value": "[concat('http://veille-', parameters('environnement'), '.azurewebsites.net/Api/')]"
+                        },
+                        {
+                            "name": "WEBSITE_DISABLE_OVERLAPPED_RECYCLING",
+                            "value": "1"
                         }
                     ],
                     "connectionStrings": [
@@ -211,7 +215,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "name": "[variables('Sites_Veille_name')]",
-           "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]"
             ],
@@ -257,7 +261,7 @@
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
             "name": "[concat(variables('sites_AppsInterne_name'), '/web')]",
-           "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_AppsInterne_name'))]"
             ],
@@ -334,7 +338,7 @@
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
             "name": "[concat(variables('sites_Veille_func_name'), '/web')]",
-           "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_Veille_func_name'))]"
             ],
@@ -417,7 +421,7 @@
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
             "name": "[concat( variables('sites_Veille_name'), '/web')]",
-           "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_Veille_name'))]"
             ],
@@ -494,7 +498,7 @@
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_AppsInterne_name'), '/', variables('sites_AppsInterne_name'), '.azurewebsites.net')]",
-           "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_AppsInterne_name'))]"
             ],
@@ -507,7 +511,7 @@
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_Veille_func_name'), '/', variables('sites_Veille_func_name'), '.azurewebsites.net')]",
-           "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_Veille_func_name'))]"
             ],
@@ -520,7 +524,7 @@
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_Veille_name'), '/', variables('sites_Veille_name'), '.azurewebsites.net')]",
-           "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_Veille_name'))]"
             ],
@@ -571,7 +575,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "name": "[variables('sites_Solrwebapp_name')]",
-           "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]"
             ],
@@ -605,7 +609,7 @@
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_Solrwebapp_name'), '/web')]",
-           "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_Solrwebapp_name'))]"
             ],
@@ -678,7 +682,7 @@
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_Solrwebapp_name'), '/', variables('sites_Solrwebapp_name'), '.azurewebsites.net')]",
-           "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_Solrwebapp_name'))]"
             ],

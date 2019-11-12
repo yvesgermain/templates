@@ -111,6 +111,10 @@
                         {
                             "name": "serverRole",
                             "value": "frontend"
+                        },
+                        {
+                            "name": "WEBSITE_DISABLE_OVERLAPPED_RECYCLING",
+                            "value": "1"
                         }
                     ],
                     "connectionStrings": [
@@ -175,6 +179,10 @@
                         {
                             "name": "serverRole",
                             "value": "master"
+                        },
+                        {
+                            "name": "WEBSITE_DISABLE_OVERLAPPED_RECYCLING",
+                            "value": "1"
                         }
                     ],
                     "connectionStrings": [
