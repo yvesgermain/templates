@@ -112,7 +112,12 @@ if (Test-Path $parametersFilePath) {
 else {
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
 }
-# Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa
+
+# Assigner les permissions aux groupes et au addresses IP pour accéder aux resource groups
+
+& "$PSScriptRoot\assigne-perms.ps1"
+
+<# Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa
 if ( $Environnement -eq "dev" -or $Environnement -eq "qa" -or $Environnement -eq "devops") {
     $QA = Get-AzADGroup -SearchString "QA"
     if (!( get-AzRoleAssignment -ResourceGroupName $resourceGroupName -ObjectId $qa.Id -RoleDefinitionName contributor)) {
@@ -123,6 +128,7 @@ if ( $Environnement -eq "dev" -or $Environnement -eq "qa" -or $Environnement -eq
         New-AzRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner -ResourceGroupName $resourceGroupName
     }
 }
+
 # Mettre les restrictions sur l'app de Veille
 $site = "Veille-" + $Environnement
 
@@ -190,3 +196,4 @@ $IP_logic_Apps | ForEach-Object {
 }
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
 $WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
+#>
