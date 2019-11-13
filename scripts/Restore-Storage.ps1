@@ -76,13 +76,11 @@ $params = @{'Environnement' = $Environnement }
 if ($PSBoundParameters.ContainsKey('Date')) { $params.Add('Date', $Date) }
 if ($PSBoundParameters.ContainsKey('Redirect_To')) { $params.Add('Redirect_To', $Redirect_To) }
 
-$params
-
 if ($storage -eq "All") {
-    $all = "storgum", "storappsinterne";
-    foreach ($storage in $all) {
-        $params.add('Storage', $Storage)
-        Restore-Storage @params
-        $params.remove('Storage')
-    }
+    $storage = "storgum", "storappsinterne";
+}
+foreach ($store in $Storage) {
+    $params.add('Storage', $Store)
+    Restore-Storage @params
+    $params.remove('Storage')
 }
