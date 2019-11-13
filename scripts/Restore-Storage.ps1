@@ -1,41 +1,22 @@
-﻿function copy-storage {
-    param(
-        [Parameter(Mandatory = $True)]
-        [string]
-        [ValidateSet("dev", "qa", "prd", "devops")] 
-        $Environnement,
+﻿param(
+    [Parameter(Mandatory = $True)]
+    [string]
+    [ValidateSet("dev", "qa", "prd", "devops")] 
+    $Environnement,
 
-        [Parameter(Mandatory = $True)]
-        [string]
-        [ValidateSet("storgum", "storappsinterne")] 
-        $storage
-    )
+    [Parameter(Mandatory = $false,
+        HelpMessage = "Donner la date du restore dans le format yyyyMMdd, sinon on prendra le dernier backup")]
+    $date,
 
-    $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
+    [Parameter(Mandatory = $True)]
+    [string]
+    [ValidateSet("storgum", "storappsinterne", "All")] 
+    $storage,
 
-    switch ($storage) {
-        "storgum" { $ResourceGroupName = "gumstorage-rg-" + $environnement; $container = "guichetunique" }
-        "storappsinterne" { $ResourceGroupName = "Storage-rg-" + $environnement; $container = "appsinterne" }
-    }
-
-    $GumBackupKey = (get-azureRMstorageaccountkey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
-
-    $date = get-date -Format "yyyyMMdd"
-
-    if (!( get-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumbackups -name "$container-$Environnement-$date" -ErrorAction SilentlyContinue) ) {
-        New-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumbackups -Name "$container-$Environnement-$date" 
-    }
-
-    $newPath = "$container-$Environnement-$date"
-
-    $SourceKey = ( Get-AzureRmStorageaccountkey -Name "$storage$Environnement" -ResourceGroupName $ResourceGroupName | where-object { $_.keyname -eq "key1" }).value
-
-    Write-Output "copy https://$storage$environnement.blob.core.windows.net/$container vers https://gumbackups.blob.core.windows.net/$newPath"
-    . $AzCopyPath /source:https://$storage$environnement.blob.core.windows.net/$container/ /sourcekey:$SourceKey /dest:https://gumbackups.blob.core.windows.net/$newPath/ /s /y /destkey:$GumBackupKey
-}
-
-# Restore storage  *************************************************
-
+    [string]
+    [ValidateSet("dev", "qa", "prd", "devops")] 
+    $Redirect_To
+)
 function restore-storage {
     param(
         [Parameter(Mandatory = $True)]
@@ -81,7 +62,8 @@ function restore-storage {
 
     if (!$Redirect_To ) {
         $newPath = "$container-$Environnement-$date"
-    } else {
+    }
+    else {
         $newPath = "$container-$Redirect_To-$date" 
     }
     
@@ -89,5 +71,18 @@ function restore-storage {
     . $AzCopyPath /source:https://gumbackups.blob.core.windows.net/$newPath/ /sourcekey:$GumBackupKey /dest:https://$storage$environnement.blob.core.windows.net/$container/ /s /y /destkey:$DestKey
 }
 
-# copy-storage -Environnement $environnement -storage storappsinterne
-# copy-storage -Environnement -storage storgum
+$params = @{'Environnement' = $Environnement }
+
+if ($PSBoundParameters.ContainsKey('Date')) { $params.Add('Date', $Date) }
+if ($PSBoundParameters.ContainsKey('Redirect_To')) { $params.Add('Redirect_To', $Redirect_To) }
+
+$params
+
+if ($storage -eq "All") {
+    $all = "storgum", "storappsinterne";
+    foreach ($storage in $all) {
+        $params.add('Storage', $Storage)
+        Restore-Storage @params
+        $params.remove('Storage')
+    }
+}
