@@ -143,7 +143,7 @@ Set-Location (Get-ChildItem $AzCopyPath).directory.fullname
 $SourceKey = (get-azstorageaccountkey -Name storappsinterneprd -ResourceGroupName storage-rg-prd | where-object {$_.keyname -eq "key1"}).value
 $DestKey   = (get-azstorageaccountkey -Name storappsinterne$Environnement -ResourceGroupName storage-rg-$Environnement | where-object {$_.keyname -eq "key1"}).value
 
-. $AzCopyPath /source:https://storappsinterneprd.blob.core.windows.net/appsinterne/ /sourcekey:$SourceKey /dest:https://storappsinterne$Environnement.blob.core.windows.net/appsinterne/ /s /y /destkey:$destkey
+# . $AzCopyPath /source:https://storappsinterneprd.blob.core.windows.net/appsinterne/ /sourcekey:$SourceKey /dest:https://storappsinterne$Environnement.blob.core.windows.net/appsinterne/ /s /y /destkey:$destkey
 
 pop-location
 

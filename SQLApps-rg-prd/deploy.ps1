@@ -113,7 +113,7 @@ $Cred = New-Object System.Management.Automation.PSCredential -ArgumentList ($use
 
 # invoke-sqlcmd -ServerInstance sqlguminterne-devops.database.windows.net -Database BdAppsInterne-devops -Query "select @@version" -Credential $cred
 
-invoke-sqlcmd -ServerInstance sqlguminterne-$environnement.database.windows.net -Database BdAppsInterne-$environnement -InputFile c:\soquij\SQL\Install\createV8.sql -Credential $cred
+<# invoke-sqlcmd -ServerInstance sqlguminterne-$environnement.database.windows.net -Database BdAppsInterne-$environnement -InputFile c:\soquij\SQL\Install\createV8.sql -Credential $cred
 
 $SourceEnv = "prd"
 $TargetEnv = $Environnement
@@ -136,7 +136,7 @@ foreach( $Bd in $Bdarray) {
     New-azSqlDatabaseCopy -ServerName $serverName -ResourceGroupName $resourceGroupName -DatabaseName $databaseName `
     -CopyResourceGroupName $TargetResourceGroupName -CopyServerName $TargetServerName -CopyDatabaseName $TargetDatabaseName
  }
-
+#>
 # Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa
 if ( $Environnement -eq "dev" -or $Environnement -eq "qa" -or $Environnement -eq "devops") {
     $QA = Get-AzADGroup -SearchString "QA"

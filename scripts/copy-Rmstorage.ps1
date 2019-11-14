@@ -9,8 +9,8 @@
     [ValidateSet("storgum", "storappsinterne", "All")] 
     $storage
 )
-
-function copy-storage {
+    
+function Copy-Storage {
     param(
         [Parameter(Mandatory = $True)]
         [string]
@@ -49,10 +49,10 @@ function copy-storage {
 $params = @{'Environnement' = $Environnement }
 
 if ($storage -eq "All") {
-    $store = "storgum", "storappsinterne";
+    $stores = "storgum", "storappsinterne";
 }
-foreach ($storage in $Store) {
-    $params.add('Storage', $Storage)
+foreach ($store in $Stores) {
+    $params.add('Storage', $Store)
     Copy-Storage @params
     $params.remove('Storage')
 }
