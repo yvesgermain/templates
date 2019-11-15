@@ -88,3 +88,31 @@ $IP_logic_Apps | ForEach-Object {
 }
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
 Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
+
+# Restriction des adresses IP sur Solr
+
+$site = "GumSolr-" + $Environnement
+
+$APIVersion = ((Get-AzureRmResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
+$WebAppConfig = (Get-AzureRmResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName $resourceGroupName -ApiVersion $APIVersion)
+$priority = 180;  
+$IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
+$IpSecurityRestrictions
+
+[System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
+
+(Get-azureRmwebapp -name ("AppsInterne-" + $Environnement )).OutboundIpAddresses.split(",") | ForEach-Object { 
+    $Ip = $_;
+    if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
+        $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
+        $webip.ipAddress = $_ + '/32';  
+        $webip.action = "Allow"; 
+        $webip.name = "Allow_AppsInterne"
+        $priority = $priority + 20 ; 
+        $webIP.priority = $priority;  
+        $ArrayList.Add($webIP); 
+        Remove-Variable webip
+    }
+}
+$WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
+Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force

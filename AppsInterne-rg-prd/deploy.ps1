@@ -155,7 +155,7 @@ $IpSecurityRestrictions
     }
 }
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-$WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
+Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 
 # Mettre les restrictions sur AppsInterne
 
@@ -196,7 +196,7 @@ $IP_logic_Apps | ForEach-Object {
     }
 }
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-$WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
+Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 
 # Restriction des adresses IP sur Solr
 
@@ -224,4 +224,4 @@ $IpSecurityRestrictions
 }
 
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-$WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
+Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
