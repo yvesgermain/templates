@@ -10,7 +10,7 @@
 
 #>
 Param(
-   [Parameter()]
+   [Parameter(Mandatory = $True)]
    [ValidateSet("dev", "qa", "prd", "devops")]
    [string]
    $Destination,
@@ -19,15 +19,26 @@ Param(
    [string]
    $source = "prd",
 
+   [Parameter(Mandatory = $True)]
+   [ValidateSet("Gum", "AppsInterne")]
+   [string]
+   $Site,
+
    [Parameter()]
    [string]
    $TargetUrl = 'https://gumbackups.blob.core.windows.net/sql-backup/'
 )
-if (get-module -ListAvailable AzureRm) {import-module azureRM.sql, azureRM.keyvault, azureRM.Storage }
+if (get-module -ListAvailable AzureRm) { import-module azureRM.sql, azureRM.keyvault, azureRM.Storage }
 
-$server = "sqlguminterne-$Destination"
-$resourcegroup = ("sqlapps-rg-" + $Destination)
-$Bds = "BdAppsInterne-$destination", "BdVeille-$destination"
+if ( $site -eq "AppsInterne") {
+   $server = "sqlguminterne-$Destination"
+   $resourcegroup = "sqlapps-rg-$Destination"
+   $Bds = "BdAppsInterne-$destination", "BdVeille-$destination"
+} else {
+   $server = "sqlgum-$Destination"
+   $resourcegroup = "Gumsql-rg-$Destination"
+   $Bds = "BdGum-$destination"
+}
 
 [string] $Storagekey = (Get-azureRMStorageAccountKey -ResourceGroupName infrastructure -Name gumbackups ).value[0]
 $StorageAccessKey = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKeyType]::StorageAccessKey
