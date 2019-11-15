@@ -46,7 +46,7 @@ $IpSecurityRestrictions
     }
 }
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig -ApiVersion $APIVersion -Force
+Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 
 # Mettre les restrictions sur AppsInterne
 
@@ -87,4 +87,4 @@ $IP_logic_Apps | ForEach-Object {
     }
 }
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig -ApiVersion $APIVersion -Force
+Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
