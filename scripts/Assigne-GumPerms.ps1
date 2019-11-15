@@ -5,6 +5,7 @@ param(
     $Environnement
 )
 
+$resourceGroupName = "GumSite-rg-$environnement"
 $Sites = "Gum-$environnement", "gummaster-$environnement"
 foreach ( $site in $sites) {
     $APIVersion = ((Get-AzureRmResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
@@ -30,7 +31,6 @@ foreach ( $site in $sites) {
     }
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
     Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
-    
 }
 
 # Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa
