@@ -60,7 +60,7 @@ $IpSecurityRestrictions
 
 [System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
 
-(Get-azwebapp -name ("AppsInterne-" + $Environnement )).OutboundIpAddresses.split(",") | ForEach-Object { 
+(Get-azureRmwebapp -name ("AppsInterne-" + $Environnement )).OutboundIpAddresses.split(",") | ForEach-Object { 
     $Ip = $_;
     if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
         $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
