@@ -670,6 +670,13 @@
                 "vnetName": "",
                 "siteAuthEnabled": false,
                 "localMySqlEnabled": false,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "205.237.253.10/32",
+                        "name": "Allow_Soquij"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": "true",                
                 "http20Enabled": false,
                 "minTlsVersion": "1.2",
                 "ftpsState": "AllAllowed",

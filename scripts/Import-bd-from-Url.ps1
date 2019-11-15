@@ -23,7 +23,7 @@ Param(
    [string]
    $TargetUrl = 'https://gumbackups.blob.core.windows.net/sql-backup/'
 )
-import-module azureRM.sql, azureRM.keyvault, azureRM.Storage
+if (get-module -ListAvailable AzureRm) {import-module azureRM.sql, azureRM.keyvault, azureRM.Storage }
 
 $server = "sqlguminterne-$Destination"
 $resourcegroup = ("sqlapps-rg-" + $Destination)

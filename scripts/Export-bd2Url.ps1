@@ -1,13 +1,13 @@
 <#
 .Synopsis
-   Copy Bd dans un storage sur Azure
+   Copy Bd dans un storage sql-backup sur Azure
 .DESCRIPTION
-   Copy BdAppsInterne-xxx de l'environnement $SourceEnv vers l'environnement $TargetEnv et redémarre le site web $TargetEnv
+   Copy BdAppsInterne-xxx de l'environnement $Environnement vers le stockage 'https://gumbackups.blob.core.windows.net/sql-backup/'
 .EXAMPLE
-   .\Export-bd2url -SourceEnv prd 
-.EXAMPLE
-   .\Export-bd2Url.ps1 -SourceEnv prd -Bd BdAppsInterne- -BDserver sqlguminterne-
-
+   .\Export-bd2url -Environnement prd 
+   .EXAMPLE
+   .\Export-bd2url 
+   Par défaut copie le BD de PRD
 #>
 Param(
     [Parameter()]
