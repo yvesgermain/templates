@@ -1,8 +1,9 @@
 param(
-     [string]
+    [Parameter(Mandatory = $True)]
+    [string]
     [ValidateSet("dev", "qa", "prd", "devops")] 
     $Environnement
- )
+)
 
 $resourceGroupName = "AppsInterne-rg-$environnement"
 
@@ -12,7 +13,6 @@ if ( $resourceGroupLocation -eq "CanadaCentral" ) {
 } else {
     $IP_logic_Apps = "40.86.203.228", "40.86.216.241", "40.86.217.241", "40.86.226.149", "40.86.228.93", "52.229.120.45", "52.229.126.25", "52.232.128.155"
 }
-
 
 # Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa
 if ( $Environnement -eq "dev" -or $Environnement -eq "qa") {
@@ -32,7 +32,7 @@ $IpSecurityRestrictions
 
 [System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
 
-(Get-azureRmwebapp -name ("AppsInterne-" + $Environnement )).OutboundIpAddresses.split(",") | ForEach-Object { 
+(Get-AzureRmwebapp -name ("AppsInterne-" + $Environnement )).OutboundIpAddresses.split(",") | ForEach-Object { 
     $Ip = $_;
     if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
         $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
