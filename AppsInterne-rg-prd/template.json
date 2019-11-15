@@ -607,7 +607,7 @@
         },
         {
             "type": "Microsoft.Web/sites/config",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2018-02-01",
             "name": "[concat(variables('sites_Solrwebapp_name'), '/web')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
