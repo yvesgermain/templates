@@ -33,7 +33,7 @@ foreach ( $site in $sites) {
     Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 }
 
-# Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa
+write-output "Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa"
 if ( $Environnement -eq "dev" -or $Environnement -eq "qa" -or $Environnement -eq "devops") {
     $QA = Get-AzureRmADGroup -SearchString "QA"
     if (!( get-AzureRmRoleAssignment -ResourceGroupName $resourceGroupName -ObjectId $qa.Id -RoleDefinitionName contributor)) {
