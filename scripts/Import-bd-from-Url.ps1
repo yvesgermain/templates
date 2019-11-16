@@ -2,7 +2,7 @@
 .Synopsis
    Importe Bd d'un storage sur Azure
 .DESCRIPTION
-   Copy BdAppsInterne-xxx de l'Destination $SourceEnv vers l'Destination $TargetEnv et redémarre le site web $TargetEnv
+   Copy les Bds de 'https://gumbackups.blob.core.windows.net/sql-backup/' vers la Destination 
 .EXAMPLE
    .\Import-bd-from-url -Destination dev 
 .EXAMPLE
@@ -14,10 +14,6 @@ Param(
    [ValidateSet("dev", "qa", "prd", "devops")]
    [string]
    $Destination,
-
-   [ValidateSet("dev", "qa", "prd", "devops")]
-   [string]
-   $source = "prd",
 
    [Parameter(Mandatory = $True)]
    [ValidateSet("Gum", "AppsInterne")]
@@ -46,6 +42,8 @@ else {
    $Bds = "BdGum-$destination"
 }
 
+Write-output " Le serveur = $server `n Resourcegroup = $resourcegroup `n Les Bds = $bds"
+
 [string] $Storagekey = (Get-azureRMStorageAccountKey -ResourceGroupName infrastructure -Name gumbackups ).value[0]
 $StorageAccessKey = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKeyType]::StorageAccessKey
 
@@ -54,7 +52,6 @@ $pass = (Get-azureKeyVaultSecret -VaultName gumkeyvault -name $("sqladmin" + $De
 
 $gum = Get-AzureRmStorageAccount -StorageAccountname gumbackups -resourcegroupname infrastructure
 
-# $DBName = (Get-AzureStorageBlob -Context $gum.context -Container sql-backup | Where-Object { $_.name -like "BdAppsInterne-$source*" } | Sort-Object LastModified -Descending)[0] | Select-Object name
 $databases = get-azureRMsqlserver -name $server -resourcegroupname $resourcegroup | get-azureRMsqldatabase | where-object { $BDs -contains $_.Databasename } 
 $databases | Remove-AzureRMsqldatabase
 
