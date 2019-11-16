@@ -16,7 +16,7 @@ foreach ( $site in $sites) {
 
     [System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
 
-    (Get-AzureRmwebapp -name).PossibleOutboundIpAddresses.split(",") | ForEach-Object { 
+    (Get-AzureRmwebapp -name $site).PossibleOutboundIpAddresses.split(",") | ForEach-Object { 
         $Ip = $_;
         if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
             $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 

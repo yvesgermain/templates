@@ -130,7 +130,7 @@ foreach ( $site in $sites) {
         }
     }
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-    $WebAppConfig | Set-AzResource  -ApiVersion $APIVersion -Force -Verbose
+    Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
     
 }
 
