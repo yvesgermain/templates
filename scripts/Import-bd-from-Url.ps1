@@ -28,13 +28,19 @@ Param(
    [string]
    $TargetUrl = 'https://gumbackups.blob.core.windows.net/sql-backup/'
 )
-if (get-module -ListAvailable AzureRm) { import-module azureRM.sql, azureRM.keyvault, azureRM.Storage }
+if (get-module -ListAvailable AzureRm) { 
+   import-module azureRM.sql, azureRM.keyvault, azureRM.Storage 
+}
+else {
+   if (get-module -ListAvailable Az.sql) { import-module az.sql } 
+}
 
 if ( $site -eq "AppsInterne") {
    $server = "sqlguminterne-$Destination"
    $resourcegroup = "sqlapps-rg-$Destination"
    $Bds = "BdAppsInterne-$destination", "BdVeille-$destination"
-} else {
+}
+else {
    $server = "sqlgum-$Destination"
    $resourcegroup = "Gumsql-rg-$Destination"
    $Bds = "BdGum-$destination"
