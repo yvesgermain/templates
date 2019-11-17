@@ -89,8 +89,8 @@ foreach ($store in $Storage) {
         "storgum" { $ResourceGroupName = "gumstorage-rg-" + $environnement; $StorageAccounts = "storgum" }
         "storappsinterne" { $ResourceGroupName = "Storage-rg-" + $environnement; $StorageAccounts = "storappsinterne" , "storveillefunc" }
     }
-    foreach ($StorageAccounts in $StorageAccounts) {
-        get-azureRmstorageaccount -resourcegroupName $resourceGroupName | where-object { $_.storageaccountname -like "$StorageAccountname*" } | foreach-object { 
+    foreach ($StorageAccount in $StorageAccounts) {
+        get-azureRmstorageaccount -resourcegroupName $resourceGroupName | where-object { $_.storageaccountname -like "$StorageAccount*" } | foreach-object { 
             $name = $_.StorageAccountName;
             Get-AzureRmStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $Name } | where-object { $_.keyname -like "key1" } | ForEach-Object {
             $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; 
