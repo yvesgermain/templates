@@ -86,14 +86,16 @@ foreach ($store in $Storage) {
 
     Write-output "Copier la clef du Storage Account dans Gum Key Vault"
     switch ($store) {
-        "storgum" { $ResourceGroupName = "gumstorage-rg-" + $environnement; }
-        "storappsinterne" { $ResourceGroupName = "Storage-rg-" + $environnement; }
+        "storgum" { $ResourceGroupName = "gumstorage-rg-" + $environnement; $StorageAccounts = "storgum" }
+        "storappsinterne" { $ResourceGroupName = "Storage-rg-" + $environnement; $StorageAccounts = "storappsinterne" , "storveillefunc" }
     }
-
-    get-azureRmstorageaccount -resourcegroupName $resourceGroupName | where-object { $_.storageaccountname -like "storgum*" } | foreach-object { 
-        $name = $_.StorageAccountName;
-        Get-AzureRmStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $Name } | where-object { $_.keyname -like "key1" } | ForEach-Object {
-        $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; 
-        Set-AzureKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"
+    foreach ($StorageAccounts in $StorageAccounts) {
+        get-azureRmstorageaccount -resourcegroupName $resourceGroupName | where-object { $_.storageaccountname -like "$StorageAccountname*" } | foreach-object { 
+            $name = $_.StorageAccountName;
+            Get-AzureRmStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $Name } | where-object { $_.keyname -like "key1" } | ForEach-Object {
+            $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; 
+            Set-AzureKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"
+        }
     }
 }
+
