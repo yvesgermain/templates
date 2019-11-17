@@ -74,7 +74,8 @@ Write-output "Copier la clef du Storage Account dans Gum Key Vault"
 $ResourceGroupName = "gumstorage-rg-" + $environnement
 
 get-azureRmstorageaccount -resourcegroupName $resourceGroupName | where-object { $_.storageaccountname -like "storgum*" } | foreach-object { 
-    Get-AzureRmStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where-object { $_.keyname -like "key1" } | ForEach-Object {
+    $name = $_.StorageAccountName;
+    Get-AzureRmStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $Name } | where-object { $_.keyname -like "key1" } | ForEach-Object {
     $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; 
     Set-AzureKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"
 }
