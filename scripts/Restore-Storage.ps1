@@ -70,7 +70,15 @@ function restore-storage {
     Write-Output "restore https://gumbackups.blob.core.windows.net/$newPath vers https://$storage$environnement.blob.core.windows.net/$container"
     . $AzCopyPath /source:https://gumbackups.blob.core.windows.net/$newPath/ /sourcekey:$GumBackupKey /dest:https://$storage$environnement.blob.core.windows.net/$container/ /s /y /destkey:$DestKey
 }
+Write-output "Copier la clef du Storage Account dans Gum Key Vault"
+$ResourceGroupName = "gumstorage-rg-" + $environnement
 
+get-azstorageaccount -resourcegroupName $resourceGroupName | where-object { $_.storageaccountname -like "storgum*" } | foreach-object { 
+    Get-AzStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where-object { $_.keyname -like "key1" } | ForEach-Object {
+    $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; 
+    Set-AzKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"
+}
+ 
 $params = @{'Environnement' = $Environnement }
 
 if ($PSBoundParameters.ContainsKey('Date')) { $params.Add('Date', $Date) }
