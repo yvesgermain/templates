@@ -26,8 +26,7 @@ Param(
 )
 if (get-module -ListAvailable AzureRm) { 
    import-module azureRM.sql, azureRM.keyvault, azureRM.Storage 
-}
-else {
+} else {
    if (get-module -ListAvailable Az.sql) { import-module az.sql } 
 }
 
@@ -35,8 +34,7 @@ if ( $site -eq "AppsInterne") {
    $server = "sqlguminterne-$Destination"
    $resourcegroup = "sqlapps-rg-$Destination"
    $Bds = "BdAppsInterne-$destination", "BdVeille-$destination"
-}
-else {
+} else {
    $server = "sqlgum-$Destination"
    $resourcegroup = "Gumsql-rg-$Destination"
    $Bds = "BdGum-$destination"
@@ -57,7 +55,7 @@ $databases | Remove-AzureRMsqldatabase
 
 $Bds | ForEach-Object { 
    $database = $_;   
-   $Dbname = (Get-AzureStorageBlob -Context $gum.context -Container sql-backup | Where-Object { $_.name -like ($database.split("-")[0] + "*") } | Sort-Object -Descending LastModified  )[0];
+   $Dbname = (Get-AzureStorageBlob -Context $gum.context -Container sql-backup | Where-Object { $_.name -like ($database.split("_")[0] + "*") } | Sort-Object -Descending LastModified  )[0];
    $Restore = New-azureRMSqlDatabaseImport `
       -ServerName $server `
       -DatabaseName $database `
