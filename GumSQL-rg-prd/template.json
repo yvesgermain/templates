@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "Environnement": {
@@ -21,7 +21,6 @@
         "DatabaseName": "[concat('BdGum-', parameters('Environnement'))]",
         "administratorLogin": "[concat('sqladmin', parameters('environnement'))]",
         "location": "CanadaCentral",
-        "storageName": "gumlogs",
         "SidSQLadmindev": "ab29cc98-8811-49b1-8e97-ecf60fc6b2b4",
         "SidSQLadminqa": "3baa776c-4826-49bf-a216-17254673507a",
         "SidSQLadminprd": "c74029db-ee61-4eae-912d-182fab6950f3",
@@ -45,9 +44,9 @@
         },
         {
             "type": "Microsoft.Sql/servers/administrators",
-            "apiVersion": "2014-04-01-preview",
+            "apiVersion": "2014-04-01",
             "name": "[concat(variables('servers_gumsqlserver_name'), '/ActiveDirectory')]",
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
             ],
@@ -72,7 +71,7 @@
             },
             "kind": "v12.0,user",
             "properties": {
-                "collation": "SQL_Latin1_General_CP1_CI_AI",
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
                 "maxSizeBytes": 2147483648,
                 "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
                 "zoneRedundant": false
@@ -143,7 +142,7 @@
             "type": "Microsoft.Sql/servers/databases/auditingPolicies",
             "apiVersion": "2014-04-01",
             "name": "[concat(variables('servers_gumsqlserver_name'), '/', variables('databaseName'), '/Default')]",
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Sql/servers/databases', variables('servers_gumsqlserver_name'), variables('databaseName'))]",
                 "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
@@ -208,7 +207,7 @@
             "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
             "apiVersion": "2014-04-01",
             "name": "[concat(variables('servers_gumsqlserver_name'), '/', variables('databaseName'), '/current')]",
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Sql/servers/databases', variables('servers_gumsqlserver_name'), variables('databaseName'))]",
                 "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
