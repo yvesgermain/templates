@@ -32,10 +32,10 @@
             "apiVersion": "2015-05-01-preview",
             "name": "[variables('servers_gumsqlserver_name')]",
             "location": "[variables('location')]",
+            "kind": "v12.0",
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
             },
-            "kind": "v12.0",
             "properties": {
                 "administratorLogin": "[variables('administratorLogin')]",
                 "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
@@ -87,6 +87,9 @@
             "properties": {
                 "startIpAddress": "0.0.0.0",
                 "endIpAddress": "0.0.0.0"
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },
         {

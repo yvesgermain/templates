@@ -2,39 +2,51 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "environnement" :{
+        "environnement": {
             "type": "string",
-            "allowedValues": ["prd","qa","dev","devops"]
+            "allowedValues": [
+                "prd",
+                "qa",
+                "dev",
+                "devops"
+            ]
         },
         "administratorLoginPassword": {
-              "type": "securestring"
+            "type": "securestring"
+        },
+        "enableADS": {
+            "defaultValue": false,
+            "type": "bool",
+            "metadata": {
+                "description": "Enable Advanced Data Security."
+            }
         }
     },
     "variables": {
-        "servers_sqlguminterne_name": "[concat('sqlguminterne-', parameters('Environnement'))]", 
-        "BdAppsInterne" : "[concat('BdAppsInterne-', parameters('environnement'))]" ,
-        "BdVeille" : "[concat('BdVeille-', parameters('environnement'))]" ,
-        "administratorLogin" : "[concat('sqladmin', parameters('environnement'))]",
+        "servers_sqlguminterne_name": "[concat('sqlguminterne-', parameters('Environnement'))]",
+        "BdAppsInterne": "[concat('BdAppsInterne-', parameters('environnement'))]",
+        "BdVeille": "[concat('BdVeille-', parameters('environnement'))]",
+        "administratorLogin": "[concat('sqladmin', parameters('environnement'))]",
         "location": "CanadaCentral",
-        "SidSQLadmindev" : "ab29cc98-8811-49b1-8e97-ecf60fc6b2b4",
-        "SidSQLadminqa" : "3baa776c-4826-49bf-a216-17254673507a",
-        "SidSQLadminprd" : "c74029db-ee61-4eae-912d-182fab6950f3",
-        "SidSQLadmindevops" : "39670c6b-8290-4499-8f84-031f42d2399e"
+        "SidSQLadmindev": "ab29cc98-8811-49b1-8e97-ecf60fc6b2b4",
+        "SidSQLadminqa": "3baa776c-4826-49bf-a216-17254673507a",
+        "SidSQLadminprd": "c74029db-ee61-4eae-912d-182fab6950f3",
+        "SidSQLadmindevops": "39670c6b-8290-4499-8f84-031f42d2399e"
     },
     "resources": [
         {
             "type": "Microsoft.Sql/servers",
             "apiVersion": "2015-05-01-preview",
             "name": "[variables('servers_sqlguminterne_name')]",
-            "location": "canadacentral",
+            "location": "[variables('location')]",
             "kind": "v12.0",
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
+            },
             "properties": {
                 "administratorLogin": "[variables('administratorLogin')]",
                 "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
                 "version": "12.0"
-            },
-            "tags": {
-                "Environnement": "[parameters('Environnement')]"
             }
         },
         {
@@ -56,7 +68,7 @@
             "type": "Microsoft.Sql/servers/databases",
             "apiVersion": "2017-03-01-preview",
             "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdAppsInterne'))]",
-            "location": "canadacentral",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
             ],
@@ -79,7 +91,7 @@
             "type": "Microsoft.Sql/servers/databases",
             "apiVersion": "2017-03-01-preview",
             "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdVeille'))]",
-            "location": "canadacentral",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
             ],
@@ -97,7 +109,8 @@
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
             }
-        },        {
+        },
+        {
             "type": "Microsoft.Sql/servers/firewallRules",
             "apiVersion": "2015-05-01-preview",
             "name": "[concat(variables('servers_sqlguminterne_name'), '/AllowAllWindowsAzureIps')]",
@@ -122,6 +135,231 @@
             "properties": {
                 "startIpAddress": "205.237.253.10",
                 "endIpAddress": "205.237.253.10"
+            }
+        },
+        {
+            "condition": "[parameters('enableADS')]",
+            "type": "Microsoft.Sql/servers/securityAlertPolicies",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": true,
+                "retentionDays": 0
+            }
+        },
+        {
+            "condition": "[parameters('enableADS')]",
+            "type": "Microsoft.Sql/servers/vulnerabilityAssessments",
+            "apiVersion": "2018-06-01-preview",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "storageContainerPath": "https://gumlogs.blob.core.windows.net/vulnerability-assessment/",
+                "recurringScans": {
+                    "isEnabled": true,
+                    "emailSubscriptionAdmins": true,
+                    "emails": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/auditingPolicies",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdAppsInterne'), '/Default')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlguminterne_name'), variables('BdAppsInterne'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "auditingState": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/auditingSettings",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdAppsInterne'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlguminterne_name'), variables('BdAppsInterne'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000",
+                "isStorageSecondaryKeyInUse": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdAppsInterne'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlguminterne_name'), variables('BdAppsInterne'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000",
+                "isStorageSecondaryKeyInUse": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
+            "apiVersion": "2018-06-01-preview",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdAppsInterne'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlguminterne_name'), variables('BdAppsInterne'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": false,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdAppsInterne'), '/current')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlguminterne_name'), variables('BdAppsInterne'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "status": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdAppsInterne'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlguminterne_name'), variables('BdAppsInterne'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "recurringScans": {
+                    "isEnabled": false,
+                    "emailSubscriptionAdmins": true,
+                    "emails": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/auditingPolicies",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdVeille'), '/Default')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlguminterne_name'), variables('BdVeille'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "auditingState": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/auditingSettings",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdVeille'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlguminterne_name'), variables('BdVeille'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000",
+                "isStorageSecondaryKeyInUse": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdVeille'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlguminterne_name'), variables('BdVeille'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000",
+                "isStorageSecondaryKeyInUse": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
+            "apiVersion": "2018-06-01-preview",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdVeille'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlguminterne_name'), variables('BdVeille'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": false,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdVeille'), '/current')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlguminterne_name'), variables('BdVeille'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "status": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[concat(variables('servers_sqlguminterne_name'), '/', variables('BdVeille'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlguminterne_name'), variables('BdVeille'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlguminterne_name'))]"
+            ],
+            "properties": {
+                "recurringScans": {
+                    "isEnabled": false,
+                    "emailSubscriptionAdmins": true,
+                    "emails": []
+                }
             }
         }
     ]
