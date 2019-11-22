@@ -152,7 +152,7 @@
                 "hostNamesDisabled": false,
                 "containerSize": 0,
                 "dailyMemoryTimeQuota": 0,
-                "httpsOnly": false
+                "httpsOnly": true
             }
         },
         {
@@ -208,7 +208,7 @@
                 "hostNamesDisabled": false,
                 "containerSize": 1536,
                 "dailyMemoryTimeQuota": 0,
-                "httpsOnly": false
+                "httpsOnly": true
             }
         },
         {
@@ -254,7 +254,7 @@
                 "hostNamesDisabled": false,
                 "containerSize": 0,
                 "dailyMemoryTimeQuota": 0,
-                "httpsOnly": false
+                "httpsOnly": true
             }
         },
         {
@@ -602,7 +602,7 @@
                 "hostNamesDisabled": false,
                 "containerSize": 0,
                 "dailyMemoryTimeQuota": 0,
-                "httpsOnly": false
+                "httpsOnly": true
             }
         },
         {

@@ -34,7 +34,7 @@
             "location": "[variables('location')]",
             "kind": "v12.0",
             "tags": {
-                "Environnement": "[parameters('Environnement')]"
+               "Environnement": "[parameters('Environnement')]" 
             },
             "properties": {
                 "administratorLogin": "[variables('administratorLogin')]",
