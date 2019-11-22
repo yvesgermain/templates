@@ -2,23 +2,34 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "Environnement": {
-            "type": "string"
+        "environnement": {
+            "type": "string",
+            "allowedValues": [
+                "prd",
+                "qa",
+                "dev",
+                "devops"
+            ]
         },
         "administratorLoginPassword": {
             "type": "securestring"
         },
         "enableADS": {
-            "defaultValue": false,
+            "defaultValue": true,
             "type": "bool",
             "metadata": {
                 "description": "Enable Advanced Data Security."
             }
+        },
+        "BDs": {
+            "type": "array",
+            "defaultValue": [
+                "BdGum-"
+            ]
         }
     },
     "variables": {
-        "servers_gumsqlserver_name": "[concat('sqlgum-', parameters('Environnement'))]",
-        "DatabaseName": "[concat('BdGum-', parameters('Environnement'))]",
+        "servers_sqlgum_name": "[concat('sqlgum-', parameters('Environnement'))]",
         "administratorLogin": "[concat('sqladmin', parameters('environnement'))]",
         "location": "CanadaCentral",
         "SidSQLadmindev": "ab29cc98-8811-49b1-8e97-ecf60fc6b2b4",
@@ -30,12 +41,12 @@
         {
             "type": "Microsoft.Sql/servers",
             "apiVersion": "2015-05-01-preview",
-            "name": "[variables('servers_gumsqlserver_name')]",
+            "name": "[variables('servers_sqlgum_name')]",
             "location": "[variables('location')]",
-            "kind": "v12.0",
             "tags": {
-               "Environnement": "[parameters('Environnement')]" 
+                "Environnement": "devops"
             },
+            "kind": "v12.0",
             "properties": {
                 "administratorLogin": "[variables('administratorLogin')]",
                 "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
@@ -45,10 +56,10 @@
         {
             "type": "Microsoft.Sql/servers/administrators",
             "apiVersion": "2014-04-01",
-            "name": "[concat(variables('servers_gumsqlserver_name'), '/ActiveDirectory')]",
-            "location": "[variables('location')]",
+            "name": "[concat(variables('servers_sqlgum_name'), '/ActiveDirectory')]",
+            "location": "Canada Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
             ],
             "properties": {
                 "administratorType": "ActiveDirectory",
@@ -58,46 +69,97 @@
             }
         },
         {
-            "type": "Microsoft.Sql/servers/databases",
+            "type": "Microsoft.Sql/servers/auditingSettings",
             "apiVersion": "2017-03-01-preview",
-            "name": "[concat(variables('servers_gumsqlserver_name'), '/', variables('databaseName'))]",
+            "name": "[concat(variables('servers_sqlgum_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled",
+                "storageEndpoint": "https://gumlogs.blob.core.windows.net/",
+                "retentionDays": 7,
+                "auditActionsAndGroups": [
+                    "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
+                    "FAILED_DATABASE_AUTHENTICATION_GROUP",
+                    "BATCH_COMPLETED_GROUP"
+                ],
+                "storageAccountSubscriptionId": "6a04c78c-475c-4872-b897-f85eec86bf02",
+                "storageAccountAccessKey": "[listKeys(resourceId('Infrastructure','Microsoft.Storage/storageAccounts', 'gumlogs'), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2017-10-01-preview",
+            "name": "[concat(variables('servers_sqlgum_name'), '/', parameters('BDs')[copyIndex()], parameters('environnement'))]", 
+            "copy": {
+                "name": "BD",
+                "count": "[length(parameters('BDs'))]"
+            },
             "location": "[variables('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
             ],
+            "tags": {
+                "Environnement": "devops"
+            },
             "sku": {
                 "name": "Basic",
-                "tier": "Basic"
+                "tier": "Basic",
+                "capacity": 5
             },
             "kind": "v12.0,user",
             "properties": {
                 "collation": "SQL_Latin1_General_CP1_CI_AS",
                 "maxSizeBytes": 2147483648,
                 "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
-                "zoneRedundant": false
+                "zoneRedundant": false,
+                "readScale": "Disabled",
+                "readReplicaCount": 0
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/extendedAuditingSettings",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[concat(variables('servers_sqlgum_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled",
+                "storageEndpoint": "https://gumlogs.blob.core.windows.net/",
+                "retentionDays": 7,
+                "auditActionsAndGroups": [
+                    "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
+                    "FAILED_DATABASE_AUTHENTICATION_GROUP",
+                    "BATCH_COMPLETED_GROUP"
+                ],
+                "storageAccountSubscriptionId": "6a04c78c-475c-4872-b897-f85eec86bf02",
+                "storageAccountAccessKey": "[listKeys(resourceId('Infrastructure','Microsoft.Storage/storageAccounts', 'gumlogs'), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false
             }
         },
         {
             "type": "Microsoft.Sql/servers/firewallRules",
             "apiVersion": "2015-05-01-preview",
-            "name": "[concat(variables('servers_gumsqlserver_name'), '/AllowAllWindowsAzureIps')]",
+            "name": "[concat(variables('servers_sqlgum_name'), '/AllowAllWindowsAzureIps')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
             ],
             "properties": {
                 "startIpAddress": "0.0.0.0",
                 "endIpAddress": "0.0.0.0"
-            },
-            "tags": {
-                "Environnement": "[parameters('Environnement')]"
             }
         },
         {
             "type": "Microsoft.Sql/servers/firewallRules",
             "apiVersion": "2015-05-01-preview",
-            "name": "[concat(variables('servers_gumsqlserver_name'), '/SoquijNetwork')]",
+            "name": "[concat(variables('servers_sqlgum_name'), '/AllowSoquij')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
             ],
             "properties": {
                 "startIpAddress": "205.237.253.10",
@@ -105,12 +167,112 @@
             }
         },
         {
-            "condition": "[parameters('enableADS')]",
             "type": "Microsoft.Sql/servers/securityAlertPolicies",
             "apiVersion": "2017-03-01-preview",
-            "name": "[concat(variables('servers_gumsqlserver_name'), '/Default')]",
+            "name": "[concat(variables('servers_sqlgum_name'), '/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    "ygermain@ssoquij.qc.ca"
+                ],
+                "emailAccountAdmins": true,
+                "retentionDays": 0
+            }
+        },
+        {
+            "name": "[concat(variables('servers_sqlgum_name'), '/vulnerabilityAssessments')]",
+            "type": "Microsoft.Sql/servers/vulnerabilityAssessments",
+            "condition": "[parameters('enableADS')]",
+            "apiVersion": "2018-06-01-preview",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Sql/servers/', variables('servers_sqlgum_name'))]",
+                "[concat('Microsoft.Sql/servers/', variables('servers_sqlgum_name'), '/securityAlertPolicies/Default')]"
+
+            ],
+            "properties": {
+                "storageContainerPath": "https://gumlogs.blob.core.windows.net/vulnerability-assessment/",
+                "storageAccountAccessKey": "[listKeys(resourceId('infrastructure', 'Microsoft.Storage/storageAccounts', 'gumlogs'), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
+                "recurringScans": {
+                    "isEnabled": true,
+                    "emailSubscriptionAdmins": true,
+                    "emails": [
+                        "ygermain@soquij.qc.ca"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/auditingSettings",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[concat(variables('servers_sqlgum_name'), '/', parameters('BDs')[copyIndex()], parameters('Environnement') , '/Default' )]", 
+            "copy": {
+                "name": "BD",
+                "count": "[length(parameters('BDs'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlgum_name'), concat(parameters('BDs')[copyIndex()], parameters('Environnement')) )]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled",
+                "storageEndpoint": "https://gumlogs.blob.core.windows.net/",
+                "retentionDays": 7,
+                "auditActionsAndGroups": [
+                    "BATCH_COMPLETED_GROUP",
+                    "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
+                    "FAILED_DATABASE_AUTHENTICATION_GROUP"
+                ],
+                "storageAccountSubscriptionId": "6a04c78c-475c-4872-b897-f85eec86bf02",
+                "storageAccountAccessKey": "[listKeys(resourceId('Infrastructure','Microsoft.Storage/storageAccounts', 'gumlogs'), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[concat(variables('servers_sqlgum_name'), '/', concat(parameters('BDs')[copyIndex()], parameters('Environnement')) , '/Default' )]", 
+            "copy": {
+                "name": "BD",
+                "count": "[length(parameters('BDs'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlgum_name'), concat(parameters('BDs')[copyIndex()], parameters('Environnement')) )]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled",
+                "storageEndpoint": "https://gumlogs.blob.core.windows.net/",
+                "retentionDays": 7,
+                "auditActionsAndGroups": [
+                    "BATCH_COMPLETED_GROUP",
+                    "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
+                    "FAILED_DATABASE_AUTHENTICATION_GROUP"
+                ],
+                "storageAccountSubscriptionId": "6a04c78c-475c-4872-b897-f85eec86bf02",
+                "storageAccountAccessKey": "[listKeys(resourceId('Infrastructure','Microsoft.Storage/storageAccounts', 'gumlogs'), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
+            "apiVersion": "2018-06-01-preview",
+            "name": "[concat(variables('servers_sqlgum_name'), '/', parameters('BDs')[copyIndex()], parameters('Environnement') , '/Default' )]", 
+            "copy": {
+                "name": "BD",
+                "count": "[length(parameters('BDs'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlgum_name'), concat(parameters('BDs')[copyIndex()], parameters('Environnement')) )]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
             ],
             "properties": {
                 "state": "Enabled",
@@ -125,95 +287,17 @@
             }
         },
         {
-            "condition": "[parameters('enableADS')]",
-            "type": "Microsoft.Sql/servers/vulnerabilityAssessments",
-            "apiVersion": "2018-06-01-preview",
-            "name": "[concat(variables('servers_gumsqlserver_name'), '/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
-            ],
-            "properties": {
-                "storageContainerPath": "https://gumlogs.blob.core.windows.net/vulnerability-assessment/",
-                "recurringScans": {
-                    "isEnabled": true,
-                    "emailSubscriptionAdmins": true,
-                    "emails": []
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/databases/auditingPolicies",
-            "apiVersion": "2014-04-01",
-            "name": "[concat(variables('servers_gumsqlserver_name'), '/', variables('databaseName'), '/Default')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_gumsqlserver_name'), variables('databaseName'))]",
-                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
-            ],
-            "properties": {
-                "auditingState": "Disabled"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/databases/auditingSettings",
-            "apiVersion": "2017-03-01-preview",
-            "name": "[concat(variables('servers_gumsqlserver_name'), '/', variables('databaseName'), '/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_gumsqlserver_name'), variables('databaseName'))]",
-                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
-            ],
-            "properties": {
-                "state": "Disabled",
-                "retentionDays": 0,
-                "auditActionsAndGroups": [],
-                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000",
-                "isStorageSecondaryKeyInUse": false
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
-            "apiVersion": "2017-03-01-preview",
-            "name": "[concat(variables('servers_gumsqlserver_name'), '/', variables('databaseName'), '/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_gumsqlserver_name'), variables('databaseName'))]",
-                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
-            ],
-            "properties": {
-                "state": "Disabled",
-                "retentionDays": 0,
-                "auditActionsAndGroups": [],
-                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000",
-                "isStorageSecondaryKeyInUse": false
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
-            "apiVersion": "2018-06-01-preview",
-            "name": "[concat(variables('servers_gumsqlserver_name'), '/', variables('databaseName'), '/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_gumsqlserver_name'), variables('databaseName'))]",
-                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
-            ],
-            "properties": {
-                "state": "Disabled",
-                "disabledAlerts": [
-                    ""
-                ],
-                "emailAddresses": [
-                    ""
-                ],
-                "emailAccountAdmins": false,
-                "retentionDays": 0
-            }
-        },
-        {
             "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
             "apiVersion": "2014-04-01",
-            "name": "[concat(variables('servers_gumsqlserver_name'), '/', variables('databaseName'), '/current')]",
-            "location": "[variables('location')]",
+            "name": "[concat(variables('servers_sqlgum_name'), '/', parameters('BDs')[copyIndex()], parameters('Environnement') , '/current' )]", 
+            "location": "Canada Central",
+            "copy": {
+                "name": "BD",
+                "count": "[length(parameters('BDs'))]"
+            },
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_gumsqlserver_name'), variables('databaseName'))]",
-                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlgum_name'), concat(parameters('BDs')[copyIndex()], parameters('Environnement')) )]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
             ],
             "properties": {
                 "status": "Enabled"
@@ -222,16 +306,24 @@
         {
             "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
             "apiVersion": "2017-03-01-preview",
-            "name": "[concat(variables('servers_gumsqlserver_name'), '/', variables('databaseName'), '/Default')]",
+            "name": "[concat(variables('servers_sqlgum_name'), '/', parameters('BDs')[copyIndex()], parameters('Environnement') , '/Default' )]", 
+            "location": "Canada Central",
+            "copy": {
+                "name": "BD",
+                "count": "[length(parameters('BDs'))]"
+            },
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_gumsqlserver_name'), variables('databaseName'))]",
-                "[resourceId('Microsoft.Sql/servers', variables('servers_gumsqlserver_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', variables('servers_sqlgum_name'), concat(parameters('BDs')[copyIndex()], parameters('Environnement')) )]",
+                "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
             ],
             "properties": {
+                "storageContainerPath": "https://gumlogs.blob.core.windows.net/vulnerability-assessment/",
+                "storageAccountAccessKey": "[listKeys(resourceId('infrastructure', 'Microsoft.Storage/storageAccounts', 'gumlogs'), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
                 "recurringScans": {
-                    "isEnabled": false,
+                    "isEnabled": true,
                     "emailSubscriptionAdmins": true,
-                    "emails": []
+                    "emails": [
+                    ]
                 }
             }
         }

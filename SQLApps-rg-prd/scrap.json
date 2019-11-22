@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environnement": {
+            "type": "string",
+            "allowedValues": [
+                "prd",
+                "qa",
+                "dev",
+                "devops"
+            ]
+        },
+        "administratorLoginPassword": {
+            "type": "securestring"
+        }
+    },
+    "variables": {
+
+        "StorageAccountName": "Gumlogs"
+
+    },
+    "resources": [
+    ],
+    "outputs": {
+        "storageAccountAccessKey":
+        {
+            "type": "string",
+            "value": "[listKeys(resourceId('Infrastructure','Microsoft.Storage/storageAccounts', 'gumlogs'), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
+        },
+        "ResourceId": {
+            "type" :"string",
+            "value": "[subscription().subscriptionId]"
+        }
+    }
+}

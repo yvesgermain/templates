@@ -80,6 +80,9 @@
             "apiVersion": "2016-08-01",
             "name": "[variables('Sites_AppsInterne_name')]",
             "location": "[resourceGroup().location]",
+            "Identity": {
+                "type": "SystemAssigned"
+            },
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]"
             ],
@@ -216,6 +219,9 @@
             "apiVersion": "2016-08-01",
             "name": "[variables('Sites_Veille_name')]",
             "location": "[resourceGroup().location]",
+            "Identity": {
+                "type": "SystemAssigned"
+            },
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]"
             ],
