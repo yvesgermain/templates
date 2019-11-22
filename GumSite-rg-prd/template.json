@@ -13,6 +13,7 @@
         }
     },
     "variables": {
+        "location": "CanadaCentral",
         "sites_gummaster_name": "[concat('GumMaster-', parameters('Environnement'))]",
         "sites_gumfrontend_name": "[concat('Gum-', parameters('Environnement'))]",
         "serverfarms_gummaster_name": "[concat('ASP-Standard-', parameters('Environnement'))]",
@@ -23,7 +24,7 @@
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
             "name": "[variables('serverfarms_gumfrontend_name')]",
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
             },
@@ -47,7 +48,7 @@
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
             "name": "[variables('serverfarms_gummaster_name')]",
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
             },
@@ -71,7 +72,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "name": "[variables('sites_gumfrontend_name')]",
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gumfrontend_name'))]"
             ],
@@ -139,7 +140,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "name": "[variables('sites_gummaster_name')]",
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gummaster_name'))]"
             ],
@@ -207,7 +208,7 @@
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
             "name": "[concat(variables('sites_gumfrontend_name'), '/web')]",
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_gumfrontend_name'))]"
             ],
@@ -287,7 +288,7 @@
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
             "name": "[concat(variables('sites_gummaster_name'), '/web')]",
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_gummaster_name'))]"
             ],
@@ -367,7 +368,7 @@
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_gumfrontend_name'), '/', variables('sites_gumfrontend_name'), '.azurewebsites.net')]",
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_gumfrontend_name'))]"
             ],
@@ -380,7 +381,7 @@
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_gummaster_name'), '/', variables('sites_gummaster_name'), '.azurewebsites.net')]",
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_gummaster_name'))]"
             ],

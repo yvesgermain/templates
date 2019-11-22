@@ -44,7 +44,7 @@
             "name": "[variables('servers_sqlgum_name')]",
             "location": "[variables('location')]",
             "tags": {
-                "Environnement": "devops"
+                 "Environnement": "[parameters('Environnement')]"
             },
             "kind": "v12.0",
             "properties": {
@@ -57,7 +57,7 @@
             "type": "Microsoft.Sql/servers/administrators",
             "apiVersion": "2014-04-01",
             "name": "[concat(variables('servers_sqlgum_name'), '/ActiveDirectory')]",
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
             ],
@@ -103,7 +103,7 @@
                 "[resourceId('Microsoft.Sql/servers', variables('servers_sqlgum_name'))]"
             ],
             "tags": {
-                "Environnement": "devops"
+                 "Environnement": "[parameters('Environnement')]"
             },
             "sku": {
                 "name": "Basic",
@@ -290,7 +290,7 @@
             "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
             "apiVersion": "2014-04-01",
             "name": "[concat(variables('servers_sqlgum_name'), '/', parameters('BDs')[copyIndex()], parameters('Environnement') , '/current' )]", 
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "copy": {
                 "name": "BD",
                 "count": "[length(parameters('BDs'))]"
@@ -307,7 +307,7 @@
             "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
             "apiVersion": "2017-03-01-preview",
             "name": "[concat(variables('servers_sqlgum_name'), '/', parameters('BDs')[copyIndex()], parameters('Environnement') , '/Default' )]", 
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "copy": {
                 "name": "BD",
                 "count": "[length(parameters('BDs'))]"

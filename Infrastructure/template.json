@@ -2,14 +2,12 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "location": {
-            "type": "string"
-        },
         "storageAccountName": {
             "type": "string"
         }
     },
     "variables": {
+        "location": "CanadaCentral",
         "sites_GumSolr_name": "GumSolr-IC",
         "Environnement": "Infrastructure",
         "serverfarms_standard_infra": "ASP-standard-infra"
@@ -19,7 +17,7 @@
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
             "name": "[variables('serverfarms_standard_infra')]",
-            "location": "Canada Central",
+            "location": "[variables('location')]",
             "tags": {
                 "Environnement": "[variables('Environnement')]"
             },
@@ -43,7 +41,7 @@
             "name": "[parameters('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-04-01",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "properties": {
                 "accessTier": "Hot",
                 "supportsHttpsTrafficOnly": true
@@ -71,7 +69,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "name": "[variables('sites_GumSolr_name')]",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "kind": "app",
             "tags": {
                 "Environnement": "[variables('Environnement')]"
@@ -108,7 +106,7 @@
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_GumSolr_name'), '/web')]",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_GumSolr_name'))]"
             ],
@@ -183,7 +181,7 @@
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_GumSolr_name'), '/', variables('sites_GumSolr_name'), '.azurewebsites.net')]",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_GumSolr_name'))]"
             ],
