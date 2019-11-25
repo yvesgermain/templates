@@ -33,6 +33,9 @@
             "name": "[variables('servers_sqlguminterne_name')]",
             "location": "[variables('location')]",
             "kind": "v12.0",
+            "identity":{
+                "type": "SystemAssigned"
+            },
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
             },

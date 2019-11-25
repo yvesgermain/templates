@@ -729,7 +729,7 @@
         },
         "bd_VeilleContenuExterneEntities": {
             "type": "string",
-            "value": "[concat('Data Source=sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin' , parameters('Environnement'), ';Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework')]"
+            "value": "[concat('Data Source=sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=tbl_VeilleDeContenuExterne;Persist Security Info=False;User ID=sqladmin' , parameters('Environnement'), ';Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework')]"
         }
     }
 }
