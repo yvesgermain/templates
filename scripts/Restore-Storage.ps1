@@ -54,15 +54,15 @@ function restore-storage {
     $DestKey = (get-azureRMstorageaccountkey -Name "$storage$Destination" -ResourceGroupName $ResourceGroupName | where-object { $_.keyname -eq "key1" }).value
 
     if (!$date) {
-        $dateformat = ((get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAccountName gumbackups | Where-Object { $_.name -like "$container-$Destination-*" } | sort-object -Property LastModifiedtime -Descending)[0]).LastModifiedtime
+        $dateformat = ((get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAccountName gumbackups | Where-Object { $_.name -like "$container-$Source-*" } | sort-object -Property LastModifiedtime -Descending)[0]).LastModifiedtime
         $date = "{0:yyyyMMdd}" -f $dateformat
     }
 
-    if (!( get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAccountName gumbackups -name "$container-$Destination-$date" -ErrorAction SilentlyContinue)) {
-        write-warning "Le backup $container-$Destination-$date n'existe pas";
+    if (!( get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAccountName gumbackups -name "$container-$Source-$date" -ErrorAction SilentlyContinue)) {
+        write-warning "Le backup $container-$Source-$date n'existe pas";
         break 
     }
-    # Pour Rediriger les données vers un autre container.
+    # Pour Rediriger les donnees vers un autre container.
 
     $newPath = "$container-$Source-$date" 
     
