@@ -70,7 +70,7 @@ function restore-storage {
     . $AzCopyPath /source:https://gumbackups.blob.core.windows.net/$newPath/ /sourcekey:$GumBackupKey /dest:https://$storage$Destination.blob.core.windows.net/$container/ /s /y /destkey:$DestKey
 }
 
-$params = @{'Environnement' = $Destination }
+$params = @{'Destination' = $Destination }
 
 if ($PSBoundParameters.ContainsKey('Date')) { $params.Add('Date', $Date) }
 if ($PSBoundParameters.ContainsKey('$Source')) { $params.Add('$Source', $Source) }
