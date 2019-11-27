@@ -15,7 +15,7 @@
             "type": "securestring"
         },
         "enableADS": {
-            "defaultValue": true,
+            "defaultValue": false,
             "type": "bool",
             "metadata": {
                 "description": "Enable Advanced Data Security."
@@ -202,7 +202,7 @@
                 "storageContainerPath": "https://gumlogs.blob.core.windows.net/vulnerability-assessment/",
                 "storageAccountAccessKey": "[listKeys(resourceId('infrastructure', 'Microsoft.Storage/storageAccounts', 'gumlogs'), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
                 "recurringScans": {
-                    "isEnabled": true,
+                    "isEnabled": false,
                     "emailSubscriptionAdmins": true,
                     "emails": [
                         "ygermain@soquij.qc.ca"
@@ -322,7 +322,7 @@
                 "storageContainerPath": "https://gumlogs.blob.core.windows.net/vulnerability-assessment/",
                 "storageAccountAccessKey": "[listKeys(resourceId('infrastructure', 'Microsoft.Storage/storageAccounts', 'gumlogs'), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
                 "recurringScans": {
-                    "isEnabled": true,
+                    "isEnabled": false,
                     "emailSubscriptionAdmins": true,
                     "emails": [
                     ]

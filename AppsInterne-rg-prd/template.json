@@ -144,7 +144,7 @@
                     "connectionStrings": [
                         {
                             "name": "umbracoDbDSN",
-                            "connectionString": "[concat('Server=tcp:sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdAppsInterne-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\"')]",
+                            "connectionString": "[concat( '@Microsoft.KeyVault(SecretUri=https://gumkeyvault.vault.azure.net:443/secrets/DSN-appsinterne-', parameters('Environnement'))]",
                             "type": "SQLAzure"
                         }
                     ]
@@ -200,7 +200,7 @@
                     "connectionStrings": [
                         {
                             "name": "bd_VeilleContenuExterneEntities",
-                            "value": "[concat('Data Source=sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin' , parameters('Environnement'), ';Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework')]",
+                            "value": "[concat( '@Microsoft.KeyVault(SecretUri=https://gumkeyvault.vault.azure.net:443/secrets/DSN-veille-', parameters('Environnement'))]",
                             "type": "SQLAzure"
                         }
                     ]
@@ -236,7 +236,7 @@
                     "connectionStrings": [
                         {
                             "name": "bd_VeilleContenuExterneEntities",
-                            "connectionString": "[concat('Server=tcp:sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework;Authentication=\"Active Directory Password\"')]",
+                            "connectionString": "[concat( '@Microsoft.KeyVault(SecretUri=https://gumkeyvault.vault.azure.net:443/secrets/DSN-Bdveille-', parameters('Environnement'))]",
                             "type": "SQLServer"
                         }
                     ]
