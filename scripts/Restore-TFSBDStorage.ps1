@@ -35,10 +35,11 @@ Param(
 if (!( get-module -ListAvailable vsteam)) {
     install-module vsteam
 }
+
 Set-VSTeamAccount -Account http://srvtfs01:8080/tfs/soquij -UseWindowsAuthentication -verbose
 Set-VSTeamDefaultProject -Project GuichetUnique
-$id = (Get-VSTeamReleaseDefinition -ProjectName GuichetUnique | where-object {$_.name -like "Restore BD et Stockage"}).id
-$b =  Get-VSTeamReleaseDefinition -ProjectName GuichetUnique -Id $id -Raw
+$id = (Get-VSTeamReleaseDefinition -ProjectName GuichetUnique | where-object { $_.name -like "Restore BD et Stockage" }).id
+$b = Get-VSTeamReleaseDefinition -ProjectName GuichetUnique -Id $id -Raw
 $b.environments.variables.Destination.value = $Destination
 $b.environments.variables.Storage.value = $storage
 $b.environments.variables.Source.value = $Source
@@ -51,12 +52,13 @@ if (![System.IO.directory]::Exists( "C:\templates\DevOps")) {
     new-item C:\templates\DevOps
     git clone http://srvtfs01:8080/tfs/SOQUIJ/GuichetUnique/_git/DevOps c:\templates\devops
     $removedevops = 1
+} else {
+    Push-Location
+    Set-Location c:\templates\DevOps
+    git pull
+    Pop-Location
 }
-Push-Location
-Set-Location c:\templates\DevOps
-git pull
-$BuildId = (git log --pretty=oneline -n1 c:\templates\devops\scripts ).Substring(0,9)
+$BuildId = (git log --pretty=oneline -n1 c:\templates\devops\scripts ).Substring(0, 9)
 $Release = Add-VSTeamRelease -ArtifactAlias devops -ProjectName guichetUnique -BuildId $BuildId -DefinitionId $id
 Show-VSTeamRelease -ProjectName GuichetUnique -id $Release.id
-Pop-Location
-if ( $removedevops -eq 1) {Remove-Item c:\templates\devops -Recurse -Force}
+if ( $removedevops -eq 1) { Remove-Item c:\templates\devops -Recurse -Force }
