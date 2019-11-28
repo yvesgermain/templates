@@ -43,6 +43,7 @@ $b.environments.variables.Destination.value = $Destination
 $b.environments.variables.Storage.value = $storage
 $b.environments.variables.Source.value = $Source
 $b.environments.variables.BD.value = $BD
+$b.environments.variables.date.value = $date
 $body = $b | ConvertTo-Json -Depth 100
 $body | Out-File -FilePath $env:TEMP\scrap.json -Encoding utf8
 update-VSTeamReleaseDefinition -InFile $env:TEMP\scrap.json -ProjectName GuichetUnique -Verbose
