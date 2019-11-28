@@ -49,9 +49,9 @@ $body | Out-File -FilePath $env:TEMP\scrap.json -Encoding utf8
 update-VSTeamReleaseDefinition -InFile $env:TEMP\scrap.json -ProjectName GuichetUnique -Verbose
 if (![System.IO.directory]::Exists( "C:\templates\DevOps")) {
     new-item C:\templates\DevOps
+    Set-Location c:\templates\devops
+    git clone http://srvtfs01:8080/tfs/SOQUIJ/GuichetUnique/_git/DevOps
 }
-Set-Location c:\templates\devops
-git clone http://srvtfs01:8080/tfs/SOQUIJ/GuichetUnique/_git/DevOps
-$BuildId = (git log --pretty=oneline -n1 scripts/ ).Substring(0,9)
+$BuildId = (git log --pretty=oneline -n1 c:\templates\devops\scripts ).Substring(0,9)
 $Release = Add-VSTeamRelease -ArtifactAlias devops -ProjectName guichetUnique -BuildId $BuildId -DefinitionId $id
 Show-VSTeamRelease -ProjectName GuichetUnique -id $Release.id
