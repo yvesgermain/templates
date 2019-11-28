@@ -42,7 +42,7 @@ switch ($BD) {
         $server = "sqlgum-$Destination"
         $resourcegroup = "Gumsql-rg-$Destination"
         $BdDest = "BdGum-$destination"
-        $BdSource = "BdGum-$Source"
+        $BdSource = "BdGum-$Source_"
     }
     "AppsInterne" {
         $server = "sqlguminterne-$Destination"
@@ -54,7 +54,7 @@ switch ($BD) {
         $server = "sqlguminterne-$Destination"
         $resourcegroup = "sqlapps-rg-$Destination"
         $BdDest = "BdVeille-$destination"
-        $BdSource = "BdVeille-$Source"
+        $BdSource = "BdVeille-$Source_"
     }
 }
 
