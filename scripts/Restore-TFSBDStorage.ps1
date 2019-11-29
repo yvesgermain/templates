@@ -18,7 +18,7 @@ Param(
     $Destination,
 
     [Parameter(Mandatory = $True)]
-    [ValidateSet("Gum", "AppsInterne", "Veille")]
+    [ValidateSet("Gum", "AppsInterne", "Veille", "null")]
     [string]
     $BD,
 

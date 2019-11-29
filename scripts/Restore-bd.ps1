@@ -21,7 +21,7 @@ Param(
     $Destination,
 
     [Parameter(Mandatory = $True)]
-    [ValidateSet("Gum", "AppsInterne", "Veille")]
+    [ValidateSet("Gum", "AppsInterne", "Veille", "null")]
     [string]
     $BD,
 
@@ -33,6 +33,7 @@ Param(
     [string]
     $TargetUrl = 'https://gumbackups.blob.core.windows.net/sql-backup/'
 )
+if ($bd -eq "null") {Write-Output "Aucune BD à restaurer"; break}
 If (!$Source) { $Source -eq $Destination }
 
 if (get-module -ListAvailable AzureRm) { 
