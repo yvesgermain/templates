@@ -32,8 +32,13 @@ Param(
     $date
 )
 
+set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+Set-PSRepository -InstallationPolicy Trusted -Name psgallery
+
 if (!( get-module -ListAvailable vsteam)) {
     install-module vsteam
+    $file = 'C:\Program Files\WindowsPowerShell\Modules\VSTeam\6.4.1\vsteam.classes.ps1'
+    (get-content $file ).replace('      $this.isDeleted = $obj.isDeleted','#     $this.isDeleted = $obj.isDeleted') | set-content $file
 }
 
 Set-VSTeamAccount -Account http://srvtfs01:8080/tfs/soquij -UseWindowsAuthentication -verbose
