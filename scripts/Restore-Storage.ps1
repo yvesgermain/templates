@@ -40,7 +40,7 @@ function restore-storage {
         [ValidateSet("storgum", "storappsinterne", "null")] 
         $storage
     )
-    if ($storage -eq "null") {Write-Output "Storage = null. Aucun storage à restaurer!"; break}
+    if ($storage -eq "null") {Write-Output "Storage = null. Aucun storage à restaurer!"; return 0}
     $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 
     if (!$Source ) {$source = $Destination}
