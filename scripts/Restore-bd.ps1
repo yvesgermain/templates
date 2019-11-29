@@ -33,7 +33,7 @@ Param(
     [string]
     $TargetUrl = 'https://gumbackups.blob.core.windows.net/sql-backup/'
 )
-if ($bd -eq "null") {Write-Output "Aucune BD à restaurer"; break}
+if ($bd -eq "null") {Write-Output "Aucune BD à restaurer"; return 0}
 If (!$Source) { $Source -eq $Destination }
 
 if (get-module -ListAvailable AzureRm) { 
