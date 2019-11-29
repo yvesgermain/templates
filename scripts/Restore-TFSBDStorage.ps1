@@ -33,8 +33,9 @@ Param(
     $date
 )
 
-set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 Set-PSRepository -InstallationPolicy Trusted -Name psgallery
+if (!(Test-Path $profile)) {New-item –type file –force $profile }
 
 if (!( get-module -ListAvailable vsteam)) {
     install-module vsteam
@@ -59,13 +60,13 @@ if (![System.IO.directory]::Exists( "C:\templates\DevOps")) {
     git clone http://srvtfs01:8080/tfs/SOQUIJ/GuichetUnique/_git/DevOps c:\templates\devops
     $removedevops = 1
 } else {
-    Push-Location
     Set-Location c:\templates\DevOps
     git pull
-    Pop-Location
 }
+Push-Location
 Set-Location c:\templates\DevOps
 $BuildId = (git log --pretty=oneline -n1 c:\templates\devops\scripts ).Substring(0, 9)
 $Release = Add-VSTeamRelease -ArtifactAlias devops -ProjectName guichetUnique -BuildId $BuildId -DefinitionId $id
 Show-VSTeamRelease -ProjectName GuichetUnique -id $Release.id
+Pop-Location
 if ( $removedevops -eq 1) { Remove-Item c:\templates\devops -Recurse -Force }
