@@ -22,8 +22,8 @@ $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 
 # Enlève les vieux Boot diagnostics des crawlers précédents 
 
-$storageAccount = Get-AzureRmStorageAccount -ResourceGroupName infrastructure -Name gumbackups
-Get-AzureRmStorageContainer -Container bootdiagnostics-vmcrawl* -Context $storageAccount.context | Remove-AzureRmStorageContainer -Confirm:$false -Force
+#$storageAccount = Get-AzureRmStorageAccount -ResourceGroupName infrastructure -Name gumbackups
+#Get-AzureRmStorageContainer -Container bootdiagnostics-vmcrawl* -Context $storageAccount.context | Remove-AzureRmStorageContainer -Confirm:$false -Force
 
 $i = switch ($environnement) {
     "dev" { "3" }
