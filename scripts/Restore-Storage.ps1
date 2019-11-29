@@ -14,7 +14,7 @@
 
     [Parameter(Mandatory = $True)]
     [string]
-    [ValidateSet("storgum", "storappsinterne", "All")] 
+    [ValidateSet("storgum", "storappsinterne", "All", "null")] 
     $storage
 
 )
@@ -34,12 +34,13 @@ function restore-storage {
             HelpMessage = "Donner la date du restore dans le format yyyyMMdd, sinon on prendra le dernier backup")]
         $date,
 
-        [Parameter(Mandatory = $True)]
+        [Parameter(Mandatory = $True,
+        HelpMessage = "Si null, aucune restauration de données")]
         [string]
-        [ValidateSet("storgum", "storappsinterne")] 
+        [ValidateSet("storgum", "storappsinterne", "null")] 
         $storage
     )
-
+    if ($storage -eq "null") {Write-Output "Storage = null. Aucun storage à restaurer!"; break}
     $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 
     if (!$Source ) {$source = $Destination}

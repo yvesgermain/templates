@@ -80,9 +80,9 @@ switch ($BD) {
 
 Write-output "Le serveur = $server `nResourcegroup = $resourcegroup `nBD source = $Bdsource`nBD destination = $BdDest"
 
-$Bdname = Get-AzureStorageBlob -Context $context -Container sql-backup | Where-Object { $_.name -like ($bdSource + "*") } ;
+[array] $Bdname = Get-AzureStorageBlob -Context $context -Container sql-backup | Where-Object { $_.name -like ($bdSource + "*") } ;
 if ( !$Bdname ) { write-warning "$BdSource n'existe pas"; break} 
-if ($Bdname -is [array]) { $Bdname = ($Bdname | Sort-Object -Descending LastModified )[0]}
+$Bdname = ($Bdname | Sort-Object -Descending LastModified )[0]
 $databases = get-azureRMsqlserver -name $server -resourcegroupname $resourcegroup | get-azureRMsqldatabase | where-object { $BdDest -contains $_.Databasename } 
 if ( $databases) { $databases | Remove-AzureRMsqldatabase }
 

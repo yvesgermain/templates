@@ -22,9 +22,10 @@ Param(
     [string]
     $BD,
 
-    [Parameter(Mandatory = $True)]
+    [Parameter(Mandatory = $True,
+    HelpMessage = "Si null, aucune restauration de données")]
     [string]
-    [ValidateSet("storgum", "storappsinterne")] 
+    [ValidateSet("storgum", "storappsinterne", "null")] 
     $storage,
 
     [Parameter(Mandatory = $false,
@@ -54,7 +55,7 @@ $body = $b | ConvertTo-Json -Depth 100
 $body | Out-File -FilePath $env:TEMP\scrap.json -Encoding utf8
 update-VSTeamReleaseDefinition -InFile $env:TEMP\scrap.json -ProjectName GuichetUnique -Verbose
 if (![System.IO.directory]::Exists( "C:\templates\DevOps")) {
-    new-item C:\templates\DevOps
+    mkdir C:\templates\DevOps
     git clone http://srvtfs01:8080/tfs/SOQUIJ/GuichetUnique/_git/DevOps c:\templates\devops
     $removedevops = 1
 } else {
