@@ -64,6 +64,7 @@ if (![System.IO.directory]::Exists( "C:\templates\DevOps")) {
     git pull
     Pop-Location
 }
+Set-Location c:\templates\DevOps
 $BuildId = (git log --pretty=oneline -n1 c:\templates\devops\scripts ).Substring(0, 9)
 $Release = Add-VSTeamRelease -ArtifactAlias devops -ProjectName guichetUnique -BuildId $BuildId -DefinitionId $id
 Show-VSTeamRelease -ProjectName GuichetUnique -id $Release.id
