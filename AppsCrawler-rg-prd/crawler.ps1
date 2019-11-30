@@ -25,6 +25,7 @@ $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 $storageAccount = Get-AzureRmStorageAccount -ResourceGroupName infrastructure -Name gumbackups
 $storageAccount | Get-AzureRmStorageContainer | Where-Object {$_.name -like "bootdiagnostics-vmcrawl*"} | Remove-AzureRmStorageContainer -Force
 
+
 $i = switch ($environnement) {
     "dev" { "3" }
     "qa" { "4" }
