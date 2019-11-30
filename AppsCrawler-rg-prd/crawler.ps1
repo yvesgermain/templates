@@ -104,7 +104,7 @@ Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -
 
 $ArrayList.Removeat( $Index ) 
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-$WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
+Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 
 if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force }
 
