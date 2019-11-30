@@ -36,3 +36,4 @@ Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-locatio
 .\ControleQualite.App.exe
 
 "Done!"
+get-process chromedriver | stop-process -Force
