@@ -56,7 +56,7 @@ $VirtualMachine = New-AzureRMVMConfig -VMName $VMName -VMSize $VMSize
 $VirtualMachine = Set-AzureRMVMOperatingSystem -VM $VirtualMachine -Windows -ComputerName $ComputerName -Credential $Credential -ProvisionVMAgent -EnableAutoUpdate
 $VirtualMachine = Add-AzureRMVMNetworkInterface -VM $VirtualMachine -Id $NIC.Id
 $VirtualMachine = Set-AzureRMVMSourceImage -VM $VirtualMachine -PublisherName 'MicrosoftWindowsServer' -Offer 'WindowsServer' -Skus '2016-Datacenter' -Version latest
-# $VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
+$VirtualMachine = Set-AzureRmVMBootDiagnostics -VM $VirtualMachine -Disable
 
 "Création de la VM"
 New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
