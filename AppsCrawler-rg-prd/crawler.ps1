@@ -56,7 +56,7 @@ $VirtualMachine = New-AzureRMVMConfig -VMName $VMName -VMSize $VMSize
 $VirtualMachine = Set-AzureRMVMOperatingSystem -VM $VirtualMachine -Windows -ComputerName $ComputerName -Credential $Credential -ProvisionVMAgent -EnableAutoUpdate
 $VirtualMachine = Add-AzureRMVMNetworkInterface -VM $VirtualMachine -Id $NIC.Id
 $VirtualMachine = Set-AzureRMVMSourceImage -VM $VirtualMachine -PublisherName 'MicrosoftWindowsServer' -Offer 'WindowsServer' -Skus '2016-Datacenter' -Version latest
-$VirtualMachine = Set-AzureRmVMBootDiagnostics -VM $VirtualMachine -Disable
+# $VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
 
 "Création de la VM"
 New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
@@ -71,7 +71,7 @@ $storageContext = New-AzureStorageContext -StorageAccountName gumbackups -Storag
 Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzurestorageContainerAcl -Permission Blob
 
 "Donne accès à l'adresse IP du crawler au site gummaster"
-$ip = (Get-AzureRMPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
+$VmIP = (Get-AzureRMPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
 $Site = "gummaster-$environnement"
 $APIVersion = ((Get-AzureRMResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
 $WebAppConfig = (Get-AzureRMResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName GumSite-rg-$Environnement -ApiVersion $APIVersion)
@@ -81,16 +81,19 @@ $IpSecurityRestrictions
 
 [System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
 
-if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
-    $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
-    $webip.ipAddress = $ip + '/32';  
-    $webip.action = "Allow"; 
-    $webip.name = "Allow_Crawler"
-    $webIP.priority = $priority;  
-    $index= $ArrayList.Add($webIP); 
-    $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-    $WebAppConfig | Set-AzureRMResource -ApiVersion $APIVersion -Force -Verbose
-}
+    if ($arrayList.ipAddress -notcontains ($VmIP + '/32')) {
+        $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
+        $webip.ipAddress = $_ + '/32';  
+        $webip.action = "Allow"; 
+        $webip.name = "Allow_Address_Interne"
+        $priority = $priority + 20 ; 
+        $webIP.priority = $priority;  
+        $ArrayList.Add($webIP); 
+        Remove-Variable webip
+    }
+
+$WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
+Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 
 "Configurer la vm avec Chrome et installer le crawler"
 Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath -Parameter @{"Environnement" = $Environnement }
