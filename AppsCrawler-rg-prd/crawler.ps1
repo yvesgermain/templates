@@ -88,7 +88,7 @@ $IpSecurityRestrictions
         $webip.name = "Allow_Address_Interne"
         $priority = $priority + 20 ; 
         $webIP.priority = $priority;  
-        $ArrayList.Add($webIP); 
+        $ArrayList.Add($VmIP); 
         Remove-Variable webip
     }
 
