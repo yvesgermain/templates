@@ -83,12 +83,12 @@ $IpSecurityRestrictions
 
     if ($arrayList.ipAddress -notcontains ($VmIP + '/32')) {
         $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
-        $webip.ipAddress = $_ + '/32';  
+        $webip.ipAddress = $Vmip + '/32';  
         $webip.action = "Allow"; 
         $webip.name = "Allow_Address_Interne"
         $priority = $priority + 20 ; 
         $webIP.priority = $priority;  
-        $ArrayList.Add($VmIP); 
+        $ArrayList.Add($webIP); 
         Remove-Variable webip
     }
 
