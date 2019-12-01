@@ -102,8 +102,7 @@ Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -
 
 "Retire accès à l'adresse IP du crawler au site gummaster"
 
-$ArrayList.Removeat( $Index ) 
-$WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
+$WebAppConfig.properties.ipSecurityRestrictions = $IpSecurityRestrictions
 Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 
 if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force }
