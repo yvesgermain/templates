@@ -35,15 +35,15 @@ function restore-storage {
         $date,
 
         [Parameter(Mandatory = $True,
-        HelpMessage = "Si null, aucune restauration de données")]
+            HelpMessage = "Si null, aucune restauration de données")]
         [string]
         [ValidateSet("storgum", "storappsinterne", "null")] 
         $storage
     )
-    if ($storage -eq "null") {Write-Output "Storage = null. Aucun storage à restaurer!"; return 0}
+    if ($storage -eq "null") { Write-Output "Storage = null. Aucun storage à restaurer!"; return 0 }
     $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 
-    if (!$Source ) {$source = $Destination}
+    if (!$Source ) { $source = $Destination }
 
     switch ($storage) {
         "storgum" { $ResourceGroupName = "gumstorage-rg-" + $Destination; $container = "guichetunique" }
@@ -53,7 +53,7 @@ function restore-storage {
     $GumBackupKey = (get-azureRMstorageaccountkey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
 
     $DestKey = (get-azureRMstorageaccountkey -Name "$storage$Destination" -ResourceGroupName $ResourceGroupName | where-object { $_.keyname -eq "key1" }).value
-if (!( get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAccountName gumbackups | where-object { $_.name -like "$container-$Source-$date*"} -ErrorAction SilentlyContinue)) {
+    if (!( get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAccountName gumbackups | where-object { $_.name -like "$container-$Source-$date*" } -ErrorAction SilentlyContinue)) {
         write-warning "Le backup $container-$Source-$date n'existe pas";
         break 
     }
@@ -71,7 +71,7 @@ if (!( get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAcc
     . $AzCopyPath /source:https://gumbackups.blob.core.windows.net/$newPath/ /sourcekey:$GumBackupKey /dest:https://$storage$Destination.blob.core.windows.net/$container/ /s /y /destkey:$DestKey
 }
 
-if (!$Source ) {$source = $Destination}
+if (!$Source ) { $source = $Destination }
 $params = @{'Destination' = $Destination }
 
 if ($PSBoundParameters.ContainsKey('Date')) { $params.Add('Date', $Date) }
