@@ -53,8 +53,7 @@ function restore-storage {
     $GumBackupKey = (get-azureRMstorageaccountkey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
 
     $DestKey = (get-azureRMstorageaccountkey -Name "$storage$Destination" -ResourceGroupName $ResourceGroupName | where-object { $_.keyname -eq "key1" }).value
-
-    if (!( get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAccountName gumbackups -name "$container-$Source-$date" -ErrorAction SilentlyContinue)) {
+if (!( get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAccountName gumbackups -name "$container-$Source-$date" -ErrorAction SilentlyContinue)) {
         write-warning "Le backup $container-$Source-$date n'existe pas";
         break 
     }
@@ -75,7 +74,7 @@ function restore-storage {
 $params = @{'Destination' = $Destination }
 
 if ($PSBoundParameters.ContainsKey('Date')) { $params.Add('Date', $Date) }
-if ($PSBoundParameters.ContainsKey('$Source')) { $params.Add('$Source', $Source) }
+if ($PSBoundParameters.ContainsKey('Source')) { $params.Add('Source', $Source) }
 
 if ($storage -eq "All") {
     $storage = "storgum", "storappsinterne";
