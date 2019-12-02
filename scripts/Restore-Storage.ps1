@@ -53,7 +53,7 @@ function restore-storage {
     $GumBackupKey = (get-azureRMstorageaccountkey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
 
     $DestKey = (get-azureRMstorageaccountkey -Name "$storage$Destination" -ResourceGroupName $ResourceGroupName | where-object { $_.keyname -eq "key1" }).value
-if (!( get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAccountName gumbackups -name "$container-$Source-$date" -ErrorAction SilentlyContinue)) {
+if (!( get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAccountName gumbackups | where-object { $_.name -like "$container-$Source-$date*"} -ErrorAction SilentlyContinue)) {
         write-warning "Le backup $container-$Source-$date n'existe pas";
         break 
     }
