@@ -144,7 +144,7 @@
                     "connectionStrings": [
                         {
                             "name": "umbracoDbDSN",
-                            "connectionString": "[concat( '@Microsoft.KeyVault(SecretUri=https://gumkeyvault.vault.azure.net:443/secrets/DSN-appsinterne-', parameters('Environnement'))]",
+                            "connectionString": "[concat( 'Server=tcp:sqlguminterne-', parameters('environnement'), '.database.windows.net,1433;Initial Catalog=BdAppsInterne-', parameters('environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework;Authentication=\"Active Directory Password\"')]",
                             "type": "SQLAzure"
                         }
                     ]
