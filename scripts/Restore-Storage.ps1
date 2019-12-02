@@ -71,6 +71,7 @@ if (!( get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAcc
     . $AzCopyPath /source:https://gumbackups.blob.core.windows.net/$newPath/ /sourcekey:$GumBackupKey /dest:https://$storage$Destination.blob.core.windows.net/$container/ /s /y /destkey:$DestKey
 }
 
+if (!$Source ) {$source = $Destination}
 $params = @{'Destination' = $Destination }
 
 if ($PSBoundParameters.ContainsKey('Date')) { $params.Add('Date', $Date) }
