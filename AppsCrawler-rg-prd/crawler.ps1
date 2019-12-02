@@ -7,7 +7,7 @@ Param(
     $defaultpath
 
 )
-$chromepath = $defaultpath +'\DevOps\AppsCrawler-rg-prd\Install-chrome.ps1'
+$chromepath = $defaultpath + '\DevOps\AppsCrawler-rg-prd\Install-chrome.ps1'
 $VMLocalAdminUser = "Soquijadm"
 $VMLocalAdminSecurePassword = (Get-AzureKeyVaultsecret -VaultName gumkeyvault -name Soquijadm ).SecretValue
 $Location = "CanadaCentral"
@@ -23,7 +23,7 @@ $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 # Enlève les vieux Boot diagnostics des crawlers précédents 
 
 $storageAccount = Get-AzureRmStorageAccount -ResourceGroupName infrastructure -Name gumbackups
-$storageAccount | Get-AzureRmStorageContainer | Where-Object {$_.name -like "bootdiagnostics-vmcrawl*"} | Remove-AzureRmStorageContainer -Force
+$storageAccount | Get-AzureRmStorageContainer | Where-Object { $_.name -like "bootdiagnostics-vmcrawl*" } | Remove-AzureRmStorageContainer -Force
 
 
 $i = switch ($environnement) {
@@ -42,9 +42,9 @@ if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -Erro
     "Removing resource group $ResourceGroupName"
     Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force
 }
- while (get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { start-sleep 20}
+while (get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { start-sleep 20 }
 
- "Création du resourceGroup $ResourceGroupName"
+"Création du resourceGroup $ResourceGroupName"
 New-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{"Environnement" = $environnement } 
 $Vnet = New-AzureRMVirtualNetwork -Name $NetworkName -ResourceGroupName $ResourceGroupName -Location $Location -AddressPrefix $VnetAddressPrefix -Subnet $SingleSubnet
 
@@ -81,16 +81,16 @@ $IpSecurityRestrictions
 
 [System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
 
-    if ($arrayList.ipAddress -notcontains ($VmIP + '/32')) {
-        $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
-        $webip.ipAddress = $Vmip + '/32';  
-        $webip.action = "Allow"; 
-        $webip.name = "Allow_Address_Interne"
-        $priority = $priority + 20 ; 
-        $webIP.priority = $priority;  
-        $ArrayList.Add($webIP); 
-        Remove-Variable webip
-    }
+if ($arrayList.ipAddress -notcontains ($VmIP + '/32')) {
+    $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
+    $webip.ipAddress = $Vmip + '/32';  
+    $webip.action = "Allow"; 
+    $webip.name = "Allow_Address_Interne"
+    $priority = $priority + 20 ; 
+    $webIP.priority = $priority;  
+    $ArrayList.Add($webIP); 
+    Remove-Variable webip
+}
 
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
 Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force

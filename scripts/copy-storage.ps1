@@ -56,3 +56,8 @@ foreach ($storage in $Store) {
     Copy-Storage @params
     $params.remove('Storage')
 }
+
+# Enlever les container de plus de 10 jours
+
+et-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumbackups | where-object {$_.name -like "appsinterne*" -and $_.LastModifiedTime -lt (get-date).adddays(-10)} | remove-AzureRmStorageContainer -force
+et-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumbackups | where-object {$_.name -like "guichetunique*" -and $_.LastModifiedTime -lt (get-date).adddays(-10)} | remove-AzureRmStorageContainer -force
