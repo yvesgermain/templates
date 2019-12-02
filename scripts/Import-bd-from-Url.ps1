@@ -15,6 +15,9 @@ Param(
    [string]
    $Destination,
 
+   [string]
+   $Source,
+
    [Parameter(Mandatory = $True)]
    [ValidateSet("Gum", "AppsInterne")]
    [string]
@@ -24,12 +27,14 @@ Param(
    [string]
    $TargetUrl = 'https://gumbackups.blob.core.windows.net/sql-backup/'
 )
+
 if (get-module -ListAvailable AzureRm) { 
    import-module azureRM.sql, azureRM.keyvault, azureRM.Storage 
 } else {
    if (get-module -ListAvailable Az.sql) { import-module az.sql } 
 }
 
+if (!$Source) {$source = $destination}
 if ( $site -eq "AppsInterne") {
    $server = "sqlguminterne-$Destination"
    $resourcegroup = "sqlapps-rg-$Destination"
@@ -53,9 +58,10 @@ $gum = Get-AzureRmStorageAccount -StorageAccountname gumbackups -resourcegroupna
 $databases = get-azureRMsqlserver -name $server -resourcegroupname $resourcegroup | get-azureRMsqldatabase | where-object { $BDs -contains $_.Databasename } 
 $databases | Remove-AzureRMsqldatabase
 
-$Bds | ForEach-Object { 
-   $database = $_;   
-   $Dbname = (Get-AzureStorageBlob -Context $gum.context -Container sql-backup | Where-Object { $_.name -like ($database.split("_")[0] + "*") } | Sort-Object -Descending LastModified  )[0];
+$BDs | ForEach-Object { 
+   $database = $_;
+   $sourceBD = $_.split("-")[0] + "-" + $Source
+   $Dbname = (Get-AzureStorageBlob -Context $gum.context -Container sql-backup | Where-Object { $_.name -like "$SourceBD*"} | Sort-Object -Descending LastModified  )[0];
    $Restore = New-azureRMSqlDatabaseImport `
       -ServerName $server `
       -DatabaseName $database `
