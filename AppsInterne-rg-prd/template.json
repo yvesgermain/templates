@@ -130,11 +130,11 @@
                         },
                         {
                             "name": "UrlMoteurRecherche",
-                            "value": "[concat('http://gumsolr-', parameters('environnement'), '.azurewebsites.net/solr/index')]"
+                            "value": "[concat('https://gumsolr-', parameters('environnement'), '.azurewebsites.net/solr/index')]"
                         },
                         {
                             "name": "VeilleDeLien.UrlApi",
-                            "value": "[concat('http://veille-', parameters('environnement'), '.azurewebsites.net/Api/')]"
+                            "value": "[concat('https://veille-', parameters('environnement'), '.azurewebsites.net/Api/')]"
                         },
                         {
                             "name": "WEBSITE_DISABLE_OVERLAPPED_RECYCLING",
@@ -200,7 +200,7 @@
                     "connectionStrings": [
                         {
                             "name": "bd_VeilleContenuExterneEntities",
-                            "value": "[concat( 'Server=tcp:sqlguminterne-',  parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-',  parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin',  parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=Soquij715;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework;Authentication=\"Active Directory Password\"')]",
+                            "value": "[concat( 'Server=tcp:sqlguminterne-',  parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-',  parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin',  parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=',  parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework;Authentication=\"Active Directory Password\"')]",
                             "type": "SQLAzure"
                         }
                     ]
@@ -236,7 +236,7 @@
                     "connectionStrings": [
                         {
                             "name": "bd_VeilleContenuExterneEntities",
-                            "connectionString": "[concat( '@Microsoft.KeyVault(SecretUri=https://gumkeyvault.vault.azure.net:443/secrets/DSN-Bdveille-', parameters('Environnement'))]",
+                            "connectionString": "[concat( 'Server=tcp:sqlguminterne-',  parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-',  parameters('Environnement'), ';Persist Security Info=False;User ID=SQLadmin',  parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=',  parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\";')]",
                             "type": "SQLServer"
                         }
                     ]
