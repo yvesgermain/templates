@@ -56,7 +56,7 @@ $VirtualMachine = New-AzureRMVMConfig -VMName $VMName -VMSize $VMSize
 $VirtualMachine = Set-AzureRMVMOperatingSystem -VM $VirtualMachine -Windows -ComputerName $ComputerName -Credential $Credential -ProvisionVMAgent -EnableAutoUpdate
 $VirtualMachine = Add-AzureRMVMNetworkInterface -VM $VirtualMachine -Id $NIC.Id
 $VirtualMachine = Set-AzureRMVMSourceImage -VM $VirtualMachine -PublisherName 'MicrosoftWindowsServer' -Offer 'WindowsServer' -Skus '2016-Datacenter' -Version latest
-# $VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
+$VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
 
 "Création de la VM"
 New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
@@ -85,7 +85,7 @@ if ($arrayList.ipAddress -notcontains ($VmIP + '/32')) {
     $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
     $webip.ipAddress = $Vmip + '/32';  
     $webip.action = "Allow"; 
-    $webip.name = "Allow_Address_Interne"
+    $webip.name = "Allow_Crawler"
     $priority = $priority + 20 ; 
     $webIP.priority = $priority;  
     $ArrayList.Add($webIP); 
@@ -98,7 +98,7 @@ Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConf
 "Configurer la vm avec Chrome et installer le crawler"
 Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath -Parameter @{"Environnement" = $Environnement }
 "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
-#Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzureRMstorageContainerAcl -Permission  Off
+Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzureRMstorageContainerAcl -Permission  Off
 
 "Retire accès à l'adresse IP du crawler au site gummaster"
 
