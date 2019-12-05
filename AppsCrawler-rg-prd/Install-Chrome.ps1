@@ -27,7 +27,7 @@ $ChromeInstaller = "ChromeInstaller.exe";
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
 set-location "C:\Program Files\nodejs"
-npm install -g lighthouse
+.\npm install -g lighthouse
 
 "Decompressing file TriggerExecCrawler.zip in c:\crawler"
 Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler
