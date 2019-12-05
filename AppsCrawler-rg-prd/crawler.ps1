@@ -8,6 +8,7 @@ Param(
 
 )
 $chromepath = $defaultpath + '\DevOps\AppsCrawler-rg-prd\Install-chrome.ps1'
+$chromepath2 = $defaultpath + '\DevOps\AppsCrawler-rg-prd\Install-chrome2.ps1'
 $VMLocalAdminUser = "Soquijadm"
 $VMLocalAdminSecurePassword = (Get-AzureKeyVaultsecret -VaultName gumkeyvault -name Soquijadm ).SecretValue
 $Location = "CanadaCentral"
@@ -19,6 +20,7 @@ $NetworkName = "CrawlNet-$environnement"
 $NICName = "CrawlNIC-$environnement"
 $SubnetName = "CrawlSubnet-$environnement"
 $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
+
 
 # Enlève les vieux Boot diagnostics des crawlers précédents 
 
@@ -96,8 +98,10 @@ $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
 Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 
 "Configurer la vm avec Chrome et installer le crawler"
-Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath -Parameter @{"Environnement" = $Environnement }
-<# "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
+Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath -Parameter @{"Environnement" = $Environnement }
+
+Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath2 -Parameter @{"Environnement" = $Environnement }
+"Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
 Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzurestorageContainerAcl -Permission  Off
 
 "Retire accès à l'adresse IP du crawler au site gummaster"
@@ -107,4 +111,4 @@ Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConf
 
 if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force }
 
-#>
+
