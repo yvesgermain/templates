@@ -33,7 +33,7 @@ set-location "C:\Program Files\nodejs"
 Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler
 Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName}
 (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
-# .\ControleQualite.App.exe
+cmd /c "cd c:\crawler\b\ && ControleQualite.App.exe"
 
 "Done!"
 get-process chromedriver | stop-process -Force
