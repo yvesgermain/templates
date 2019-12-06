@@ -19,6 +19,7 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 
 Write-output "Starting installation de lighthouse" ;
 set-location "C:\Program Files\nodejs"
+.\npm prefix -g
 $a = .\npm install lighthouse --loglevel verbose
 
 
