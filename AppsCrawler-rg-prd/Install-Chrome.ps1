@@ -15,11 +15,14 @@ $NODEJS_DOWNLOAD_LOCATION= "C:\"
 (New-Object Net.WebClient).DownloadFile($NODEJS_URL, "$NODEJS_DOWNLOAD_LOCATION$NODEJS_FILENAME"); 
 msiexec /qn /l* C:\node-log.txt /i "$NODEJS_DOWNLOAD_LOCATION$NODEJS_FILENAME"
 
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+# $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
 Write-output "Starting installation de lighthouse" ;
 set-location "C:\Program Files\nodejs"
 .\npm prefix -g
+
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
 .\npm install -g lighthouse --loglevel verbose
 
 Write-output "Installation de Chrome"
