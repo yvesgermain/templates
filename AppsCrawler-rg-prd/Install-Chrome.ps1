@@ -27,13 +27,13 @@ $ChromeInstaller = "ChromeInstaller.exe";
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
 set-location "C:\Program Files\nodejs"
-.\npm install -g lighthouse
+npm install -g lighthouse
 
 "Decompressing file TriggerExecCrawler.zip in c:\crawler"
 Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler
 Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName}
 (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
-cmd /c ControleQualite.App.exe
+.\ControleQualite.App.exe
 
 "Done!"
 get-process chromedriver | stop-process -Force
