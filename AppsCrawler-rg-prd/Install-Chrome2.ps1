@@ -9,8 +9,7 @@ Param(
 
 Write-output "Starting installation de lighthouse" ;
 set-location "C:\Program Files\nodejs"
-$a = .\npm install -g lighthouse --loglevel verbose
-write-output $a
+.\npm install -g lighthouse --loglevel verbose >> c:\log.log
 
 Write-output "Starting Crawler" ;
 Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName}

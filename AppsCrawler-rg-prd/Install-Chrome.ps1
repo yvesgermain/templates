@@ -22,9 +22,8 @@ set-location "C:\Program Files\nodejs"
 $a = .\npm install -g lighthouse --loglevel verbose
 
 
-Write-output $a
-Write-Output "whoami"
-write-output Write-Output $(whoami.exe)
+$a >> c:\log.log
+whoami.exe >> c:\log.log
 Write-output "Installation de Chrome"
 
 $ChromeInstaller = "ChromeInstaller.exe"; 
@@ -33,11 +32,15 @@ $ChromeInstaller = "ChromeInstaller.exe";
 Write-output "Downloading TriggerExecCrawler.zip"
 (new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip', "$env:temp\TriggerExecCrawler.zip");
 
-Write-output "Decompressing file TriggerExecCrawler.zip in c:\crawler"
+"Decompressing file TriggerExecCrawler.zip in c:\crawler"
 Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler
 Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName}
 (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
+<#
+
 .\ControleQualite.App.exe
 
 Write-output "Done controleQualiteApp.exe !"
 get-process chromedriver | stop-process -Force
+
+#>
