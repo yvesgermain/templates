@@ -19,9 +19,12 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 
 Write-output "Starting installation de lighthouse" ;
 set-location "C:\Program Files\nodejs"
-.\npm install -g lighthouse --loglevel verbose
+$a = .\npm install -g lighthouse --loglevel verbose
 
 
+Write-output $a
+Write-Output "whoami"
+write-output Write-Output $(whoami.exe)
 Write-output "Installation de Chrome"
 
 $ChromeInstaller = "ChromeInstaller.exe"; 
