@@ -15,7 +15,7 @@ $NODEJS_DOWNLOAD_LOCATION= "C:\"
 (New-Object Net.WebClient).DownloadFile($NODEJS_URL, "$NODEJS_DOWNLOAD_LOCATION$NODEJS_FILENAME"); 
 msiexec /qn /l* C:\node-log.txt /i "$NODEJS_DOWNLOAD_LOCATION$NODEJS_FILENAME"
 
-# $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
 Write-output "Starting installation de lighthouse" ;
 set-location "C:\Program Files\nodejs"
@@ -33,6 +33,7 @@ Write-output "Downloading TriggerExecCrawler.zip"
 
 "Installation de lighthouse" >> c:\log.log
 .\npm install -g lighthouse --loglevel verbose >> c:\log.log
+npm install -g lighthouse --loglevel verbose >> c:\log.log
 
 "Decompressing file TriggerExecCrawler.zip in c:\crawler"
 Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler

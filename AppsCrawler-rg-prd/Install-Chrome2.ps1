@@ -14,7 +14,8 @@ set-location "C:\Program Files\nodejs"
 
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
-cmd /c "npm install lighthouse --loglevel verbose >> c:\log.log"
+.\npm install lighthouse --loglevel verbose >> c:\log.log
+npm install lighthouse --loglevel verbose >> c:\log.log
 
 Write-output "Starting Crawler" ;
 $dir = Get-ChildItem C:\crawler\*\ControleQualite.App.exe 
