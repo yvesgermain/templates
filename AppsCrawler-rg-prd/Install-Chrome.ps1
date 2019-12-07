@@ -23,12 +23,6 @@ set-location "C:\Program Files\nodejs"
 
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") + ';C:\windows\system32\config\systemprofile\AppData\Roaming\npm'
 
-
-$passw = "Tohu7890"  |  ConvertTo-SecureString -AsPlainText -Force
-$cred  = New-Object System.Management.Automation.PSCredential -ArgumentList ("\soquijadm", $passw)
-Start-Process -Credential $cred  -FilePath cmd -ArgumentList "/c npm install -g lighthouse"
-.\npm install -g lighthouse --loglevel verbose
-
 Write-output "Installation de Chrome"
 
 $ChromeInstaller = "ChromeInstaller.exe"; 
@@ -37,13 +31,15 @@ $ChromeInstaller = "ChromeInstaller.exe";
 Write-output "Downloading TriggerExecCrawler.zip"
 (new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip', "$env:temp\TriggerExecCrawler.zip");
 
-.\npm install -g lighthouse --loglevel verbose
+"Installation de lighthouse" >> c:\log.log
+.\npm install -g lighthouse --loglevel verbose >> c:\log.log
 
 "Decompressing file TriggerExecCrawler.zip in c:\crawler"
 Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler
 Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName}
 (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 
-.\ControleQualite.App.exe
+<# .\ControleQualite.App.exe
 Write-output "Done controleQualiteApp.exe !"
 get-process chromedriver | stop-process -Force
+#>
