@@ -21,7 +21,7 @@ Write-output "Starting installation de lighthouse" ;
 set-location "C:\Program Files\nodejs"
 .\npm prefix -g
 
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") + ";" + 'C:\windows\system32\config\systemprofile\AppData\Roaming\npm'
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") + ';C:\windows\system32\config\systemprofile\AppData\Roaming\npm'
 
 .\npm install -g lighthouse --loglevel verbose
 
@@ -32,6 +32,8 @@ $ChromeInstaller = "ChromeInstaller.exe";
 & "$LocalTempDir\$ChromeInstaller" /silent /install;
 Write-output "Downloading TriggerExecCrawler.zip"
 (new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip', "$env:temp\TriggerExecCrawler.zip");
+
+.\npm install -g lighthouse --loglevel verbose
 
 "Decompressing file TriggerExecCrawler.zip in c:\crawler"
 Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler
