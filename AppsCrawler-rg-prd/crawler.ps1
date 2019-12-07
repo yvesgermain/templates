@@ -101,7 +101,7 @@ Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConf
 Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath -Parameter @{"Environnement" = $Environnement }
 
 # Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath2 -Parameter @{"Environnement" = $Environnement }
-
+<#
 "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
 Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzurestorageContainerAcl -Permission  Off
 
@@ -111,3 +111,4 @@ $WebAppConfig.properties.ipSecurityRestrictions = $IpSecurityRestrictions
 Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 
 if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force }
+#>
