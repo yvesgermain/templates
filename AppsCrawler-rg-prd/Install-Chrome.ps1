@@ -21,7 +21,7 @@ Write-output "Starting installation de lighthouse" ;
 set-location "C:\Program Files\nodejs"
 .\npm prefix -g
 
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") + ";" + 'C:\windows\system32\config\systemprofile\AppData\Roaming\npm'
 
 .\npm install -g lighthouse --loglevel verbose
 
