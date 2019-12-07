@@ -23,6 +23,10 @@ set-location "C:\Program Files\nodejs"
 
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") + ';C:\windows\system32\config\systemprofile\AppData\Roaming\npm'
 
+
+$passw = "Tohu7890"  |  ConvertTo-SecureString -AsPlainText -Force
+$cred  = New-Object System.Management.Automation.PSCredential -ArgumentList ("\soquijadm", $passw)
+Start-Process -Credential $cred  -FilePath cmd -ArgumentList "/c npm install -g lighthouse"
 .\npm install -g lighthouse --loglevel verbose
 
 Write-output "Installation de Chrome"
