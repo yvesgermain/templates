@@ -6,8 +6,8 @@ Param(
     $Environnement 
 )
 
-
-Write-output "Starting installation de lighthouse" ;
+"Starting installation de lighthouse dans install-chrome2.ps1 " >> c:\log.log
+Write-output "Starting installation de lighthouse dans install-chrome2.ps1 "  ;
 set-location "C:\Program Files\nodejs"
 
 .\npm prefix -g
