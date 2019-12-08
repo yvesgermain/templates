@@ -99,8 +99,9 @@ Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConf
 
 "Configurer la vm avec Chrome et installer le crawler"
 Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath -Parameter @{"Environnement" = $Environnement }
-
- Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath2 -Parameter @{"Environnement" = $Environnement }
+"Starting sleep 20 seconds"
+Start-sleep -Seconds 20
+Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath2 -Parameter @{"Environnement" = $Environnement }
 
 "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
 Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzurestorageContainerAcl -Permission  Off
