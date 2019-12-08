@@ -31,13 +31,14 @@ $ChromeInstaller = "ChromeInstaller.exe";
 Write-output "Downloading TriggerExecCrawler.zip"
 (new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip', "$env:temp\TriggerExecCrawler.zip");
 
-"Installation de lighthouse" >> c:\log.log
+"Installation de lighthouse dans install-chrome.ps1" >> c:\log.log
 .\npm install -g lighthouse
 npm install -g lighthouse >> c:\log.log
 
 "Decompressing file TriggerExecCrawler.zip in c:\crawler"
 Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler
-Get-ChildItem C:\crawler\*\ControleQualite.App.exe | foreach-object {set-location $_.DirectoryName}
+$dir = Get-ChildItem C:\crawler\*\ControleQualite.App.exe 
+set-location $dir.DirectoryName
 (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 
 .\ControleQualite.App.exe
