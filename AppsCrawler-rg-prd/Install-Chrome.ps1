@@ -34,7 +34,7 @@ Write-output "Downloading TriggerExecCrawler.zip"
 "Installation de lighthouse dans install-chrome.ps1" >> c:\log.log
 Write-output "Starting installation de lighthouse" ;
 set-location "C:\Program Files\nodejs"
-.\npm install -g lighthouse
+.\npm install -g lighthouse >> c:\log.log
 npm install -g lighthouse >> c:\log.log
 
 "Decompressing file TriggerExecCrawler.zip in c:\crawler"
@@ -42,7 +42,3 @@ Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath 
 $dir = Get-ChildItem C:\crawler\*\ControleQualite.App.exe 
 set-location $dir.DirectoryName
 (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
-
-.\ControleQualite.App.exe
-Write-output "Done controleQualiteApp.exe !"
-get-process chromedriver | stop-process -Force
