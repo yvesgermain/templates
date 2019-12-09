@@ -32,6 +32,8 @@ Write-output "Downloading TriggerExecCrawler.zip"
 (new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip', "$env:temp\TriggerExecCrawler.zip");
 
 "Installation de lighthouse dans install-chrome.ps1" >> c:\log.log
+Write-output "Starting installation de lighthouse" ;
+set-location "C:\Program Files\nodejs"
 .\npm install -g lighthouse
 npm install -g lighthouse >> c:\log.log
 

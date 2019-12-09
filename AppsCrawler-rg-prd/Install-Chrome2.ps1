@@ -14,8 +14,8 @@ set-location "C:\Program Files\nodejs"
 
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
-.\npm install lighthouse 
-npm install lighthouse
+.\npm install -g lighthouse >> c:\log.log
+npm install -g lighthouse >> c:\log.log
 
 .\npm list -g lighthouse --depth 0 >> c:\log.log
 
