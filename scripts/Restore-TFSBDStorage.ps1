@@ -65,7 +65,7 @@ if (![System.IO.directory]::Exists( "C:\templates\DevOps")) {
 }
 Push-Location 
 Set-Location c:\templates\DevOps
-$BuildId = (git log --pretty=oneline -n1 c:\templates\devops\scripts ).Substring(0, 9)
+$BuildId = (git log --pretty=oneline -n1 c:\templates\devops ).Substring(0, 8)
 $Release = Add-VSTeamRelease -ArtifactAlias devops -ProjectName guichetUnique -BuildId $BuildId -DefinitionId $id
 Show-VSTeamRelease -ProjectName GuichetUnique -id $Release.id
 Pop-Location

@@ -184,6 +184,18 @@
                         {
                             "name": "WEBSITE_DISABLE_OVERLAPPED_RECYCLING",
                             "value": "1"
+                        },
+                        {
+                            "name": "Serilog.EnvoyerLogErreurA",
+                            "value": "ateam@soquij.qc.ca"
+                        },
+                        {
+                            "name": "Serilog.CurrentUrl",
+                            "value": "localhost"
+                        },
+                        {
+                            "Name": "Serilog.ErrorLevel",
+                            "value": "Error"
                         }
                     ],
                     "connectionStrings": [
