@@ -5,9 +5,10 @@ Param(
 $Build
 )
 
-if (! (test-path c:\templates\devops)) {mkdir c:\templates\devops -force}
+if (! (test-path c:\templates\devops)) {mkdir c:\templates\devops -force
+    git clone http://srvtfs01:8080/tfs/SOQUIJ/GuichetUnique/_git/DevOps c:\templates\devops
+}
 set-location c:\templates\devops
-git clone http://srvtfs01:8080/tfs/SOQUIJ/GuichetUnique/_git/DevOps c:\templates\devops
 
 Set-VSTeamAccount -Account http://srvtfs01:8080/tfs/soquij -UseWindowsAuthentication -verbose
 Set-VSTeamDefaultProject -Project GuichetUnique
