@@ -1,4 +1,27 @@
-if (! (test-path c:\templates\devops)) {md c:\templates\devops}
-set-location c:\templates\devops
+
+Param(
+[Parameter(Mandatory = $True)]
+[ValidateSet("dev", "qa", "prd", "devops")]
+[string]
+$Environnement,
+
+[Parameter(Mandatory = $True)]
+[string]
+$Build
+)
+
+if (! (test-path c:\templates\devops)) {mkdir c:\templates\devops}
+set-location c:\templates\devops c:\templates\devops
 git clone http://srvtfs01:8080/tfs/SOQUIJ/GuichetUnique/_git/DevOps
 git pull
+
+Set-VSTeamAccount -Account http://srvtfs01:8080/tfs/soquij -UseWindowsAuthentication -verbose
+Set-VSTeamDefaultProject -Project GuichetUnique
+#$id = (Get-VSTeamReleaseDefinition -ProjectName GuichetUnique | where-object { $_.name -like "Infrastructure Azure Guichet Unique" }).id
+$id = 37
+$b = Get-VSTeamReleaseDefinition -ProjectName GuichetUnique -Id $id -Raw
+$b | where-object {$_.environments -like $environnement} |% { $_.variables.Build.value = $Build}
+
+$body = $b | ConvertTo-Json -Depth 100
+$body | Out-File -FilePath $env:TEMP\scrap.json -Encoding utf8
+update-VSTeamReleaseDefinition -InFile $env:TEMP\scrap.json -ProjectName GuichetUnique -Verbose
