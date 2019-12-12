@@ -74,29 +74,32 @@ Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzurestorageC
 
 "Donne accès à l'adresse IP du crawler au site gummaster"
 $VmIP = (Get-AzureRMPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
-$Site = "gummaster-$environnement"
+$Sites = "gummaster", "gum"
 $APIVersion = ((Get-AzureRMResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
-$WebAppConfig = (Get-AzureRMResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName GumSite-rg-$Environnement -ApiVersion $APIVersion)
-$priority = 500;  
-$IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
-$IpSecurityRestrictions
 
-[System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
+foreach ($site in $sites) {
+    $WebAppConfig = (Get-AzureRMResource -ResourceType Microsoft.Web/sites/config -ResourceName "$site-$Environnement" -ResourceGroupName GumSite-rg-$Environnement -ApiVersion $APIVersion)
+    New-Variable -Name "WebAppConfig$site" -Value $webAppConfig
+    $priority = 500;  
+    New-Variable -Name "IpSecurityRestrictions$site" -value $WebAppConfig.Properties.ipsecurityrestrictions; 
+    $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
 
-if ($arrayList.ipAddress -notcontains ($VmIP + '/32')) {
-    $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
-    $webip.ipAddress = $Vmip + '/32';  
-    $webip.action = "Allow"; 
-    $webip.name = "Allow_Crawler"
-    $priority = $priority + 20 ; 
-    $webIP.priority = $priority;  
-    $ArrayList.Add($webIP); 
-    Remove-Variable webip
+    [System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
+
+    if ($arrayList.ipAddress -notcontains ($VmIP + '/32')) {
+        $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
+        $webip.ipAddress = $Vmip + '/32';  
+        $webip.action = "Allow"; 
+        $webip.name = "Allow_Crawler"
+        $priority = $priority + 20 ; 
+        $webIP.priority = $priority;  
+        $ArrayList.Add($webIP); 
+        Remove-Variable webip
+    }
+
+    $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
+    Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 }
-
-$WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
-
 "Configurer la vm avec Chrome et installer le crawler"
 Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath -Parameter @{"Environnement" = $Environnement }
 "Starting sleep 60 seconds"
@@ -108,7 +111,10 @@ Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzurestorageC
 
 "Retire accès à l'adresse IP du crawler au site gummaster"
 
-$WebAppConfig.properties.ipSecurityRestrictions = $IpSecurityRestrictions
+foreach ($site in $sites) {
+$WebAppConfig = (Get-Variable -Name "WebAppConfig$site").value
+$WebAppConfig.properties.ipSecurityRestrictions = get-variable -name "IpSecurityRestrictions$site"
 Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
+}
 
 if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force }
