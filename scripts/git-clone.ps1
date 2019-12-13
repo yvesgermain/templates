@@ -8,7 +8,7 @@ set-location c:\templates\devops;
 
 Set-VSTeamAccount -Account http://srvtfs01:8080/tfs/soquij -UseWindowsAuthentication -verbose
 Set-VSTeamDefaultProject -Project GuichetUnique
-
+whoami.exe 
 $id = (Get-VSTeamReleaseDefinition -ProjectName GuichetUnique | where-object { $_.name -like "Infrastructure Azure AppsInterne" }).id
 $BuildId = (git log --pretty=oneline -n1 c:\templates\devops ).Substring(0, 8)
 $Release = Add-VSTeamRelease -ArtifactAlias devops -ProjectName guichetUnique -BuildId $BuildId -DefinitionId $id
