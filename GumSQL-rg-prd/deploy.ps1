@@ -53,7 +53,7 @@ Function RegisterRP {
     )
 
     Write-Host "Registering resource provider '$ResourceProviderNamespace'";
-    Register-AzResourceProvider -ProviderNamespace $ResourceProviderNamespace;
+    Register-AzureRmResourceProvider -ProviderNamespace $ResourceProviderNamespace;
 }
 
 #*******************************************************************************
@@ -88,14 +88,14 @@ if ($resourceProviders.length) {
 
 #Create or check for existing resource group
 $ResourceGroupName = "GumSQL-rg-" + $Environnement
-$resourceGroup = Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
+$resourceGroup = Get-AzureRmResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
 if (!$resourceGroup) {
     if (!$ResourceGroupLocation) {
         Write-Host "Resource group '$ResourceGroupName' does not exist. To create a new resource group, please enter a location.";
         $resourceGroupLocation = Read-Host "ResourceGroupLocation";
     }
     Write-Host "Creating resource group '$ResourceGroupName' in location '$ResourceGroupLocation'";
-    New-AzResourceGroup -Name $ResourceGroupName -Location $ResourceGroupLocation -Tag @{Environnement = $Environnement }
+    New-AzureRmResourceGroup -Name $ResourceGroupName -Location $ResourceGroupLocation -Tag @{Environnement = $Environnement }
 }
 else {
     Write-Host "Using existing resource group '$ResourceGroupName'";
@@ -104,10 +104,10 @@ else {
 # Start the deployment
 Write-Host "Starting deployment...";
 if (Test-Path $ParametersFilePath) {
-    New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $TemplateFilePath -TemplateParameterFile $ParametersFilePath;
+    New-AzureRmResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $TemplateFilePath -TemplateParameterFile $ParametersFilePath;
 }
 else {
-    New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $TemplateFilePath;
+    New-AzureRmResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $TemplateFilePath;
 }
 
 if ( $Environnement -eq "prd") { write-warning "Il faut copier la BD manuellement" } else {
@@ -121,23 +121,23 @@ if ( $Environnement -eq "prd") { write-warning "Il faut copier la BD manuellemen
     $TargetResourceGroupName = "GumSQL-rg-" + $Environnement
 
     "Removing database $TargetDatabaseName"
-    if (get-azSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue) {
-        Remove-azSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName
+    if (get-AzureRmSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName -ErrorAction SilentlyContinue) {
+        Remove-AzureRmSqlDatabase -DatabaseName $TargetDatabaseName -ServerName $TargetServerName -ResourceGroupName $TargetResourceGroupName
     }
     "Copying database $databaseName from server $servername to database $TargetDatabaseName on $TargetServerName"
-    New-azSqlDatabaseCopy -ServerName $serverName -ResourceGroupName $resourceGroupName -DatabaseName $databaseName `
+    New-AzureRmSqlDatabaseCopy -ServerName $serverName -ResourceGroupName $resourceGroupName -DatabaseName $databaseName `
         -CopyResourceGroupName $TargetResourceGroupName -CopyServerName $TargetServerName -CopyDatabaseName $TargetDatabaseName
 
 }
 
 # Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa
 if ( $Environnement -eq "dev" -or $Environnement -eq "qa" -or $Environnement -eq "devops") {
-    $QA = Get-AzADGroup -SearchString "QA"
-    if (!( get-AzRoleAssignment -ResourceGroupName $resourceGroupName -ObjectId $qa.Id -RoleDefinitionName contributor)) {
-        New-AzRoleAssignment -ObjectId $QA.Id -RoleDefinitionName Contributor -ResourceGroupName $resourceGroupName
+    $QA = Get-AzureRmADGroup -SearchString "QA"
+    if (!( get-AzureRmRoleAssignment -ResourceGroupName $resourceGroupName -ObjectId $qa.Id -RoleDefinitionName contributor)) {
+        New-AzureRmRoleAssignment -ObjectId $QA.Id -RoleDefinitionName Contributor -ResourceGroupName $resourceGroupName
     }
-    $dev = Get-AzADGroup -SearchString "dev"
-    if (!( get-AzRoleAssignment -ResourceGroupName $resourceGroupName -ObjectId $dev.Id -RoleDefinitionName owner)) {
-        New-AzRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner -ResourceGroupName $resourceGroupName
+    $dev = Get-AzureRmADGroup -SearchString "dev"
+    if (!( get-AzureRmRoleAssignment -ResourceGroupName $resourceGroupName -ObjectId $dev.Id -RoleDefinitionName owner)) {
+        New-AzureRmRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner -ResourceGroupName $resourceGroupName
     }
 }
