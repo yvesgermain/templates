@@ -72,7 +72,7 @@ $storageContext = New-AzureStorageContext -StorageAccountName gumbackups -Storag
 "Permettre les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
 Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzurestorageContainerAcl -Permission Blob
 
-"Donne accès à l'adresse IP du crawler au site gummaster"
+"Donne accès à l'adresse IP du crawler au site Gum et gummaster"
 $VmIP = (Get-AzureRMPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
 $Sites = "gummaster", "gum"
 $APIVersion = ((Get-AzureRMResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
@@ -109,11 +109,11 @@ Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName
 "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
 Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzurestorageContainerAcl -Permission  Off
 
-"Retire accès à l'adresse IP du crawler au site gummaster"
+"Retire accès à l'adresse IP du crawler au site Gum et gummaster"
 
 foreach ($site in $sites) {
 $WebAppConfig = (Get-Variable -Name "WebAppConfig$site").value
-$WebAppConfig.properties.ipSecurityRestrictions = get-variable -name "IpSecurityRestrictions$site"
+$WebAppConfig.properties.ipSecurityRestrictions = (get-variable -name "IpSecurityRestrictions$site").value
 Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 }
 
