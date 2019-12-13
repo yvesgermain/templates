@@ -1,10 +1,10 @@
 import-module vsteam
 
-if (test-path c:\templates\devops) {remove-item d:\templates\devops -force -recurse };
-if (! (test-path c:\templates\devops)) {mkdir d:\templates\devops -force;
-    git clone http://srvtfs01:8080/tfs/SOQUIJ/GuichetUnique/_git/DevOps d:\templates\devops;
+if (test-path c:\templates\devops) {remove-item c:\templates\devops -force -recurse };
+if (! (test-path c:\templates\devops)) {mkdir c:\templates\devops -force;
+    git clone http://srvtfs01:8080/tfs/SOQUIJ/GuichetUnique/_git/DevOps c:\templates\devops;
 }
-set-location d:\templates\devops;
+set-location c:\templates\devops;
 
 Set-VSTeamAccount -Account http://srvtfs01:8080/tfs/soquij -UseWindowsAuthentication -verbose
 Set-VSTeamDefaultProject -Project GuichetUnique
