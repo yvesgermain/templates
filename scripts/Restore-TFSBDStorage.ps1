@@ -33,7 +33,8 @@ Param(
     $date
 )
 
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+if ((Get-ExecutionPolicy ).value -gt 1 ) { Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force }
+
 Set-PSRepository -InstallationPolicy Trusted -Name psgallery
 if (!(Test-Path $profile)) {New-item –type file –force $profile }
 
