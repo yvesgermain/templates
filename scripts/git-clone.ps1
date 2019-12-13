@@ -1,23 +1,15 @@
+import-module vsteam
 
-Param(
-[Parameter(Mandatory = $True)]
-[string]
-$Build
-)
-
-if (test-path c:\templates\devops) {rd c:\templates\devops -force -recurse };
-if (! (test-path c:\templates\devops)) {mkdir c:\templates\devops -force;
-    git clone http://srvtfs01:8080/tfs/SOQUIJ/GuichetUnique/_git/DevOps c:\templates\devops;
+if (test-path c:\templates\devops) {remove-item d:\templates\devops -force -recurse };
+if (! (test-path c:\templates\devops)) {mkdir d:\templates\devops -force;
+    git clone http://srvtfs01:8080/tfs/SOQUIJ/GuichetUnique/_git/DevOps d:\templates\devops;
 }
-set-location c:\templates\devops;
+set-location d:\templates\devops;
 
 Set-VSTeamAccount -Account http://srvtfs01:8080/tfs/soquij -UseWindowsAuthentication -verbose
 Set-VSTeamDefaultProject -Project GuichetUnique
-#$id = (Get-VSTeamReleaseDefinition -ProjectName GuichetUnique | where-object { $_.name -like "Infrastructure Azure Guichet Unique" }).id
-$id = 37
-$b = Get-VSTeamReleaseDefinition -ProjectName GuichetUnique -Id $id -Raw
-$b.environments | foreach-object { if ($_.name -like $environnement) { $_.variables.build.value = $build} }
 
-$body = $b | ConvertTo-Json -Depth 100
-$body | Out-File -FilePath $env:TEMP\scrap.json -Encoding utf8
-update-VSTeamReleaseDefinition -InFile $env:TEMP\scrap.json -ProjectName GuichetUnique -Verbose
+$id = (Get-VSTeamReleaseDefinition -ProjectName GuichetUnique | where-object { $_.name -like "Infrastructure Azure AppsInterne" }).id
+$BuildId = (git log --pretty=oneline -n1 c:\templates\devops ).Substring(0, 8)
+$Release = Add-VSTeamRelease -ArtifactAlias devops -ProjectName guichetUnique -BuildId $BuildId -DefinitionId $id
+Show-VSTeamRelease -ProjectName GuichetUnique -id $Release.id
