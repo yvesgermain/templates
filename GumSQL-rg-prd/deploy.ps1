@@ -62,13 +62,6 @@ Function RegisterRP {
 #*******************************************************************************
 $ErrorActionPreference = "Stop"
 
-# Verify that the Az module is installed 
-if (!(Get-InstalledModule -Name Az -MinimumVersion $AzModuleVersion -ErrorAction SilentlyContinue)) {
-    Write-Host "This script requires to have Az Module version $AzModuleVersion installed..
-It was not found, please install from: https://docs.microsoft.com/en-us/powershell/azure/install-az-ps"
-    exit
-} 
-
 # sign in
 Write-Host "Logging in...";
 # Connect-AzAccount; 
