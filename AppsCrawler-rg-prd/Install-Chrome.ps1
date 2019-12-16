@@ -20,9 +20,9 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 Write-output "Installation de Chrome"
 
 $ChromeInstaller = "ChromeInstaller.exe"; 
-Write-output "Downloading chrome_installer.exe"
-(new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/77.0.3865.75_chrome_installer.exe', "$env:temp\$ChromeInstaller");
-& "$LocalTempDir\$ChromeInstaller" /silent /install;
+Write-output "Downloading chromeinstaller.exe"
+(new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/ChromeStandaloneSetup64.exe', "$env:temp\$ChromeInstaller");
+& "$LocalTempDir\$ChromeInstaller";
 <#
 (new-object System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$LocalTempDir\$ChromeInstaller");
 & "$LocalTempDir\$ChromeInstaller" /silent /install;
