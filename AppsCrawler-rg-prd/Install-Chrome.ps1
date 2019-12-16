@@ -22,7 +22,7 @@ Write-output "Installation de Chrome"
 $ChromeInstaller = "ChromeInstaller.exe"; 
 Write-output "Downloading chromeinstaller.exe"
 (new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/ChromeStandaloneSetup64.exe', "$env:temp\$ChromeInstaller");
-& "$LocalTempDir\$ChromeInstaller";
+& "$LocalTempDir\$ChromeInstaller" /silent /install;
 <#
 (new-object System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$LocalTempDir\$ChromeInstaller");
 & "$LocalTempDir\$ChromeInstaller" /silent /install;
