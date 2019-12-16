@@ -20,10 +20,10 @@ npm install -g lighthouse >> c:\log.log
 .\npm list -g lighthouse --depth 0 >> c:\log.log
 
 Write-output "Starting Crawler" ;
-$dir = Get-ChildItem C:\crawler\*\ControleQualite.App.exe 
-set-location $dir.DirectoryName
+
+set-location "C:\Program Files\nodejs"
 (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
-.\ControleQualite.App.exe
+C:\crawler\b\ControleQualite.App.exe 
 
 "Done!"
 get-process chromedriver | stop-process -Force

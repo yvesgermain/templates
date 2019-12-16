@@ -1,3 +1,10 @@
+Param(
+    [Parameter()]
+    [ValidateSet("dev", "qa", "prd", "devops")]
+    [string]
+    $Environnement
+)
+
 import-module vsteam
 #Set-VSTeamAccount -Account http://srvtfs01:8080/tfs/soquij -UseBearerToken 'aeysyml9sQfogRSS+vQHfUoLEgpfRPOf4hQoPdjZYO4' -verbose
 

@@ -37,7 +37,8 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 Write-output "Starting installation de lighthouse" ;
 set-location "C:\Program Files\nodejs"
 .\npm install -g lighthouse >> c:\log.log
-# npm install -g lighthouse >> c:\log.log
+"npm install -g lighthouse" >> c:\log.log
+npm install -g lighthouse >> c:\log.log
 .\npm prefix -g
 
 "Decompressing file TriggerExecCrawler.zip in c:\crawler"
