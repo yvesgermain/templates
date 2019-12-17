@@ -24,8 +24,9 @@ Write-output "Starting Crawler" ;
 set-location "C:\Program Files\nodejs"
 (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 #> 
-C:\crawler\b\ControleQualite.App.exe 
 # set-location "C:\Windows\System32\config\systemprofile\AppData\Roaming\npm"
+Set-Location C:\crawler\b\
+C:\crawler\b\ControleQualite.App.exe 
 
 "Done!"
-get-process chromedriver | stop-process -Force
+# get-process chromedriver | stop-process -Force
