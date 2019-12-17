@@ -146,11 +146,15 @@
                         },
                         {
                             "name": "Serilog.CurrentUrl",
-                            "value": "localhost"
+                            "value": "[variables('sites_AppsInterne_name')]"
                         },
                         {
-                            "Name": "Serilog.ErrorLevel",
+                            "name": "Serilog.ErrorLevel",
                             "value": "Error"
+                        },
+                        {
+                            "name": "Serilog.MessageTemplate", 
+                            "value": "Heure de l'erreur : {Timestamp:yyyy-MM-dd  HH:mm:ss} {NewLine}{NewLine}Endroit ou l'erreur s'est produite : {NewLine}{NewLine}{SourceContext}{NewLine}{NewLine}Message de l'erreur : {NewLine}{Message}{NewLine}{NewLine}Message détaillé : {NewLine}{Exception}"
                         }
                     ],
                     "connectionStrings": [
