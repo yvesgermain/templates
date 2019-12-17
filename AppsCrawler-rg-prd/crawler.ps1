@@ -109,7 +109,7 @@ Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName
 "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
 Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzurestorageContainerAcl -Permission  Off
 
-"Retire accès à l'adresse IP du crawler au site Gum et gummaster"
+<#"Retire accès à l'adresse IP du crawler au site Gum et gummaster"
 
 foreach ($site in $sites) {
 $WebAppConfig = (Get-Variable -Name "WebAppConfig$site").value
@@ -118,3 +118,4 @@ Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConf
 }
 
 if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force }
+#>
