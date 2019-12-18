@@ -24,7 +24,8 @@ set-location "C:\Program Files\nodejs"
 (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 #> 
 # set-location "C:\Windows\System32\config\systemprofile\AppData\Roaming\npm"
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")  + ";c:\program files\nodejs" 
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")  + ";c:\program files\nodejs" $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") + ';C:\windows\system32\config\systemprofile\AppData\Roaming\npm;c:\program files\nodejs'
+
 $env:Path >> c:\log.log
 where.exe node >> c:\log.log
 Set-Location C:\crawler\b\

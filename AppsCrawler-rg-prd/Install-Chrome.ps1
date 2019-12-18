@@ -31,7 +31,7 @@ Write-output "Downloading chromeinstaller.exe"
 Write-output "Downloading TriggerExecCrawler.zip"
 (new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip', "$env:temp\TriggerExecCrawler.zip");
 
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") + ';C:\windows\system32\config\systemprofile\AppData\Roaming\npm'
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") + ';C:\windows\system32\config\systemprofile\AppData\Roaming\npm;c:\program files\nodejs'
 
 "Installation de lighthouse dans install-chrome.ps1" >> c:\log.log
 Write-output "Starting installation de lighthouse" ;
