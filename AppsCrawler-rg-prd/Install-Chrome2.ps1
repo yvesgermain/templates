@@ -12,8 +12,7 @@ set-location "C:\Program Files\nodejs"
 
 .\npm prefix -g
 
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-$env:Path >> c:\log.log
+
 .\npm install -g lighthouse >> c:\log.log
 npm install -g lighthouse >> c:\log.log
 
@@ -25,6 +24,8 @@ set-location "C:\Program Files\nodejs"
 (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 #> 
 # set-location "C:\Windows\System32\config\systemprofile\AppData\Roaming\npm"
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")  + ";c:\program files\nodejs" 
+$env:Path >> c:\log.log
 Set-Location C:\crawler\b\
 C:\crawler\b\ControleQualite.App.exe 
 
