@@ -26,8 +26,9 @@ set-location "C:\Program Files\nodejs"
 # set-location "C:\Windows\System32\config\systemprofile\AppData\Roaming\npm"
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")  + ";c:\program files\nodejs" 
 $env:Path >> c:\log.log
+where.exe node >> c:\log.log
 Set-Location C:\crawler\b\
 C:\crawler\b\ControleQualite.App.exe 
 
 "Done!"
-# get-process chromedriver | stop-process -Force
+get-process chromedriver | stop-process -Force
