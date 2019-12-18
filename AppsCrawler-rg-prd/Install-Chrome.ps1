@@ -49,4 +49,4 @@ set-location "C:\Windows\System32\config\systemprofile\AppData\Roaming\npm"
 # C:\crawler\b\ControleQualite.App.exe 
 $PSVersionTable >> c:\log.log
 where.exe node >> c:\log.log
-# get-process chromedriver | stop-process -Force
+get-process chromedriver | stop-process -Force
