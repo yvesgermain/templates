@@ -64,7 +64,7 @@ $VirtualMachine = Set-AzureRMVMBootDiagnostics -VM $VirtualMachine -Disable
 New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine -Verbose
 
 $DestKey = (get-AzureRmStorageAccountKey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
-$source = (Get-ChildItem \\srvtfs01\drop\GuichetUnique\ControleQualite\ControleQualite-IC\*\crawler\publish.zip | sort-object -Property creationdate)[0].fullname
+$source = (Get-ChildItem \\srvtfs01\drop\GuichetUnique\ControleQualite\ControleQualite-IC\*\crawler\publish.zip | sort-object -Property creationtime)[0].fullname
 "Copie du TriggerExecCrawler.zip dans https://gumbackups.blob.core.windows.net/depot-tfs"
 . $AzCopyPath /source:$source /dest:https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip /destkey:$destkey /Y
 
@@ -109,7 +109,7 @@ Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName
 "Retirer les droits sur le blob https://gumbackups.blob.core.windows.net/depot-tfs"
 Get-AzureStorageContainer depot-tfs -Context $storageContext | set-AzurestorageContainerAcl -Permission  Off
 
-<#"Retire accès à l'adresse IP du crawler au site Gum et gummaster"
+"Retire accès à l'adresse IP du crawler au site Gum et gummaster"
 
 foreach ($site in $sites) {
 $WebAppConfig = (Get-Variable -Name "WebAppConfig$site").value
@@ -118,4 +118,3 @@ Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConf
 }
 
 if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { Remove-AzureRMResourceGroup -Name $ResourceGroupName -Force }
-#>
