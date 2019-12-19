@@ -19,6 +19,7 @@ $VMSize = "Standard_D2_v2"
 $NetworkName = "CrawlNet-$environnement"
 $NICName = "CrawlNIC-$environnement"
 $SubnetName = "CrawlSubnet-$environnement"
+$PublicIPAddressName = "PIP-$environnement"
 $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 
 
@@ -37,7 +38,6 @@ $i = switch ($environnement) {
 
 $SubnetAddressPrefix = "10.0.$i.0/24"
 $VnetAddressPrefix = "10.0.0.0/16"
-$PublicIPAddressName = "PIP-$environnement"
 $SingleSubnet = New-AzureRMVirtualNetworkSubnetConfig -Name $SubnetName -AddressPrefix $SubnetAddressPrefix
 
 if ( get-AzureRMResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue ) { 

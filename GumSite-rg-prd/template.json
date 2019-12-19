@@ -132,6 +132,10 @@
                         {
                             "name": "Serilog.MessageTemplate", 
                             "value": "Heure de l'erreur : {Timestamp:yyyy-MM-dd  HH:mm:ss} {NewLine}{NewLine}Endroit ou l'erreur s'est produite : {NewLine}{NewLine}{SourceContext}{NewLine}{NewLine}Message de l'erreur : {NewLine}{Message}{NewLine}{NewLine}Message détaillé : {NewLine}{Exception}"
+                        },
+                        {
+                            "name": "WEBSITE_TIME_ZONE",
+                            "value": "Central Standard Time"
                         }
                     ],
                     "connectionStrings": [
@@ -216,6 +220,10 @@
                         {
                             "name": "Serilog.MessageTemplate", 
                             "value": "Heure de l'erreur : {Timestamp:yyyy-MM-dd  HH:mm:ss} {NewLine}{NewLine}Endroit ou l'erreur s'est produite : {NewLine}{NewLine}{SourceContext}{NewLine}{NewLine}Message de l'erreur : {NewLine}{Message}{NewLine}{NewLine}Message détaillé : {NewLine}{Exception}"
+                        },
+                        {
+                            "name": "WEBSITE_TIME_ZONE",
+                            "value": "Central Standard Time"
                         }
                     ],
                     "connectionStrings": [
