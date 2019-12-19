@@ -135,7 +135,7 @@
                         },
                         {
                             "name": "WEBSITE_TIME_ZONE",
-                            "value": "Central Standard Time"
+                            "value":"Eastern Standard Time"
                         }
                     ],
                     "connectionStrings": [
@@ -223,7 +223,7 @@
                         },
                         {
                             "name": "WEBSITE_TIME_ZONE",
-                            "value": "Central Standard Time"
+                            "value":"Eastern Standard Time"
                         }
                     ],
                     "connectionStrings": [
