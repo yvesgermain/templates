@@ -32,15 +32,17 @@ foreach ( $site in $sites) {
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
     Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 }
-
-write-output "Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa"
-if ( $Environnement -eq "dev" -or $Environnement -eq "qa" -or $Environnement -eq "devops") {
-    $QA = Get-AzureRmADGroup -SearchString "QA"
-    if (!( get-AzureRmRoleAssignment -ResourceGroupName $resourceGroupName -ObjectId $qa.Id -RoleDefinitionName contributor)) {
-        New-AzureRmRoleAssignment -ObjectId $QA.Id -RoleDefinitionName Contributor -ResourceGroupName $resourceGroupName
-    }
-    $dev = Get-AzureRmADGroup -SearchString "dev"
-    if (!( get-AzureRmRoleAssignment -ResourceGroupName $resourceGroupName -ObjectId $dev.Id -RoleDefinitionName owner)) {
-        New-AzureRmRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner -ResourceGroupName $resourceGroupName
+$resourceGroupNames = "GumSite-rg-$environnement", "Gumsql-rg-$environnement", "Gumstorage-rg-$environnement"
+foreach ($resourceGroupName in $resourceGroupNames) {
+    write-output "Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa"
+    if ( $Environnement -eq "dev" -or $Environnement -eq "qa" -or $Environnement -eq "devops") {
+        $QA = Get-AzureRmADGroup -SearchString "QA"
+        if (!( get-AzureRmRoleAssignment -ResourceGroupName $resourceGroupName -ObjectId $qa.Id -RoleDefinitionName contributor)) {
+            New-AzureRmRoleAssignment -ObjectId $QA.Id -RoleDefinitionName Contributor -ResourceGroupName $resourceGroupName
+        }
+        $dev = Get-AzureRmADGroup -SearchString "dev"
+        if (!( get-AzureRmRoleAssignment -ResourceGroupName $resourceGroupName -ObjectId $dev.Id -RoleDefinitionName owner)) {
+            New-AzureRmRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner -ResourceGroupName $resourceGroupName
+        }
     }
 }
