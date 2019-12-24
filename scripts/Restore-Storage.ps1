@@ -59,7 +59,7 @@ function restore-storage {
     }
 
     if (!$date) {
-        $dateformat = ((get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAccountName gumbackups | Where-Object { $_.name -like "$container-$Source-*" } | sort-object -Property LastModifiedtime -Descending)[0]).LastModifiedtime
+        $dateformat = ((get-AzureRmStorageContainer -ResourceGroupName infrastructure -StorageAccountName gumbackups | Where-Object { $_.name -like "$container-$Source-*" } | sort-object -Property LastModifiedtime -Descending)[0]).LastModifiedtime.ToLocalTime()
         $date = "{0:yyyyMMdd}" -f $dateformat
     }
 
