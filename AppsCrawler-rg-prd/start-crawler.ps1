@@ -1,6 +1,7 @@
 $ResourceGroupName = "VmCrawler-rg"
 $VMName = "VMcrawl"
 $PublicIPAddressName = "PIP-crawler"
+$chromepath = $defaultpath + '\DevOps\AppsCrawler-rg-prd\run-lighthouse.ps1'
 get-azureRMvm -name $vmname -ResourceGroupName $ResourceGroupName | start-azureRmvm
 
 "Donne accès à l'adresse IP du crawler au site Gum et gummaster"
@@ -39,7 +40,7 @@ foreach ($Environnement in $Environnements) {
     }
 
     "Run lighthouse remotely"
-    Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName -CommandId 'RunPowerShellScript' -ScriptPath .\Run-lighthouse.ps1 -Parameter @{"Environnement" = $Environnement }
+    Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName -CommandId 'RunPowerShellScript' -ScriptPath $chromepath -Parameter @{"Environnement" = $Environnement }
 
     "Retire accès à l'adresse IP du crawler au site Gum et gummaster"
 
