@@ -1,7 +1,7 @@
 $ResourceGroupName = "VmCrawler-rg"
 $VMName = "VMcrawl"
 $PublicIPAddressName = "PIP-crawler"
-get-azvm -name $vmname | start-azvm
+get-azureRMvm -name $vmname | start-azureRmvm
 
 "Donne accès à l'adresse IP du crawler au site Gum et gummaster"
 $VmIP = (Get-AzureRMPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
@@ -49,4 +49,4 @@ foreach ($Environnement in $Environnements) {
     }
 }
 
-get-azvm -name $vmname | stop-azvm -Force
+get-azurermvm -name $vmname | stop-azureRMvm -Force
