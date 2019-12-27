@@ -45,8 +45,9 @@ npm install -g lighthouse >> c:\log.log
 .\npm prefix -g
 
 set-location "C:\Windows\System32\config\systemprofile\AppData\Roaming\npm"
-# (Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
-C:\crawler\b\ControleQualite.App.exe 
+(Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
+(Get-Content ControleQualite.App.exe.config ).replace('value= "head"','value= "headless"') | set-content .\ControleQualite.App.exe.config -Encoding UTF8
+# C:\crawler\b\ControleQualite.App.exe 
 $PSVersionTable >> c:\log.log
 where.exe node >> c:\log.log
 get-process chromedriver | stop-process -Force
