@@ -32,7 +32,7 @@ Write-output "Downloading TriggerExecCrawler.zip"
 (new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip', "$env:temp\TriggerExecCrawler.zip");
 "Decompressing file TriggerExecCrawler.zip in c:\crawler"
 Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler
-$dir = Get-ChildItem C:\crawler\*\ControleQualite.App.exe 
+$dir = (Get-ChildItem C:\crawler\*\ControleQualite.App.exe ).directoryname
 
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") + ';C:\windows\system32\config\systemprofile\AppData\Roaming\npm;c:\program files\nodejs'
 
@@ -44,9 +44,10 @@ set-location "C:\Program Files\nodejs"
 npm install -g lighthouse >> c:\log.log
 .\npm prefix -g
 
-set-location "C:\Windows\System32\config\systemprofile\AppData\Roaming\npm"
-(Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-$environnement") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
-(Get-Content ControleQualite.App.exe.config ).replace('value= "head"','value= "headless"') | set-content .\ControleQualite.App.exe.config -Encoding UTF8
+set-location $dir
+
+(Get-Content ControleQualite.App.exe.config) -replace('gummaster-(dev|qa|prd)\.azure' , "gummaster-$environnement.azure") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
+(Get-Content ControleQualite.App.exe.config ).replace('value="head"','value="headless"') | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 # C:\crawler\b\ControleQualite.App.exe 
 $PSVersionTable >> c:\log.log
 where.exe node >> c:\log.log
