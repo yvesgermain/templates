@@ -1,15 +1,22 @@
-$VmIP = (Get-AzureRMPublicIpAddress -ResourceGroupNane "crawler-rg-dev" -Name PIP-dev).ipaddress
+$ResourceGroupName = "VmCrawler-rg"
+$VMName = "VMcrawl"
+$PublicIPAddressName = "PIP-crawler"
+
+"Donne accès à l'adresse IP du crawler au site Gum et gummaster"
+$VmIP = (Get-AzureRMPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
+$APIVersion = ((Get-AzureRMResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
 
 $Environnements = "dev", "qa", "prd"
 $Sites = "gummaster", "gum"
-$APIVersion = ((Get-AzureRMResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
 
 foreach ($Environnement in $Environnements) {
     foreach ($site in $sites) {
         $WebAppConfig = (Get-AzureRMResource -ResourceType Microsoft.Web/sites/config -ResourceName "$site-$Environnement" -ResourceGroupName GumSite-rg-$Environnement -ApiVersion $APIVersion)
-        New-Variable -Name "WebAppConfig$site$Environnement" -Value $webAppConfig
+        if ( Get-Variable -name "WebAppConfig$site" ) { Remove-Variable -Name "WebAppConfig$site" }
+        New-Variable -Name "WebAppConfig$site" -Value $webAppConfig
         $priority = 500;  
-        New-Variable -Name "IpSecurityRestrictions$site$Environnement" -value $WebAppConfig.Properties.ipsecurityrestrictions; 
+        if ( Get-Variable -name "IpSecurityRestrictions$site" ) { Remove-Variable -Name "IpSecurityRestrictions$site" }
+        New-Variable -Name "IpSecurityRestrictions$site" -value $WebAppConfig.Properties.ipsecurityrestrictions; 
         $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
 
         [System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
@@ -28,30 +35,16 @@ foreach ($Environnement in $Environnements) {
         $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
         Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
     }
-}
 
-dir c:\crawler -Directory | remove-item -Force -Recurse
-Write-output "Downloading TriggerExecCrawler.zip"
-(new-object System.Net.WebClient).DownloadFile('https://gumbackups.blob.core.windows.net/depot-tfs/TriggerExecCrawler.zip', "$env:temp\TriggerExecCrawler.zip");
-"Decompressing file TriggerExecCrawler.zip in c:\crawler"
-Expand-Archive -LiteralPath "$env:temp\TriggerExecCrawler.zip" -DestinationPath C:\crawler
-$dir = Get-ChildItem C:\crawler\*\ControleQualite.App.exe 
+    "Run lighthouse remotely"
+    Invoke-AzureRMVMRunCommand -ResourceGroupName $ResourceGroupName -VMName $VmName -CommandId 'RunPowerShellScript' -ScriptPath .\Run-lighthouse.ps1 -Parameter @{"Environnement" = $Environnement }
 
-cd $dir.directory
-.\controlequalite.app.exe
-(Get-Content ControleQualite.App.exe.config ).replace('gummaster-dev' , "gummaster-qa") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
-.\controlequalite.app.exe
-(Get-Content ControleQualite.App.exe.config ).replace('gummaster-qa' , "gummaster-prd") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
-.\controlequalite.app.exe
-(Get-Content ControleQualite.App.exe.config ).replace('gummaster-prd' , "gummaster-dev") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
-.\controlequalite.app.exe
+    "Retire accès à l'adresse IP du crawler au site Gum et gummaster"
 
-"Retire accès à l'adresse IP du crawler au site Gum et gummaster"
-
-foreach ($Environnement in $Environnements) {
     foreach ($site in $sites) {
-        $WebAppConfig = (Get-Variable -Name "WebAppConfig$site$Environnement").value
+        $WebAppConfig = (Get-Variable -Name "WebAppConfig$site").value
         $WebAppConfig.properties.ipSecurityRestrictions = (get-variable -name "IpSecurityRestrictions$site").value
         Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
     }
 }
+
