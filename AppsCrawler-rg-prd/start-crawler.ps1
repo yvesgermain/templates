@@ -49,3 +49,4 @@ foreach ($Environnement in $Environnements) {
     }
 }
 
+get-azvm -name $vmname | stop-azvm -Force
