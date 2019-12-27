@@ -5,6 +5,7 @@ get-azureRMvm -name $vmname -ResourceGroupName $ResourceGroupName | start-azureR
 
 "Donne accès à l'adresse IP du crawler au site Gum et gummaster"
 $VmIP = (Get-AzureRMPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
+$VmIP
 $APIVersion = ((Get-AzureRMResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
 
 $Environnements = "dev", "qa", "prd"
