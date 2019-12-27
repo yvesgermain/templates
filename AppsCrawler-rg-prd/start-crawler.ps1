@@ -1,6 +1,7 @@
 $ResourceGroupName = "VmCrawler-rg"
 $VMName = "VMcrawl"
 $PublicIPAddressName = "PIP-crawler"
+get-azvm -name $vmname | start-azvm
 
 "Donne accès à l'adresse IP du crawler au site Gum et gummaster"
 $VmIP = (Get-AzureRMPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $PublicIPAddressName).ipaddress
@@ -12,10 +13,10 @@ $Sites = "gummaster", "gum"
 foreach ($Environnement in $Environnements) {
     foreach ($site in $sites) {
         $WebAppConfig = (Get-AzureRMResource -ResourceType Microsoft.Web/sites/config -ResourceName "$site-$Environnement" -ResourceGroupName GumSite-rg-$Environnement -ApiVersion $APIVersion)
-        if ( Get-Variable -name "WebAppConfig$site" ) { Remove-Variable -Name "WebAppConfig$site" }
+        Remove-Variable -Name "WebAppConfig$site" -ErrorAction SilentlyContinue
         New-Variable -Name "WebAppConfig$site" -Value $webAppConfig
         $priority = 500;  
-        if ( Get-Variable -name "IpSecurityRestrictions$site" ) { Remove-Variable -Name "IpSecurityRestrictions$site" }
+        Remove-Variable -Name "IpSecurityRestrictions$site" -ErrorAction SilentlyContinue
         New-Variable -Name "IpSecurityRestrictions$site" -value $WebAppConfig.Properties.ipsecurityrestrictions; 
         $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
 
