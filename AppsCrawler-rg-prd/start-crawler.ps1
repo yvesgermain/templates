@@ -1,3 +1,8 @@
+Param(
+    [Parameter(Mandatory = $true)]
+    [string]
+    $defaultpath
+)
 $ResourceGroupName = "VmCrawler-rg"
 $VMName = "VMcrawl"
 $PublicIPAddressName = "PIP-crawler"
