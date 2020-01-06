@@ -17,6 +17,7 @@
         "sites_gummaster_name": "[concat('GumMaster-', parameters('Environnement'))]",
         "sites_gumfrontend_name": "[concat('Gum-', parameters('Environnement'))]",
         "serverfarms_gummaster_name": "[concat('ASP-Standard-', parameters('Environnement'))]",
+        "sites_Solrwebapp_name": "[concat('GumSolr-', parameters('Environnement'))]",
         "serverfarms_gumfrontend_name": "[concat('ASP-FrontEnd-', parameters('Environnement'))]"
     },
     "resources": [
@@ -427,6 +428,141 @@
             ],
             "properties": {
                 "siteName": "[concat(variables('sites_gummaster_name'), parameters('Environnement'))]",
+                "hostNameType": "Verified"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "name": "[variables('sites_Solrwebapp_name')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gumfrontend_name'))]"
+            ],
+            "kind": "app",
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat( variables('sites_Solrwebapp_name') , '.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "[concat( variables('sites_Solrwebapp_name') , 'scm.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[variables('serverfarms_gumfrontend_name')]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "WEBSITE_TIME_ZONE",
+                            "value": "Eastern Standard Time"
+                        }
+                    ]
+                },
+                "reserved": false,
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-02-01",
+            "name": "[concat(variables('sites_Solrwebapp_name'), '/web')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('sites_Solrwebapp_name'))]"
+            ],
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "phpVersion": "5.6",
+                "pythonVersion": "",
+                "nodeVersion": "",
+                "linuxFxVersion": "",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2017",
+                "httpLoggingEnabled": false,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "[variables('sites_Solrwebapp_name')]",
+                "scmType": "None",
+                "use32BitWorkerProcess": "true",
+                "webSocketsEnabled": false,
+                "alwaysOn": true,
+                "javaVersion": "1.8",
+                "javaContainer": "JETTY",
+                "javaContainerVersion": "9.3",
+                "appCommandLine": "",
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": true,
+                        "virtualDirectories": null
+                    }
+                ],
+                "winAuthAdminState": 0,
+                "winAuthTenantState": 0,
+                "customAppPoolIdentityAdminState": false,
+                "customAppPoolIdentityTenantState": false,
+                "loadBalancing": "LeastRequests",
+                "routingRules": [
+                ],
+                "experiments": {
+                    "rampUpRules": [
+                    ]
+                },
+                "autoHealEnabled": false,
+                "vnetName": "",
+                "siteAuthEnabled": false,
+                "localMySqlEnabled": false,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "205.237.253.10/32",
+                        "name": "Allow_Soquij"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": "true",
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": 0,
+                "fileChangeAuditEnabled": false,
+                "functionsRuntimeScaleMonitoringEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2016-08-01",
+            "name": "[concat(variables('sites_Solrwebapp_name'), '/', variables('sites_Solrwebapp_name'), '.azurewebsites.net')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('sites_Solrwebapp_name'))]"
+            ],
+            "properties": {
+                "siteName": "[variables('sites_Solrwebapp_name')]",
                 "hostNameType": "Verified"
             }
         }

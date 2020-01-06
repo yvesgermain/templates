@@ -58,11 +58,12 @@ $gum = Get-AzureRmStorageAccount -StorageAccountname gumbackups -resourcegroupna
 $databases = get-azureRMsqlserver -name $server -resourcegroupname $resourcegroup | get-azureRMsqldatabase | where-object { $BDs -contains $_.Databasename } 
 $databases | Remove-AzureRMsqldatabase
 
+$op = @();
 $BDs | ForEach-Object { 
    $database = $_;
    $sourceBD = $_.split("-")[0] + "-" + $Source
    $Dbname = (Get-AzureStorageBlob -Context $gum.context -Container sql-backup | Where-Object { $_.name -like "$SourceBD*"} | Sort-Object -Descending LastModified  )[0];
-   $Restore = New-azureRMSqlDatabaseImport `
+   $op += New-azureRMSqlDatabaseImport `
       -ServerName $server `
       -DatabaseName $database `
       -ResourceGroupName $resourcegroup `
@@ -75,6 +76,6 @@ $BDs | ForEach-Object {
       -ServiceObjectiveName S0 `
       -DatabaseMaxSizeBytes 30gb ;
 
-   $restore
 }
 
+$op.operationstatuslink | ForEach-Object { do { $status = Get-AzurermSqlDatabaseImportExportStatus -OperationStatusLink $_ ; $status; "Sleep for 20 seconds" ; Start-Sleep -Seconds 20}  while ( $status.status -notlike "Succeeded")}
