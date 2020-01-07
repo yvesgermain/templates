@@ -87,7 +87,7 @@ Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConf
 $site = "GumSolr-" + $Environnement
 
 $APIVersion = ((Get-AzureRmResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
-$WebAppConfig = (Get-AzureRmResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName $resourceGroupName -ApiVersion $APIVersion)
+$WebAppConfig = (Get-AzureRmResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName "GumSite-rg-$environnement" -ApiVersion $APIVersion)
 $priority = 180;  
 $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
 $IpSecurityRestrictions
