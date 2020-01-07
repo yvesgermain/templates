@@ -33,11 +33,11 @@
             "name": "[variables('Serverfarms_ASP_Standard_name')]",
             "location": "[variables('location')]",
             "sku": {
-                "name": "B1",
-                "tier": "Basic",
-                "size": "B1",
-                "family": "B",
-                "capacity": 1
+                "name": "F1",
+                "tier": "Free",
+                "size": "F1",
+                "family": "F",
+                "capacity": 0
             },
             "kind": "app",
             "properties": {
