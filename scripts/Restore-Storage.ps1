@@ -69,7 +69,6 @@ function restore-storage {
     
     Write-Output "restore https://gumbackups.blob.core.windows.net/$newPath vers https://$storage$Destination.blob.core.windows.net/$container"
     . $AzCopyPath /source:https://gumbackups.blob.core.windows.net/$newPath/ /sourcekey:$GumBackupKey /dest:https://$storage$Destination.blob.core.windows.net/$container/ /s /y /destkey:$DestKey /z:$( $env:temp + '\' + $newPath)
-    Remove-Item -Path $( $env:temp + '\' + $newPath) -Recurse -force
 }
 
 if (!$Source ) { $source = $Destination }
