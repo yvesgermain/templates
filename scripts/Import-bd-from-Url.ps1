@@ -78,4 +78,6 @@ $BDs | ForEach-Object {
 
 }
 
-$op.operationstatuslink | ForEach-Object { do { $status = Get-AzurermSqlDatabaseImportExportStatus -OperationStatusLink $_ ; $status; "Sleep for 20 seconds" ; Start-Sleep -Seconds 20}  while ( $status.status -notlike "Succeeded")}
+# $op.operationstatuslink | ForEach-Object { do { $status = Get-AzurermSqlDatabaseImportExportStatus -OperationStatusLink $_ ; $status; "Sleep for 20 seconds" ; Start-Sleep -Seconds 20}  while ( $status.status -notlike "Succeeded")}
+
+$op | Export-Clixml -Path ( $env:temp + '\Import-' + $Environnement + ".xml")
