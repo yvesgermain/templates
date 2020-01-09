@@ -34,9 +34,5 @@ foreach ( $server in $Servers ) {
     $databases = get-azureRMsqlserver | where-object {$_.ServerName -eq $server} | get-azureRMsqldatabase | where-object { $_.Databasename -notlike "master" } 
     $databases | ForEach-Object {$op += New-azureRMSqlDatabaseExport -ServerName $_.servername -DatabaseName $_.databasename -ResourceGroupName $_.ResourceGroupName -StorageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $( $TargetUrl + $_.DatabaseName + "_" + $(get-date -Format "yyyy-MM-dd_HH-mm") + '.bacpac' ) -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass}
 }
-$op | ForEach-Object { write-output "##vso[task.setvariable variable=$_.DATABASENAME]$_.operationstatuslink" }
-# $op.operationstatuslink | ForEach-Object { do { $status = Get-AzurermSqlDatabaseImportExportStatus -OperationStatusLink $_ ; $status; "Sleep for 20 seconds" ; Start-Sleep -Seconds 20}  while ( $status.status -notlike "Succeeded")}
 
-DIR ENV:
-
-$env:SYSTEM_TEAMFOUNDATIONSERVERURI
+$op.operationstatuslink | ForEach-Object { do { $status = Get-AzurermSqlDatabaseImportExportStatus -OperationStatusLink $_ ; $status; "Sleep for 20 seconds" ; Start-Sleep -Seconds 20}  while ( $status.status -notlike "Succeeded")}
