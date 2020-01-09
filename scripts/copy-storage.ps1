@@ -44,6 +44,7 @@ function copy-storage {
 
     Write-Output "copy https://$storage$environnement.blob.core.windows.net/$container vers https://gumbackups.blob.core.windows.net/$newPath"
     . $AzCopyPath /source:https://$storage$environnement.blob.core.windows.net/$container/ /sourcekey:$SourceKey /dest:https://gumbackups.blob.core.windows.net/$newPath/ /s /y /destkey:$GumBackupKey /z:$( $env:temp + '\' + $newPath)
+    Remove-Item -Path $( $env:temp + '\' + $newPath) -Recurse -Force
 }
 
 $params = @{'Environnement' = $Environnement }
