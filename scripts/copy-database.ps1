@@ -19,18 +19,18 @@ Param(
         $TargetEnv = "devops",
 
         [Parameter()]
-        [validateset("BdAppsInterne-", "BdVeille-")]
+        [validateset("BdAppsInterne", "BdVeille")]
         [string[]] 
-        $BdArray = ("BdAppsInterne-","BdVeille-")
+        $BdArray = ("BdAppsInterne","BdVeille")
     )
 import-module azurerm.sql, azurerm.Websites
 
  foreach( $Bd in $Bdarray) {
-   $databaseName = $Bd + $SourceEnv
+   $databaseName = $Bd + "-" + $SourceEnv
    $serverName = "sqlguminterne-" + $SourceEnv
    $resourceGroupName = "sqlapps-rg-" +  $SourceEnv
 
-   $TargetDatabaseName = $Bd + $TargetEnv
+   $TargetDatabaseName = $Bd + "-" + $TargetEnv
    $TargetServerName = "sqlguminterne-" + $TargetEnv
    $TargetResourceGroupName = "sqlapps-rg-" +  $TargetEnv
 
