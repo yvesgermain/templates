@@ -19,7 +19,7 @@ Param(
         $TargetEnv = "devops",
 
         [Parameter()]
-        [validateset("BdAppsInterne", "BdVeille")]
+        [validateset("BdAppsInterne", "BdVeille", {"BdAppsInterne", "BdVeille"})]
         [string[]] 
         $BdArray = ("BdAppsInterne","BdVeille")
     )
