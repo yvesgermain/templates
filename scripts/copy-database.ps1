@@ -21,7 +21,7 @@ Param(
     [Parameter()]
     [validateset("BdAppsInterne", "BdVeille", "BdGum", {@('BdAppsInterne','BdVeille')}, {@('BDGum','BdAppsInterne','BdVeille')})]
     [array] 
-    $BdArray = ("BdAppsInterne", "BdVeille")
+    $BdArray = ("BDGum","BdAppsInterne", "BdVeille")
 )
 if ( get-module az.sql) { import-module az.sql, az.Websites } else { import-module azurerm.sql, azurerm.Websites } 
 
