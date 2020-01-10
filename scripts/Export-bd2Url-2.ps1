@@ -37,4 +37,5 @@ foreach ( $server in $Servers ) {
 
 $op.operationstatuslink | ForEach-Object { do { $status = Get-AzurermSqlDatabaseImportExportStatus -OperationStatusLink $_ ; $status; "Sleep for 20 seconds" ; Start-Sleep -Seconds 20}  while ( $status.status -notlike "Succeeded")}
 
+Write-Output "Exporte variable Op vers $env:temp\Export-$Environnement.xml"
 $op | Export-Clixml -Path ( $env:temp + '\Export-' + $Environnement + ".xml")
