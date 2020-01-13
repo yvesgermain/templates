@@ -5,7 +5,7 @@
         "Environnement": {
             "type": "string"
         },
-        "AccountKey":{
+        "AccountKey": {
             "type": "securestring"
         },
         "AdminPassword": {
@@ -29,13 +29,7 @@
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
             },
-            "sku": {
-                "name": "S1",
-                "tier": "Standard",
-                "size": "S1",
-                "family": "S",
-                "capacity": 1
-            },
+            "sku": "[if(equals(parameters('Environnement'), 'prd'), json('{\"name\": \"S1\",\"tier\": \"Standard\",\"size\": \"S1\",\"family\": \"S\",\"capacity\": 1}'), json('{\"name\":\"F1\",\"tier\":\"Free\",\"size\":\"F1\",\"family\":\"F\",\"capacity\": 0}'))]",
             "kind": "app",
             "properties": {
                 "name": "[variables('serverfarms_gumfrontend_name')]",
@@ -131,12 +125,12 @@
                             "value": "Error"
                         },
                         {
-                            "name": "Serilog.MessageTemplate", 
+                            "name": "Serilog.MessageTemplate",
                             "value": "Heure de l'erreur : {Timestamp:yyyy-MM-dd  HH:mm:ss} {NewLine}{NewLine}Endroit ou l'erreur s'est produite : {NewLine}{NewLine}{SourceContext}{NewLine}{NewLine}Message de l'erreur : {NewLine}{Message}{NewLine}{NewLine}Message détaillé : {NewLine}{Exception}"
                         },
                         {
                             "name": "WEBSITE_TIME_ZONE",
-                            "value":"Eastern Standard Time"
+                            "value": "Eastern Standard Time"
                         }
                     ],
                     "connectionStrings": [
@@ -219,12 +213,12 @@
                             "value": "Error"
                         },
                         {
-                            "name": "Serilog.MessageTemplate", 
+                            "name": "Serilog.MessageTemplate",
                             "value": "Heure de l'erreur : {Timestamp:yyyy-MM-dd  HH:mm:ss} {NewLine}{NewLine}Endroit ou l'erreur s'est produite : {NewLine}{NewLine}{SourceContext}{NewLine}{NewLine}Message de l'erreur : {NewLine}{Message}{NewLine}{NewLine}Message détaillé : {NewLine}{Exception}"
                         },
                         {
                             "name": "WEBSITE_TIME_ZONE",
-                            "value":"Eastern Standard Time"
+                            "value": "Eastern Standard Time"
                         }
                     ],
                     "connectionStrings": [
@@ -283,7 +277,7 @@
                 "scmType": "VSTSRM",
                 "use32BitWorkerProcess": "true",
                 "webSocketsEnabled": "false",
-                "alwaysOn": "false",
+                "alwaysOn": "[if(equals(parameters('Environnement'), 'prd'), 'true', 'false')]",
                 "appCommandLine": "",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
@@ -299,14 +293,17 @@
                 "customAppPoolIdentityAdminState": "false",
                 "customAppPoolIdentityTenantState": "false",
                 "loadBalancing": "LeastRequests",
-                "routingRules": [],
+                "routingRules": [
+                ],
                 "experiments": {
-                    "rampUpRules": []
+                    "rampUpRules": [
+                    ]
                 },
                 "autoHealEnabled": "false",
                 "vnetName": "",
                 "siteAuthEnabled": "false",
-                "siteAuthSettings": {},
+                "siteAuthSettings": {
+                },
                 "localMySqlEnabled": "false",
                 "managedServiceIdentityId": "1284",
                 "ipSecurityRestrictions": [
@@ -379,14 +376,17 @@
                 "customAppPoolIdentityAdminState": "false",
                 "customAppPoolIdentityTenantState": "false",
                 "loadBalancing": "LeastRequests",
-                "routingRules": [],
+                "routingRules": [
+                ],
                 "experiments": {
-                    "rampUpRules": []
+                    "rampUpRules": [
+                    ]
                 },
                 "autoHealEnabled": "false",
                 "vnetName": "",
                 "siteAuthEnabled": "false",
-                "siteAuthSettings": {},
+                "siteAuthSettings": {
+                },
                 "localMySqlEnabled": "false",
                 "managedServiceIdentityId": "1285",
                 "ipSecurityRestrictions": [
@@ -509,7 +509,7 @@
                 "scmType": "None",
                 "use32BitWorkerProcess": "true",
                 "webSocketsEnabled": false,
-                "alwaysOn": true,
+                "alwaysOn": "[if(equals(parameters('Environnement'), 'prd'), 'true', 'false')]",
                 "javaVersion": "1.8",
                 "javaContainer": "JETTY",
                 "javaContainerVersion": "9.3",
