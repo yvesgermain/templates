@@ -128,10 +128,6 @@
                             "value": "[concat('https://gummaster-', parameters('environnement'), '.azurewebsites.net/umbraco')]"
                         },
                         {
-                            "name": "UrlMoteurRecherche",
-                            "value": "[concat('https://gumsolr-', parameters('environnement'), '.azurewebsites.net/solr/index')]"
-                        },
-                        {
                             "name": "VeilleDeLien.UrlApi",
                             "value": "[concat('https://veille-', parameters('environnement'), '.azurewebsites.net/Api/')]"
                         },
