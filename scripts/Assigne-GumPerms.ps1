@@ -32,6 +32,9 @@ foreach ( $site in $sites) {
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
     Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 }
+
+# Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa
+
 $resourceGroupNames = "GumSite-rg-$environnement", "Gumsql-rg-$environnement", "Gumstorage-rg-$environnement"
 foreach ($resourceGroupName in $resourceGroupNames) {
     write-output "Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa"
@@ -50,9 +53,11 @@ foreach ($resourceGroupName in $resourceGroupNames) {
 $va2065 = @("AllowSoquij, 205.237.253.10, 205.237.253.10"; "AllowAllWindowsAzureIps, 0.0.0.0, 0.0.0.0")
 
 $resourceGroupName = "GumSite-rg-$environnement"
+Enable-AzureRmSqlServerAdvancedThreatProtection -ServerName "sqlgum-$Environnement" -ResourceGroupName "gumsql-rg-$environnement"
+get-azurermsqldatabase -ResourceGroupName "gumsql-rg-$environnement" -ServerName "sqlgum-$environnement" | Where-Object {$_.databaseName -ne "Master"} | Update-AzureRmSqlDatabaseVulnerabilityAssessmentSettings -StorageAccountName gumlogs -ScanResultsContainerName vulnerability-assessment -RecurringScansInterval Weekly -EmailAdmins $true -NotificationEmail "ygermain@soqui.qc.ca"
 Get-AzureRmSqlDatabase -ResourceGroupName "gumsql-rg-$environnement" -ServerName sqlgum-$Environnement | where-object { $_.DatabaseName -ne "master" } | Set-AzureRmSqlDatabaseVulnerabilityAssessmentRuleBaseline  -RuleId "va2065" -BaselineResult $va2065
 
-# Restriction des adresses IP sur Solr
+write-output "Restriction des adresses IP sur Solr"
 
 $site = "GumSolr-" + $Environnement
 
