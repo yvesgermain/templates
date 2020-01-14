@@ -46,3 +46,8 @@ foreach ($resourceGroupName in $resourceGroupNames) {
         }
     }
 }
+
+$va2065= @("AllowSoquij, 205.237.253.10, 205.237.253.10";"AllowAllWindowsAzureIps, 0.0.0.0, 0.0.0.0")
+
+$resourceGroupName = "GumSite-rg-$environnement"
+Get-AzureRmSqlDatabase -ResourceGroupName $resourceGroupName -ServerName sqlgum-$Environnement | where-object {$_.DatabaseName -ne "master"} | Set-AzureRmSqlDatabaseVulnerabilityAssessmentRuleBaseline  -RuleId "va2065" -BaselineResult $va2065
