@@ -47,7 +47,37 @@ foreach ($resourceGroupName in $resourceGroupNames) {
     }
 }
 
-$va2065= @("AllowSoquij, 205.237.253.10, 205.237.253.10";"AllowAllWindowsAzureIps, 0.0.0.0, 0.0.0.0")
+$va2065 = @("AllowSoquij, 205.237.253.10, 205.237.253.10"; "AllowAllWindowsAzureIps, 0.0.0.0, 0.0.0.0")
 
 $resourceGroupName = "GumSite-rg-$environnement"
-Get-AzureRmSqlDatabase -ResourceGroupName $resourceGroupName -ServerName sqlgum-$Environnement | where-object {$_.DatabaseName -ne "master"} | Set-AzureRmSqlDatabaseVulnerabilityAssessmentRuleBaseline  -RuleId "va2065" -BaselineResult $va2065
+Get-AzureRmSqlDatabase -ResourceGroupName $resourceGroupName -ServerName sqlgum-$Environnement | where-object { $_.DatabaseName -ne "master" } | Set-AzureRmSqlDatabaseVulnerabilityAssessmentRuleBaseline  -RuleId "va2065" -BaselineResult $va2065
+
+# Restriction des adresses IP sur Solr
+
+$site = "GumSolr-" + $Environnement
+
+$APIVersion = ((Get-AzureRmResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
+$WebAppConfig = (Get-AzureRmResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName "GumSite-rg-$environnement" -ApiVersion $APIVersion)
+$IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
+$IpSecurityRestrictions
+
+[System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
+
+$SourceSite = "gummaster-$environnement"
+(Get-azureRmwebapp -name $Sourcesite).OutboundIpAddresses.split(",") | ForEach-Object { 
+    $Ip = $_;
+    if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
+        $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
+        $webip.ipAddress = $_ + '/32';  
+        $webip.action = "Allow"; 
+        if ( $Sourcesite -like "gummaster*") { $webip.name = "Allow_GumMaster" } else { $webip.name = "Allow_Gum" }
+        $priority = $priority + 20 ; 
+        $webIP.priority = $priority;  
+        $ArrayList.Add($webIP); 
+        $webIP
+        Remove-Variable webip
+    }
+}
+
+$WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
+Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
