@@ -47,13 +47,8 @@
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
             },
-            "sku": {
-                "name": "F1",
-                "tier": "Free",
-                "size": "F1",
-                "family": "F",
-                "capacity": 0
-            },
+            "sku": "[if(equals(parameters('Environnement'), 'prd'), json('{\"name\": \"S1\",\"tier\": \"Standard\",\"size\": \"S1\",\"family\": \"S\",\"capacity\": 1}'), if(equals(parameters('Environnement'), 'devops'), json('{\"name\":\"B1\",\"tier\":\"Basic\",\"size\":\"B1\",\"family\":\"B\",\"capacity\": 1}'), json('{\"name\":\"F1\",\"tier\":\"Free\",\"size\":\"F1\",\"family\":\"F\",\"capacity\": 0}')))]",
+
             "kind": "app",
             "properties": {
                 "name": "[variables('serverfarms_gummaster_name')]",
@@ -124,7 +119,7 @@
                             "name": "Serilog.ErrorLevel",
                             "value": "Error"
                         },
-                                                {
+                        {
                             "name": "UrlMoteurRecherche",
                             "value": "[concat('https://gumsolr-', parameters('environnement'), '.azurewebsites.net/solr/index')]"
                         },
