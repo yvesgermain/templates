@@ -32,13 +32,7 @@
             "apiVersion": "2016-09-01",
             "name": "[variables('Serverfarms_ASP_Standard_name')]",
             "location": "[variables('location')]",
-            "sku": {
-                "name": "F1",
-                "tier": "Free",
-                "size": "F1",
-                "family": "F",
-                "capacity": 0
-            },
+            "sku": "[if(equals(parameters('Environnement'), 'prd'),json('{\"name\":\"B1\",\"tier\":\"Basic\",\"size\":\"B1\",\"family\":\"B\",\"capacity\": 1}'),json('{\"name\":\"F1\",\"tier\":\"Free\",\"size\":\"F1\",\"family\":\"F\",\"capacity\": 0}'))]",
             "kind": "app",
             "properties": {
                 "name": "[variables('Serverfarms_ASP_Standard_name')]",
