@@ -47,7 +47,7 @@ function restore-storage {
 
     switch ($storage) {
         "storgum" { $ResourceGroupName = "gumstorage-rg-" + $Destination; $container = "guichetunique" }
-        "storappsinterne" { $ResourceGroupName = "Storage-rg-" + $Destination; $container = "appsinterne" }
+        "storappsinterne" { $ResourceGroupName = "AppsStorage-rg-" + $Destination; $container = "appsinterne" }
     }
 
     $GumBackupKey = (get-azureRMstorageaccountkey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
@@ -88,7 +88,7 @@ foreach ($store in $Storage) {
     Write-output "Copier la clef du Storage Account dans Gum Key Vault"
     switch ($store) {
         "storgum" { $ResourceGroupName = "gumstorage-rg-" + $Destination; $StorageAccounts = "storgum" }
-        "storappsinterne" { $ResourceGroupName = "Storage-rg-" + $Destination; $StorageAccounts = "storappsinterne" , "storveillefunc" }
+        "storappsinterne" { $ResourceGroupName = "AppsStorage-rg-" + $Destination; $StorageAccounts = "storappsinterne" , "storveillefunc" }
     }
     foreach ($StorageAccount in $StorageAccounts) {
         get-azureRmstorageaccount -resourcegroupName $resourceGroupName | where-object { $_.storageaccountname -like "$StorageAccount*" } | foreach-object { 
