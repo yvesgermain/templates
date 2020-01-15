@@ -111,7 +111,7 @@ get-azstorageaccount -resourcegroupName $resourceGroupName | where-object {$_.st
     $name = $_.storageaccountname; 
     Get-AzStorageAccountKey -ResourceGroupName $_.resourcegroupname -Name $_.StorageAccountName } | where-object { $_.keyname -like "key1"} | ForEach-Object { 
         $Secret = ConvertTo-SecureString -String $_.value -AsPlainText -Force; 
-        Set-AzKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key"
+        Set-AzKeyVaultSecret -VaultName 'gumkeyvault' -Name $name -SecretValue $Secret -ContentType "Storage key" 
     }
 
 get-azstorageaccount -resourcegroupName $resourceGroupName | where-object {$_.storageaccountname -like "storveillefunc*"} | foreach-object { 
@@ -140,8 +140,8 @@ elseIf( (Get-Item $AzCopyPath).Exists -eq $false)
 push-location
 Set-Location (Get-ChildItem $AzCopyPath).directory.fullname
 
-$SourceKey = (get-azstorageaccountkey -Name storappsinterneprd -ResourceGroupName AppsStorage-rg-prd | where-object {$_.keyname -eq "key1"}).value
-$DestKey   = (get-azstorageaccountkey -Name storappsinterne$Environnement -ResourceGroupName AppsStorage-rg-$Environnement | where-object {$_.keyname -eq "key1"}).value
+# $SourceKey = (get-azstorageaccountkey -Name storappsinterne$Environnement -ResourceGroupName AppsStorage-rg-$Environnement  | where-object {$_.keyname -eq "key1"}).value
+# $DestKey   = (get-azstorageaccountkey -Name storappsinterne$Environnement -ResourceGroupName AppsStorage-rg-$Environnement | where-object {$_.keyname -eq "key1"}).value
 
 # . $AzCopyPath /source:https://storappsinterneprd.blob.core.windows.net/appsinterne/ /sourcekey:$SourceKey /dest:https://storappsinterne$Environnement.blob.core.windows.net/appsinterne/ /s /y /destkey:$destkey
 
