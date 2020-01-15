@@ -84,7 +84,7 @@ if($resourceProviders.length) {
 }
 
 #Create or check for existing resource group
-$resourceGroupName = "Storage-rg-$environnement"
+$resourceGroupName = "AppsStorage-rg-$environnement"
 $resourceGroup = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
 if(!$resourceGroup)
 {
@@ -140,8 +140,8 @@ elseIf( (Get-Item $AzCopyPath).Exists -eq $false)
 push-location
 Set-Location (Get-ChildItem $AzCopyPath).directory.fullname
 
-$SourceKey = (get-azstorageaccountkey -Name storappsinterneprd -ResourceGroupName storage-rg-prd | where-object {$_.keyname -eq "key1"}).value
-$DestKey   = (get-azstorageaccountkey -Name storappsinterne$Environnement -ResourceGroupName storage-rg-$Environnement | where-object {$_.keyname -eq "key1"}).value
+$SourceKey = (get-azstorageaccountkey -Name storappsinterneprd -ResourceGroupName AppsStorage-rg-prd | where-object {$_.keyname -eq "key1"}).value
+$DestKey   = (get-azstorageaccountkey -Name storappsinterne$Environnement -ResourceGroupName AppsStorage-rg-$Environnement | where-object {$_.keyname -eq "key1"}).value
 
 # . $AzCopyPath /source:https://storappsinterneprd.blob.core.windows.net/appsinterne/ /sourcekey:$SourceKey /dest:https://storappsinterne$Environnement.blob.core.windows.net/appsinterne/ /s /y /destkey:$destkey
 
