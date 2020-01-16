@@ -34,5 +34,11 @@ foreach ( $server in $Servers ) {
     $databases = get-azureRMsqlserver | where-object {$_.ServerName -eq $server} | get-azureRMsqldatabase | where-object { $_.Databasename -notlike "master" } 
     $databases | ForEach-Object {$op += New-azureRMSqlDatabaseExport -ServerName $_.servername -DatabaseName $_.databasename -ResourceGroupName $_.ResourceGroupName -StorageKey $storageKey -StorageKeyType $StorageAccessKey -StorageUri $( $TargetUrl + $_.DatabaseName + "_" + $(get-date -Format "yyyy-MM-dd_HH-mm") + '.bacpac' ) -AdministratorLogin $AdministratorLogin -AdministratorLoginPassword $pass}
 }
+# Effacer les vieux backups
+write-host Effacer les vieux backups
 
+$context =Get-AzureRMStorageAccount -Name gumbackups -ResourceGroupName infrastructure
+Get-AzureStorageblob -Context $context.context -Container sql-backup | Where-Object {$_.LastModified -lt (get-date).adddays(-9) } | Remove-AzureStorageBlob
+
+# Verifie si les backups sont completes
 $op.operationstatuslink | ForEach-Object { do { $status = Get-AzurermSqlDatabaseImportExportStatus -OperationStatusLink $_ ; $status; "Sleep for 20 seconds" ; Start-Sleep -Seconds 20}  while ( $status.status -notlike "Succeeded")}
