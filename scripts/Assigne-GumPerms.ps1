@@ -50,6 +50,7 @@ foreach ($resourceGroupName in $resourceGroupNames) {
     }
 }
 
+# Creer le baseline pour les regles de firewall
 $va2065 = @("AllowSoquij, 205.237.253.10, 205.237.253.10"; "AllowAllWindowsAzureIps, 0.0.0.0, 0.0.0.0")
 
 $resourceGroupName = "GumSite-rg-$environnement"
