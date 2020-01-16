@@ -27,7 +27,7 @@ function copy-storage {
 
     switch ($storage) {
         "storgum" { $ResourceGroupName = "gumstorage-rg-" + $environnement; $container = "guichetunique" }
-        "storappsinterne" { $ResourceGroupName = "AppsStorage-rg-" + $environnement; $container = "appsinterne" }
+        "storappsinterne" { $ResourceGroupName = "Storage-rg-" + $environnement; $container = "appsinterne" }
     }
 
     $GumBackupKey = (get-azureRMstorageaccountkey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
