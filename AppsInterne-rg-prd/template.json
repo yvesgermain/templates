@@ -309,7 +309,7 @@
                 "scmType": "None",
                 "use32BitWorkerProcess": "true",
                 "webSocketsEnabled": "false",
-                "alwaysOn": "false",
+                "alwaysOn": "[if(equals(parameters('Environnement'), 'prd'),'true', 'false')]",
                 "appCommandLine": "",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
@@ -384,7 +384,7 @@
                 "scmType": "None",
                 "use32BitWorkerProcess": "true",
                 "webSocketsEnabled": "false",
-                "alwaysOn": "false",
+                "alwaysOn": "[if(equals(parameters('Environnement'), 'prd'),'true', 'false')]",
                 "appCommandLine": "",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
@@ -469,7 +469,7 @@
                 "scmType": "None",
                 "use32BitWorkerProcess": "true",
                 "webSocketsEnabled": "false",
-                "alwaysOn": "false",
+                "alwaysOn": "[if(equals(parameters('Environnement'), 'prd'),'true', 'false')]",
                 "appCommandLine": "",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
