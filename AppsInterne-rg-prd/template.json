@@ -384,7 +384,7 @@
                 "scmType": "None",
                 "use32BitWorkerProcess": "true",
                 "webSocketsEnabled": "false",
-                "alwaysOn": "[if(equals(parameters('Environnement'), 'prd'),'true', 'false')]",
+                "alwaysOn": "false",
                 "appCommandLine": "",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
