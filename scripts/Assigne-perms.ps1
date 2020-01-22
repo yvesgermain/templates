@@ -82,12 +82,13 @@ $IP_logic_Apps | ForEach-Object {
 $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
 Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 
+<# 
 Write-Output "Mettre la Connection String dans l'App Function"
 $connectionStrings = @{}
 $passw = (Get-AzureKeyVaultSecret -VaultName gumkeyvault -name "sqladmin$environnement").secretvaluetext
 $connectionStrings['bd_VeilleContenuExterneEntities'] = @{Type= "SQLServer"; Value= 'Source=sqlguminterne-' + $environnement + '.database.windows.net,1433;Initial Catalog=Veille-'+ $environnement + ';Persist Security Info=False;UserID=sqladmin' + $environnement + ';Password=' + $passw + ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;ConnectionTimeout=30;App=EntityFramework'}
 Set-AzureRmWebApp -ResourceGroupName "appsinterne-rg-$environnement" -name "veille-func-$Environnement" -ConnectionStrings $connectionStrings
-
+#>
 # Creer le baseline pour les regles de firewall
 $va2065 = @("AllowSoquij, 205.237.253.10, 205.237.253.10"; "AllowAllWindowsAzureIps, 0.0.0.0, 0.0.0.0")
 
