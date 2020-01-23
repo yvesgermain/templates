@@ -30,6 +30,22 @@ foreach ( $site in $sites) {
             Remove-Variable webip
         }
     }
+    # Permettre le Logic App 
+    $IP_logic_Apps | ForEach-Object { 
+        $Ip = $_;
+        if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
+            $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
+            $webip.ipAddress = $_ + '/32';  
+            $webip.action = "Allow"; 
+            $webip.name = "Allow_Logic_App"
+            $priority = $priority + 20 ; 
+            $webIP.priority = $priority;  
+            $ArrayList.Add($webIP); 
+            $webIP
+            Remove-Variable webip
+        }
+    }
+
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
     Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 }
@@ -56,7 +72,7 @@ $va2065 = @("AllowSoquij, 205.237.253.10, 205.237.253.10"; "AllowAllWindowsAzure
 
 $resourceGroupName = "GumSite-rg-$environnement"
 Enable-AzureRmSqlServerAdvancedThreatProtection -ServerName "sqlgum-$Environnement" -ResourceGroupName "gumsql-rg-$environnement"
-get-azurermsqldatabase -ResourceGroupName "gumsql-rg-$environnement" -ServerName "sqlgum-$environnement" | Where-Object {$_.databaseName -ne "master"} | Update-AzureRmSqlDatabaseVulnerabilityAssessmentSetting -StorageAccountName gumlogs -ScanResultsContainerName vulnerability-assessment -RecurringScansInterval Weekly -EmailAdmins $true -NotificationEmail "ygermain@soqui.qc.ca"
+get-azurermsqldatabase -ResourceGroupName "gumsql-rg-$environnement" -ServerName "sqlgum-$environnement" | Where-Object { $_.databaseName -ne "master" } | Update-AzureRmSqlDatabaseVulnerabilityAssessmentSetting -StorageAccountName gumlogs -ScanResultsContainerName vulnerability-assessment -RecurringScansInterval Weekly -EmailAdmins $true -NotificationEmail "ygermain@soqui.qc.ca"
 Get-AzureRmSqlDatabase -ResourceGroupName "gumsql-rg-$environnement" -ServerName sqlgum-$Environnement | where-object { $_.DatabaseName -ne "master" } | Set-AzureRmSqlDatabaseVulnerabilityAssessmentRuleBaseline  -RuleId "va2065" -BaselineResult $va2065
 
 write-output "Restriction des adresses IP sur Solr"
@@ -66,6 +82,7 @@ $site = "GumSolr-" + $Environnement
 $APIVersion = ((Get-AzureRmResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
 $WebAppConfig = (Get-AzureRmResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName "GumSite-rg-$environnement" -ApiVersion $APIVersion)
 $IpSecurityRestrictions = $WebAppConfig.Properties.ipsecurityrestrictions; 
+$priority = 180;  
 $IpSecurityRestrictions
 
 [System.Collections.ArrayList]$ArrayList = $IpSecurityRestrictions ;
@@ -77,7 +94,22 @@ $SourceSite = "gummaster-$environnement"
         $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
         $webip.ipAddress = $_ + '/32';  
         $webip.action = "Allow"; 
-        if ( $Sourcesite -like "gummaster*") { $webip.name = "Allow_GumMaster" } else { $webip.name = "Allow_Gum" }
+        $webip.name = "Allow_GumMaster"
+        $priority = $priority + 20 ; 
+        $webIP.priority = $priority;  
+        $ArrayList.Add($webIP); 
+        $webIP
+        Remove-Variable webip
+    }
+}
+# Permettre le Logic App 
+$IP_logic_Apps | ForEach-Object { 
+    $Ip = $_;
+    if ($arrayList.ipAddress -notcontains ($Ip + '/32')) {
+        $webIP = [PSCustomObject]@{ipAddress = ''; action = ''; priority = ""; name = ""; description = ''; }; 
+        $webip.ipAddress = $_ + '/32';  
+        $webip.action = "Allow"; 
+        $webip.name = "Allow_Logic_App"
         $priority = $priority + 20 ; 
         $webIP.priority = $priority;  
         $ArrayList.Add($webIP); 

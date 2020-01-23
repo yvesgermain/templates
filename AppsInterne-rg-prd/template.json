@@ -210,7 +210,7 @@
                         {
                             "name": "bd_VeilleContenuExterneEntities",
                             "value": "[concat( 'Server=tcp:sqlguminterne-',  parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-',  parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin',  parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=',  parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework;Authentication=\"Active Directory Password\"')]",
-                            "type": "SQLAzure"
+                            "type": "SQLserver"
                         }
                     ]
                 },
