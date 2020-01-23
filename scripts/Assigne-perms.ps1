@@ -9,10 +9,9 @@ $resourceGroupName = "AppsInterne-rg-$environnement"
 
 # Outbound IP addresses - Logic Apps service & managed connectors voir https://docs.microsoft.com/en-us/azure/logic-apps/logic-apps-limits-and-config#configuration  
 # CanadaCentral
-    $IP_logic_Apps = "13.71.184.150", "13.71.186.1", "40.85.250.135", "40.85.250.212", "40.85.252.47", "52.233.29.92", "52.228.39.241", "52.228.39.244" 
+$IP_logic_Apps = "13.71.184.150", "13.71.186.1", "40.85.250.135", "40.85.250.212", "40.85.252.47", "52.233.29.92", "52.228.39.241", "52.228.39.244" 
 
 # CanadaEast: $IP_logic_Apps = "40.86.203.228", "40.86.216.241", "40.86.217.241", "40.86.226.149", "40.86.228.93", "52.229.120.45", "52.229.126.25", "52.232.128.155"
-
 
 # Mettre les restrictions sur l'app de Veille
 $site = "Veille-" + $Environnement
@@ -94,7 +93,7 @@ $va2065 = @("AllowSoquij, 205.237.253.10, 205.237.253.10"; "AllowAllWindowsAzure
 "Enable Azure Advanced Threat protection"
 Enable-AzureRmSqlServerAdvancedThreatProtection -ServerName "sqlguminterne-$Environnement" -ResourceGroupName "SQLApps-rg-$environnement"
 "Update Azure SQL Database Vulnerability Assessment Settings to weekly"
-Get-azurermsqldatabase -ResourceGroupName "SQLApps-rg-$environnement" -ServerName "sqlguminterne-$environnement" | Where-Object {$_.databaseName -ne "master"} | Update-AzureRmSqlDatabaseVulnerabilityAssessmentSettings -StorageAccountName gumlogs -ScanResultsContainerName vulnerability-assessment -RecurringScansInterval Weekly -EmailAdmins $true -NotificationEmail "ygermain@soquij.qc.ca"
+Get-azurermsqldatabase -ResourceGroupName "SQLApps-rg-$environnement" -ServerName "sqlguminterne-$environnement" | Where-Object {$_.databaseName -ne "master"} | Update-AzureRmSqlDatabaseVulnerabilityAssessmentSetting -StorageAccountName gumlogs -ScanResultsContainerName vulnerability-assessment -RecurringScansInterval Weekly -EmailAdmins $true -NotificationEmail "ygermain@soquij.qc.ca"
 "Set Azure SQL Database Vulnerability Assessment for Firewall baseline"
 Get-AzureRmSqlDatabase -ResourceGroupName "SQLApps-rg-$environnement" -ServerName "sqlguminterne-$Environnement" | where-object {$_.DatabaseName -ne "master"} | Set-AzureRmSqlDatabaseVulnerabilityAssessmentRuleBaseline  -RuleId "va2065" -BaselineResult $va2065
 
