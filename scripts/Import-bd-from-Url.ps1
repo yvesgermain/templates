@@ -83,3 +83,4 @@ $BDs | ForEach-Object {
 
 Write-Output "Exporte variable Op vers C:\temp\Import-$Destination.xml"
 $op | Export-Clixml -Path ( "C:\temp\Import-" + $Destination + ".xml")
+$op
