@@ -102,7 +102,7 @@ $passw = (Get-AzureKeyVaultSecret -VaultName gumkeyvault -name "sqladmin$environ
 $connectionStrings['bd_VeilleContenuExterneEntities'] = @{Type= "SQLServer"; Value= 'Source=sqlguminterne-' + $environnement + '.database.windows.net,1433;Initial Catalog=Veille-'+ $environnement + ';Persist Security Info=False;UserID=sqladmin' + $environnement + ';Password=' + $passw + ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;ConnectionTimeout=30;App=EntityFramework'}
 Set-AzureRmWebApp -ResourceGroupName "appsinterne-rg-$environnement" -name "veille-func-$Environnement" -ConnectionStrings $connectionStrings
 
-<# Creer le baseline pour les regles de firewall
+# Creer le baseline pour les regles de firewall
 $va2065 = @("AllowSoquij, 205.237.253.10, 205.237.253.10"; "AllowAllWindowsAzureIps, 0.0.0.0, 0.0.0.0")
 "Enable Azure Advanced Threat protection"
 Enable-AzureRmSqlServerAdvancedThreatProtection -ServerName "sqlguminterne-$Environnement" -ResourceGroupName "SQLApps-rg-$environnement"
@@ -111,7 +111,7 @@ Enable-AzureRmSqlServerAdvancedThreatProtection -ServerName "sqlguminterne-$Envi
 Get-azurermsqldatabase -ResourceGroupName "SQLApps-rg-$environnement" -ServerName "sqlguminterne-$environnement" | Where-Object {$_.databaseName -ne "master"} | Update-AzureRmSqlDatabaseVulnerabilityAssessmentSettings -StorageAccountName gumlogs -ScanResultsContainerName vulnerability-assessment -RecurringScansInterval Weekly -EmailAdmins $true -NotificationEmail "ygermain@soquij.qc.ca"
 "Set Azure SQL Database Vulnerability Assessment for Firewall baseline"
  Get-AzureRmSqlDatabase -ResourceGroupName "SQLApps-rg-$environnement" -ServerName "sqlguminterne-$Environnement" | where-object {$_.DatabaseName -ne "master"} | Set-AzureRmSqlDatabaseVulnerabilityAssessmentRuleBaseline  -RuleId "va2065" -BaselineResult $va2065
-#>
+
 
 write-output "Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa"
 if ( $Environnement -eq "dev" -or $Environnement -eq "qa" -or $Environnement -eq "devops") {
