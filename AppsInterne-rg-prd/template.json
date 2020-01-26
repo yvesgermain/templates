@@ -20,7 +20,7 @@
         "sites_Veille_name": "[concat('Veille-', parameters('Environnement'))]",
         "sites_AppsInterne_name": "[concat('AppsInterne-', parameters('Environnement'))]",
         "sites_Veille_func_name": "[concat('Veille-func-', parameters('Environnement'))]",
-        "serverfarms_ASP_Standard_name": "[concat('ASP-Standard-', parameters('Environnement'))]",
+        "serverfarms_ASP_Standard_name": "[concat('ASP-AppsStandard-', parameters('Environnement'))]",
         "serverfarms_FunctionApp_name": "[concat('ASP-FunctionApp-', parameters('Environnement'))]",
         "storageAccounts_veillefunc_name": "[concat('storveillefunc', parameters('Environnement'))]",
         "storageAccounts_appsinterne_name": "[concat('storappsinterne', parameters('Environnement'))]",
