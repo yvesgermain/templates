@@ -9,7 +9,18 @@ $resourceGroupName = "gumsite-rg-$environnement"
 $webAppName = "gummaster-$environnement"
 $kuduPath = "/config/imageprocessor/security.config"
 $localPath = "C:\temp\security.config.$Environnement"
-function Get-KuduApiAuthorisationHeaderValue($resourceGroupName, $webAppName, $slotName = $null){
+function Get-AzureRmWebAppPublishingCredentials($resourceGroupName, $webAppName, $slotName = $null) {
+    if ([string]::IsNullOrWhiteSpace($slotName)) {
+        $resourceType = "Microsoft.Web/sites/config"
+        $resourceName = "$webAppName/publishingcredentials"
+    }  else {
+        $resourceType = "Microsoft.Web/sites/slots/config"
+        $resourceName = "$webAppName/$slotName/publishingcredentials"
+    }
+    $publishingCredentials = Invoke-AzureRmResourceAction -ResourceGroupName $resourceGroupName -ResourceType $resourceType -ResourceName $resourceName -Action list -ApiVersion 2015-08-01 -Force
+    return $publishingCredentials
+}
+function Get-KuduApiAuthorisationHeaderValue($resourceGroupName, $webAppName, $slotName = $null) {
     $publishingCredentials = Get-AzureRmWebAppPublishingCredentials $resourceGroupName $webAppName $slotName
     return ("Basic {0}" -f [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $publishingCredentials.Properties.PublishingUserName, $publishingCredentials.Properties.PublishingPassword))))
 }
@@ -53,6 +64,6 @@ function Push-FileToWebApp($resourceGroupName, $webAppName, $slotName = "", $loc
 
 Get-FileFromWebApp -resourceGroupName $resourceGroupName -webAppName  $webAppName -kuduPath $kuduPath -localPath $localPath
 
-(get-content $localPath ).replace("umbracomediaateamdev","storgum$Environnement") | set-content -Path $localPath
+(get-content $localPath ).replace("umbracomediaateamdev", "storgum$Environnement") | set-content -Path $localPath
 
 Push-FileToWebApp -resourceGroupName $resourceGroupName -webAppName  $webAppName -kuduPath $kuduPath -localPath $localPath
