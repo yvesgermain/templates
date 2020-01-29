@@ -6,14 +6,15 @@ param(
 )
 
 $resourceGroupName = "gumsite-rg-$environnement"
-$webAppName = "gummaster-$environnement"
+$webAppNames = "gummaster-$environnement", "gum-$environnement"
 $kuduPath = "/config/imageprocessor/security.config"
 $localPath = "C:\temp\security.config.$Environnement"
 function Get-AzureRmWebAppPublishingCredentials($resourceGroupName, $webAppName, $slotName = $null) {
     if ([string]::IsNullOrWhiteSpace($slotName)) {
         $resourceType = "Microsoft.Web/sites/config"
         $resourceName = "$webAppName/publishingcredentials"
-    }  else {
+    }
+    else {
         $resourceType = "Microsoft.Web/sites/slots/config"
         $resourceName = "$webAppName/$slotName/publishingcredentials"
     }
@@ -62,8 +63,8 @@ function Push-FileToWebApp($resourceGroupName, $webAppName, $slotName = "", $loc
         -ContentType "multipart/form-data"
 }
 
-Get-FileFromWebApp -resourceGroupName $resourceGroupName -webAppName  $webAppName -kuduPath $kuduPath -localPath $localPath
-
-(get-content $localPath ).replace("umbracomediaateamdev", "storgum$Environnement") | set-content -Path $localPath -Encoding utf8
-
-Push-FileToWebApp -resourceGroupName $resourceGroupName -webAppName  $webAppName -kuduPath $kuduPath -localPath $localPath
+foreach ( $webAppName in $webAppNames) { 
+    Get-FileFromWebApp -resourceGroupName $resourceGroupName -webAppName  $webAppName -kuduPath $kuduPath -localPath $localPath
+    (get-content $localPath ).replace("umbracomediaateamdev", "storgum$Environnement") | set-content -Path $localPath -Encoding utf8
+    Push-FileToWebApp -resourceGroupName $resourceGroupName -webAppName  $webAppName -kuduPath $kuduPath -localPath $localPath
+}
