@@ -64,6 +64,6 @@ function Push-FileToWebApp($resourceGroupName, $webAppName, $slotName = "", $loc
 
 Get-FileFromWebApp -resourceGroupName $resourceGroupName -webAppName  $webAppName -kuduPath $kuduPath -localPath $localPath
 
-(get-content $localPath ).replace("umbracomediaateamdev", "storgum$Environnement") | set-content -Path $localPath
+(get-content $localPath ).replace("umbracomediaateamdev", "storgum$Environnement") | set-content -Path $localPath -Encoding utf8
 
 Push-FileToWebApp -resourceGroupName $resourceGroupName -webAppName  $webAppName -kuduPath $kuduPath -localPath $localPath
