@@ -100,8 +100,7 @@ if (!$resourceGroup) {
     }
     Write-Host "Creating resource group '$resourceGroupName' in location '$resourceGroupLocation'";
     New-AzResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation -Tag @{Environnement = $Environnement }
-}
-else {
+}else{
     Write-Host "Using existing resource group '$resourceGroupName'";
 }
 
@@ -109,8 +108,7 @@ else {
 Write-Host "Starting deployment...";
 if (Test-Path $parametersFilePath) {
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath -TemplateParameterFile $parametersFilePath;
-}
-else {
+}else{
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
 }
 
