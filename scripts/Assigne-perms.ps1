@@ -117,7 +117,7 @@ if ( $Environnement -eq "dev" -or $Environnement -eq "qa" -or $Environnement -eq
 # Creer le baseline pour les regles de firewall
 $va2065 = @("AllowSoquij, 205.237.253.10, 205.237.253.10"; "AllowAllWindowsAzureIps, 0.0.0.0, 0.0.0.0")
 "Enable Azure Advanced Threat protection"
-Get-AzureRmSqlServer -name sqlguminterne-qa -ResourceGroupName "sqlguminterne-$Environnement"| Enable-AzureRmSqlServerAdvancedThreatProtection
+Get-AzureRmSqlServer -name sqlguminterne-qa -ResourceGroupName "sqlApps-rg-$Environnement"| Enable-AzureRmSqlServerAdvancedThreatProtection
 "Update Azure SQL Database Vulnerability Assessment Settings to weekly"
 
 Get-azurermsqldatabase -ResourceGroupName "SQLApps-rg-$environnement" -ServerName "sqlguminterne-$environnement" | Where-Object {$_.databaseName -ne "master"} | Update-AzureRmSqlDatabaseVulnerabilityAssessmentSettings -StorageAccountName gumlogs -ScanResultsContainerName vulnerability-assessment -RecurringScansInterval Weekly -EmailAdmins $true -NotificationEmail "ygermain@soquij.qc.ca"
