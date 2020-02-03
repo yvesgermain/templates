@@ -99,7 +99,7 @@ Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConf
 Write-Output "Mettre la Connection String dans l'App Function"
 $connectionStrings = @{}
 $passw = (Get-AzureKeyVaultSecret -VaultName gumkeyvault -name "sqladmin$environnement").secretvaluetext
-$connectionStrings['bd_VeilleContenuExterneEntities'] = @{Type= "SQLServer"; Value= 'Source=sqlguminterne-' + $environnement + '.database.windows.net,1433;Initial Catalog=Veille-'+ $environnement + ';Persist Security Info=False;UserID=sqladmin' + $environnement + ';Password=' + $passw + ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;ConnectionTimeout=30;App=EntityFramework'}
+$connectionStrings['bd_VeilleContenuExterneEntities'] = @{Type= "SQLServer"; Value= 'Server=sqlguminterne-' + $environnement + '.database.windows.net,1433;Initial Catalog=BdVeille-'+ $environnement + ';Persist Security Info=False;UserID=sqladmin' + $environnement + ';Password=' + $passw + ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;ConnectionTimeout=30;App=EntityFramework'}
 Set-AzureRmWebApp -ResourceGroupName "appsinterne-rg-$environnement" -name "veille-func-$Environnement" -ConnectionStrings $connectionStrings
 
 write-output "Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa"

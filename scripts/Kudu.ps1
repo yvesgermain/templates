@@ -1,3 +1,11 @@
+<#
+.Synopsis
+Corriger le fichier dans les apps service par l<interface KUDU
+.DESCRIPTION
+On s'authentifie et on download le fichier security.config que l'on modifie et upload par restAPI
+.EXAMPLE
+.\kudu.ps1 -environnement "dev"
+#>
 param(
     [Parameter(Mandatory = $True)]
     [string]
