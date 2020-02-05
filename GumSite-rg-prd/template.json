@@ -18,7 +18,8 @@
         "sites_gumfrontend_name": "[concat('Gum-', parameters('Environnement'))]",
         "serverfarms_gummaster_name": "[concat('ASP-Standard-', parameters('Environnement'))]",
         "sites_Solrwebapp_name": "[concat('GumSolr-', parameters('Environnement'))]",
-        "serverfarms_gumfrontend_name": "[concat('ASP-FrontEnd-', parameters('Environnement'))]"
+        "serverfarms_gumfrontend_name": "[concat('ASP-FrontEnd-', parameters('Environnement'))]",
+        "serverfarms_gumSolrfrontend_name": "[concat('ASP-SolrFrontEnd-', parameters('Environnement'))]"
     },
     "resources": [
         {
@@ -51,6 +52,24 @@
             "kind": "app",
             "properties": {
                 "name": "[variables('serverfarms_gummaster_name')]",
+                "perSiteScaling": false,
+                "reserved": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },        
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2016-09-01",
+            "name": "[variables('serverfarms_gumSolrfrontend_name')]",
+            "location": "[variables('location')]",
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
+            },
+            "sku": "[if(equals(parameters('Environnement'), 'prd'),json('{\"name\": \"S1\",\"tier\": \"Standard\",\"size\": \"S1\",\"family\": \"S\",\"capacity\": 1}'), json('{\"name\": \"D1\",\"tier\": \"Shared\",\"size\": \"D1\",\"family\": \"D\",\"capacity\": 0}'))]",
+            "kind": "app",
+            "properties": {
+                "name": "[variables('serverfarms_gumSolrfrontend_name')]",
                 "perSiteScaling": false,
                 "reserved": false,
                 "targetWorkerCount": 0,
@@ -439,7 +458,7 @@
             "name": "[variables('sites_Solrwebapp_name')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gumfrontend_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gumSolrfrontend_name'))]"
             ],
             "kind": "app",
             "properties": {
@@ -456,7 +475,7 @@
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[variables('serverfarms_gumfrontend_name')]",
+                "serverFarmId": "[variables('serverfarms_gumSolrfrontend_name')]",
                 "siteConfig": {
                     "appSettings": [
                         {
