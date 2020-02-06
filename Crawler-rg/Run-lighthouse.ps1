@@ -1,7 +1,7 @@
 
 Param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet("dev", "qa", "prd", "devops")]
+    [ValidateSet("dev", "qa", "prd")]
     [string]
     $Environnement 
 )
