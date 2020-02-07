@@ -53,7 +53,6 @@ function Get-FileFromWebApp($resourceGroupName, $webAppName, $slotName = "", $ku
 }
 
 function Push-FileToWebApp($resourceGroupName, $webAppName, $slotName = "", $localPath, $kuduPath) {
-
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
     if ($slotName -eq "") {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
