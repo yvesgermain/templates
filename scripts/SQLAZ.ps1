@@ -1,9 +1,10 @@
 function Add-SQLAccount (
-    [Parameter()]
+    [Parameter(Mandatory = $true)]
     [ValidateSet("dev", "qa", "prd", "devops")]
     [string]
     $Environnement,
     [string] $Account = "Sqladmin",
+    [Parameter(Mandatory = $true)]
     [validateset("BdAppsInterne", "BdVeille", "BdGum")]
     [string] $BD
 ) {
