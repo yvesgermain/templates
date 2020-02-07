@@ -57,7 +57,7 @@
                 "targetWorkerCount": 0,
                 "targetWorkerSizeId": 0
             }
-        },        
+        },
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
@@ -125,18 +125,18 @@
                             "name": "WEBSITE_DISABLE_OVERLAPPED_RECYCLING",
                             "value": "1"
                         },
-                        {
-                            "name": "VeilleDeLien.CodeSource",
-                            "value": "SITEGUM"
-                        },
-                        {
-                            "name": "VeilleDeLien.UrlBase",
-                            "value": "[concat('veille-' , parameters('Environnement'),  '.azurewebsites.net')]"
-                        },
-                        {
-                            "name": "VeilleDeLien.UrlApi",
-                            "value": "[concat('veille-' , parameters('Environnement'), '.azurewebsites.net/api')]"
-                        }, 
+                        {
+                            "name": "VeilleDeLien.CodeSource",
+                            "value": "SITEGUM"
+                        },
+                        {
+                            "name": "VeilleDeLien.UrlBase",
+                            "value": "[concat('veille-',parameters('Environnement'),'.azurewebsites.net')]"
+                        },
+                        {
+                            "name": "VeilleDeLien.UrlApi",
+                            "value": "[concat('veille-',parameters('Environnement'),'.azurewebsites.net/api')]"
+                        },
                         {
                             "name": "Serilog.EnvoyerLogErreurA",
                             "value": "ateam@soquij.qc.ca"
@@ -229,18 +229,18 @@
                             "name": "WEBSITE_DISABLE_OVERLAPPED_RECYCLING",
                             "value": "1"
                         },
-                        {
-                            "name": "VeilleDeLien.CodeSource",
-                            "value": "SITEGUM"
-                        },
-                        {
-                            "name": "VeilleDeLien.UrlBase",
-                            "value": "[concat('veille-' , parameters('Environnement'),  '.azurewebsites.net')]"
-                        },
-                        {
-                            "name": "VeilleDeLien.UrlApi",
-                            "value": "[concat('veille-' , parameters('Environnement'), '.azurewebsites.net/api')]"
-                        }, 
+                        {
+                            "name": "VeilleDeLien.CodeSource",
+                            "value": "SITEGUM"
+                        },
+                        {
+                            "name": "VeilleDeLien.UrlBase",
+                            "value": "[concat('veille-',parameters('Environnement'),'.azurewebsites.net')]"
+                        },
+                        {
+                            "name": "VeilleDeLien.UrlApi",
+                            "value": "[concat('veille-',parameters('Environnement'),'.azurewebsites.net/api')]"
+                        },
                         {
                             "name": "Serilog.EnvoyerLogErreurA",
                             "value": "ateam@soquij.qc.ca"
