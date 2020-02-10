@@ -340,7 +340,9 @@
                 "ipSecurityRestrictions": [
                     {
                         "ipAddress": "205.237.253.10/32",
-                        "name": "Allow_Soquij"
+                        "name": "Allow_Soquij",
+                        "description": "Allow_Soquij",
+                        "priority": "100"
                     }
                 ],
                 "scmIpSecurityRestrictionsUseMain": "true",
@@ -423,7 +425,9 @@
                 "ipSecurityRestrictions": [
                     {
                         "ipAddress": "205.237.253.10/32",
-                        "name": "Allow_Soquij"
+                        "name": "Allow_Soquij",
+                        "description": "Allow_Soquij",
+                        "priority": "100"
                     }
                 ],
                 "scmIpSecurityRestrictionsUseMain": "true",
@@ -500,7 +504,9 @@
                 "ipSecurityRestrictions": [
                     {
                         "ipAddress": "205.237.253.10/32",
-                        "name": "Allow_Soquij"
+                        "name": "Allow_Soquij",
+                        "description": "Allow_Soquij",
+                        "priority": "100"
                     }
                 ],
                 "scmIpSecurityRestrictionsUseMain": "true",

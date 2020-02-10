@@ -1,5 +1,27 @@
 function Add-IpPermsFunc {
-param(
+<#
+ .SYNOPSIS
+    Ajoute les IP qui ont les permissions sur les sites Web
+
+ .DESCRIPTION
+    Modifie les access Resrictions dans l'onglet Networking des sites web avec toutes les addresses
+
+ .EXAMPLE
+    ./Add-IPPermsFunc.ps1 -WebSite AppsInterne -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
+
+ .PARAMETER WebSite
+    Le parametre WebSite est le site que l'on veut modifier en ajoutant les adresses IP 
+
+ .PARAMETER Environnement
+    Le parametre Environnement indique l'Environnement du site web a modifier
+
+ .PARAMETER IPs
+    Un identifiant pour la serie d'adresse ip 
+
+ .PARAMETER Webip_name
+    Le nom descriptif pour la regle a appliquer
+#>
+    param(
     [Parameter(Mandatory = $True)]
     [string]
     [ValidateSet("AppsInterne", "Veille", "Gum", "GumMaster", "GumSolr")] 
@@ -70,11 +92,13 @@ $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
 }
 
 Add-IpPermsFunc -WebSite AppsInterne -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
+Add-IpPermsFunc -WebSite AppsInterne -Environnement $Environnement -Ips AppsInterne -Webip_Name Allow_AppsInterne
 Add-IpPermsFunc -WebSite Veille -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
-Add-IpPermsFunc -WebSite Gum -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
-Add-IpPermsFunc -WebSite GumMaster -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
 Add-IpPermsFunc -WebSite Veille -Environnement $Environnement -Ips AppsInterne -Webip_Name Allow_AppsInterne
 Add-IpPermsFunc -WebSite Veille -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
-Add-IpPermsFunc -WebSite AppsInterne -Environnement $Environnement -Ips AppsInterne -Webip_Name Allow_AppsInterne
 Add-IpPermsFunc -WebSite Gum -Environnement $Environnement -Ips Gum -Webip_Name Allow_GUM
+Add-IpPermsFunc -WebSite Gum -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
+Add-IpPermsFunc -WebSite GumMaster -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
 Add-IpPermsFunc -WebSite GumMaster -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
+Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
+Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
