@@ -40,11 +40,11 @@ function Add-IpPermsFunc {
     
         [Parameter(Mandatory = $True)]
         [string]
-        [ValidateSet( "AppsInterne", "logic_App" , "Gum", "GumMaster")] 
+        [ValidateSet( "AppsInterne", "logic_App" , "Gum", "GumMaster", "GumSolr")] 
         $IPs,
     
         [string] 
-        [ValidateSet("Allow_Logic_App", "Allow_AppsInterne", "Allow_GUM", "Allow_GumMaster")] 
+        [ValidateSet("Allow_Logic_App", "Allow_AppsInterne", "Allow_GUM", "Allow_GumMaster", "Allow_GumSolr")] 
         $Webip_Name
     )
     
@@ -66,6 +66,7 @@ function Add-IpPermsFunc {
         "AppsInterne" {$IP = (Get-AzureRmwebapp -name ("$Ips-$environnement")).OutboundIpAddresses.split(",") }
         "Gum" { $IP = (Get-AzureRmwebapp -name ("$Ips-$environnement")).OutboundIpAddresses.split(",") }
         "GumMaster" { $IP = (Get-AzureRmwebapp -name ("$Ips-$environnement")).OutboundIpAddresses.split(",") }
+        "GumSolr" { $IP = (Get-AzureRmwebapp -name ("$Ips-$environnement")).OutboundIpAddresses.split(",") }
     }
     
     $site = "$WebSite-$environnement"
@@ -96,12 +97,13 @@ function Add-IpPermsFunc {
     Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
     }
     
-    Add-IpPermsFunc -WebSite Gum -Environnement $Environnement -Ips Gum -Webip_Name Allow_GUM
+    Add-IpPermsFunc -WebSite Gum -Environnement $Environnement -Ips Gum -Webip_Name Allow_Gum
     Add-IpPermsFunc -WebSite Gum -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
     Add-IpPermsFunc -WebSite GumMaster -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
     Add-IpPermsFunc -WebSite GumMaster -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
     Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
     Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
+    Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips Gum -Webip_Name Allow_Gum
 
 # Creer le baseline pour les regles de firewall
 $va2065 = @("AllowSoquij, 205.237.253.10, 205.237.253.10"; "AllowAllWindowsAzureIps, 0.0.0.0, 0.0.0.0")

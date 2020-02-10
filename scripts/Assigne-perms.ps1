@@ -97,7 +97,7 @@ function Add-IpPermsFunc {
     }
     $ArrayList | Format-Table -AutoSize
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
-    # Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
+    Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
     }
     
     Add-IpPermsFunc -WebSite AppsInterne -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
