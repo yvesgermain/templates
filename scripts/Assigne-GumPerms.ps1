@@ -152,3 +152,16 @@ function Add-SQLAccount (
 
 Add-SQLAccount -Environnement $Environnement -BD BdGum
 
+write-output "Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa"
+$resourceGroupName = "GumSite-rg-$environnement" 
+
+if ( $Environnement -eq "dev" -or $Environnement -eq "qa" -or $Environnement -eq "devops") {
+    $QA = Get-AzureRmADGroup -SearchString "QA"
+    if (!( get-AzureRmRoleAssignment -ResourceGroupName $resourceGroupName -ObjectId $qa.Id -RoleDefinitionName contributor)) {
+        New-AzureRmRoleAssignment -ObjectId $QA.Id -RoleDefinitionName Contributor -ResourceGroupName $resourceGroupName
+    }
+    $dev = Get-AzureRmADGroup -SearchString "dev"
+    if (!( get-AzureRmRoleAssignment -ResourceGroupName $resourceGroupName -ObjectId $dev.Id -RoleDefinitionName owner)) {
+        New-AzureRmRoleAssignment -ObjectId $dev.Id -RoleDefinitionName Owner -ResourceGroupName $resourceGroupName
+    }
+}
