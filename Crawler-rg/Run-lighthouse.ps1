@@ -11,7 +11,7 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 
 $dir = (Get-ChildItem C:\crawler\*\ControleQualite.App.exe ).directoryname
 Set-Location $dir
-(Get-Content ControleQualite.App.exe.config) -replace('gummaster-(dev|qa|prd)\.azure' , "gummaster-$environnement.azure") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
+(Get-Content ControleQualite.App.exe.config) -replace('gummaster-(dev|qa|prd|devops)\.azure' , "gummaster-$environnement.azure") | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 (Get-Content ControleQualite.App.exe.config ).replace('value="head"','value="headless"') | set-content .\ControleQualite.App.exe.config -Encoding UTF8
 .\ControleQualite.App.exe 
 
