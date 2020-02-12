@@ -10,13 +10,12 @@ param(
     [Parameter(Mandatory = $True)]
     [string]
     [ValidateSet("dev", "qa", "prd", "devops")] 
-    $Environnement
+    $Environnement,
+    [string]
+    [ValidateSet("GUM", "AppsInterne")] 
+    $Domaine
 )
 
-$resourceGroupName = "gumsite-rg-$environnement"
-$webAppNames = "gummaster-$environnement", "gum-$environnement"
-$kuduPath = "config/imageprocessor/security.config"
-$localPath = "C:\temp\security.config.$Environnement"
 function Get-AzureRmWebAppPublishingCredentials($resourceGroupName, $webAppName, $slotName = $null) {
     if ([string]::IsNullOrWhiteSpace($slotName)) {
         $resourceType = "Microsoft.Web/sites/config"
@@ -69,6 +68,17 @@ function Push-FileToWebApp($resourceGroupName, $webAppName, $slotName = "", $loc
         -InFile $localPath `
         -ContentType "multipart/form-data"
 }
+
+# Debut du script
+if ($domaine -like "GUM") {
+$resourceGroupName = "gumsite-rg-$environnement"
+$webAppNames = "gummaster-$environnement", "gum-$environnement"
+} else {
+$resourceGroupName = "AppsInterne-rg-$environnement"
+$webAppNames = "AppsInterne-$environnement"
+}
+$kuduPath = "config/imageprocessor/security.config"
+$localPath = "C:\temp\security.config.$Environnement"
 
 foreach ( $webAppName in $webAppNames) { 
     Get-FileFromWebApp -resourceGroupName $resourceGroupName -webAppName  $webAppName -kuduPath $kuduPath -localPath $localPath
