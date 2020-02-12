@@ -3,7 +3,7 @@ function Add-SQLAccount (
     [ValidateSet("dev", "qa", "prd", "devops")]
     [string]
     $Environnement,
-    [string] $Account = "Sqladmin",
+    [string] $Account = "Sqlrw$environnement",
     [Parameter(Mandatory = $true)]
     [validateset("BdAppsInterne", "BdVeille", "BdGum")]
     [string] $BD

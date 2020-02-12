@@ -118,7 +118,7 @@ function Add-SQLAccount (
     [ValidateSet("dev", "qa", "prd", "devops")]
     [string]
     $Environnement,
-    [string] $Account = "Sqladmin",
+    [string] $Account = "SqlRW$environnement",
     [Parameter(Mandatory = $true)]
     [validateset("BdAppsInterne", "BdVeille", "BdGum")]
     [string] $BD
@@ -126,9 +126,9 @@ function Add-SQLAccount (
 
     if ($BD -like "BdGum") { $server = "sqlgum-$Environnement" } else { $server = "sqlguminterne-$Environnement" }
     $database = $BD + '-' + $environnement
-    $password = (Get-AzureKeyVaultSecret -VaultName gumkeyvault -Name sqladmin$environnement).SecretValueText
+    $password = (Get-AzureKeyVaultSecret -VaultName gumkeyvault -Name sqlrw$environnement).SecretValueText
 
-    $cxnString = "Server=tcp:$server.database.windows.net,1433;Initial Catalog=$database;Persist Security Info=False;User ID=sqladmin$environnement@gumqc.OnMicrosoft.com;Password=$password;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Authentication=`"Active Directory Password`"";
+    $cxnString = "Server=tcp:$server.database.windows.net,1433;Initial Catalog=$database;Persist Security Info=False;User ID=sqlrw$environnement@gumqc.OnMicrosoft.com;Password=$password;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Authentication=`"Active Directory Password`"";
     $querys = "CREATE USER [$account@GUMQC.OnMicrosoft.com] FROM EXTERNAL PROVIDER",
     "ALTER ROLE DB_datareader ADD MEMBER [$account@GUMQC.OnMicrosoft.com]", 
     "ALTER ROLE DB_datawriter ADD MEMBER [$Account@GUMQC.OnMicrosoft.com]"
