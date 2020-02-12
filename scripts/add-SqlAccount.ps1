@@ -5,8 +5,8 @@ param(
     $Environnement, 
     [string] $Account = "Sqlrw$environnement",
     [Parameter(Mandatory = $true)]
-    [validateset("BdAppsInterne", "BdVeille", "BdGum", "All" )]
-    [string] $BD
+    [validateset("AppsInterne", "Gum")]
+    [string] $resourcegroup
 )
 
 function Add-SQLAccount (
@@ -16,15 +16,13 @@ function Add-SQLAccount (
     $Environnement,
     [string] $Account = "Sqlrw$environnement",
     [Parameter(Mandatory = $true)]
-    [validateset("BdAppsInterne", "BdVeille", "BdGum")]
-    [string] $BD
+    [string] $Database, 
+    [string] $server
 ) {
 
-    if ($BD -like "BdGum") { $server = "sqlgum-$Environnement" } else { $server = "sqlguminterne-$Environnement" }
-    $database = $BD + '-' + $environnement
     $password = (Get-AzureKeyVaultSecret -VaultName gumkeyvault -Name sqladmin$environnement).SecretValueText
 
-    $cxnString = "Server=tcp:$server.database.windows.net,1433;Initial Catalog=$database;Persist Security Info=False;User ID=sqladmin$environnement@gumqc.OnMicrosoft.com;Password=$password;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Authentication=`"Active Directory Password`"";
+    $cxnString = "Server=tcp:$server.database.windows.net,1433;Initial Catalog=$Database;Persist Security Info=False;User ID=sqladmin$environnement@gumqc.OnMicrosoft.com;Password=$password;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Authentication=`"Active Directory Password`"";
     $querys = "CREATE USER [$account@GUMQC.OnMicrosoft.com] FROM EXTERNAL PROVIDER",
     "ALTER ROLE DB_datareader ADD MEMBER [$account@GUMQC.OnMicrosoft.com]", 
     "ALTER ROLE DB_datawriter ADD MEMBER [$Account@GUMQC.OnMicrosoft.com]"
@@ -39,6 +37,7 @@ function Add-SQLAccount (
         foreach ( $query in $querys) {
             $query 
             $cmd = New-Object System.Data.SqlClient.SqlCommand($query, $cxn)
+
             $cmd.CommandTimeout = 120
             $cmd.ExecuteScalar()
         }
@@ -46,10 +45,16 @@ function Add-SQLAccount (
     $cxn.Close()
 }
 
-if ($BD -ne "ALL") {
-    "Ajout de SQLRW dans la BD $BD"; 
-    Add-SQLAccount -Environnement $Environnement -bd $BD -Account $account} else {
-        "BdAppsInterne", "BdVeille", "BdGum" | foreach-object  {
-            "Ajout de SQLRW dans la BD $_"; 
-            Add-SQLAccount -Environnement $Environnement -bd $_ -Account $account }
-        }
+if ($Resourcegroup -like "Gum") { 
+    $server = "sqlgum-$Environnement" ; 
+    $databases = "BDGUM-" + $environnement 
+} else {
+    $server = "sqlguminterne-$Environnement";  
+    $databases = ("BdAppsinterne-" + $environnement), ("BdbVeille-" + $Environnement)
+}
+
+Foreach ( $Database in $databases) {
+    "Ajout de SQLRW$Environnement dans la BD $Database"; 
+    Add-SQLAccount -Environnement $Environnement -Database $Database -server $server -Account $account
+}
+
