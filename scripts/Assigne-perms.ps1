@@ -134,6 +134,7 @@ Get-AzureRmSqlServer -name "sqlguminterne-$Environnement" -ResourceGroupName "sq
 Get-azurermsqldatabase -ResourceGroupName "SQLApps-rg-$environnement" -ServerName "sqlguminterne-$environnement" | Where-Object {$_.databaseName -ne "master"} | Update-AzureRmSqlDatabaseVulnerabilityAssessmentSettings -StorageAccountName gumlogs -ScanResultsContainerName vulnerability-assessment -RecurringScansInterval Weekly -EmailAdmins $true -NotificationEmail "ygermain@soquij.qc.ca"
 "Set Azure SQL Database Vulnerability Assessment for Firewall baseline"
 Get-AzureRmSqlDatabase -ResourceGroupName "SQLApps-rg-$environnement" -ServerName "sqlguminterne-$Environnement" | where-object {$_.DatabaseName -ne "master"} | Set-AzureRmSqlDatabaseVulnerabilityAssessmentRuleBaseline  -RuleId "va2065" -BaselineResult $va2065
+<#
 function Add-SQLAccount (
     [Parameter(Mandatory = $true)]
     [ValidateSet("dev", "qa", "prd", "devops")]
@@ -173,3 +174,4 @@ function Add-SQLAccount (
 
 Add-SQLAccount -Environnement $Environnement -BD BdVeille 
 Add-SQLAccount -Environnement $Environnement -BD BdAppsInterne
+ #>

@@ -113,6 +113,7 @@ Enable-AzureRmSqlServerAdvancedThreatProtection -ServerName "sqlgum-$Environneme
 get-azurermsqldatabase -ResourceGroupName "gumsql-rg-$environnement" -ServerName "sqlgum-$environnement" | Where-Object { $_.databaseName -ne "master" } | Update-AzureRmSqlDatabaseVulnerabilityAssessmentSettings -StorageAccountName gumlogs -ScanResultsContainerName vulnerability-assessment -RecurringScansInterval Weekly -EmailAdmins $true -NotificationEmail "ygermain@soqui.qc.ca"
 Get-AzureRmSqlDatabase -ResourceGroupName "gumsql-rg-$environnement" -ServerName sqlgum-$Environnement | where-object { $_.DatabaseName -ne "master" } | Set-AzureRmSqlDatabaseVulnerabilityAssessmentRuleBaseline  -RuleId "va2065" -BaselineResult $va2065
 
+<#
 function Add-SQLAccount (
     [Parameter(Mandatory = $true)]
     [ValidateSet("dev", "qa", "prd", "devops")]
@@ -151,6 +152,7 @@ function Add-SQLAccount (
 }
 
 Add-SQLAccount -Environnement $Environnement -BD BdGum
+#>
 
 write-output "Donner les droits aux groupes Dev et QA sur les resources groups ***-dev et **-qa"
 $resourceGroupName = "GumSite-rg-$environnement" 
