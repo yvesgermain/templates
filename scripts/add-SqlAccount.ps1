@@ -1,3 +1,14 @@
+param(
+    [Parameter(Mandatory = $True)]
+    [string]
+    [ValidateSet("dev", "qa", "prd", "devops")] 
+    $Environnement, 
+    [string] $Account = "Sqlrw$environnement",
+    [Parameter(Mandatory = $true)]
+    [validateset("BdAppsInterne", "BdVeille", "BdGum", "All" )]
+    [string] $BD
+)
+
 function Add-SQLAccount (
     [Parameter(Mandatory = $true)]
     [ValidateSet("dev", "qa", "prd", "devops")]
@@ -34,3 +45,11 @@ function Add-SQLAccount (
     }
     $cxn.Close()
 }
+
+if ($BD -ne "ALL") {
+    "Ajout de SQLRW dans la BD $BD"; 
+    Add-SQLAccount -Environnement $Environnement -bd $BD -Account $account} else {
+        "BdAppsInterne", "BdVeille", "BdGum" | foreach-object  {
+            "Ajout de SQLRW dans la BD $_"; 
+            Add-SQLAccount -Environnement $Environnement -bd $_ -Account $account }
+        }

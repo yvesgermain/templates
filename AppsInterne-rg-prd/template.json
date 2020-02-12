@@ -589,7 +589,7 @@
                             "type": "Http",
                             "inputs": {
                                 "method": "GET",
-                                "uri": "[concat('https://appsinterne-', parameters('Environnement'), '.azurewebsites.net/Umbraco/Api/VeilleDeLien/ExporterLiensRecensesVersAppVeilleContenu')]"
+                                "uri": "[concat('https://gummaster-', parameters('Environnement'), '.azurewebsites.net/Umbraco/Api/VeilleDeLien/ExporterLiensRecensesVersAppVeilleContenu')]"
                             }
                         }
                     }
