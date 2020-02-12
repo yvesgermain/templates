@@ -6,15 +6,6 @@ On s'authentifie et on download le fichier security.config que l'on modifie et u
 .EXAMPLE
 .\kudu.ps1 -environnement "dev"
 #>
-param(
-    [Parameter(Mandatory = $True)]
-    [string]
-    [ValidateSet("dev", "qa", "prd", "devops")] 
-    $Environnement,
-    [string]
-    [ValidateSet("GUM", "AppsInterne")] 
-    $Domaine
-)
 
 function Get-AzureRmWebAppPublishingCredentials($resourceGroupName, $webAppName, $slotName = $null) {
     if ([string]::IsNullOrWhiteSpace($slotName)) {
