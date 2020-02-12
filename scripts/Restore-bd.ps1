@@ -11,12 +11,12 @@
 #>
 Param(
 
-    [ValidateSet("dev", "qa", "prd", "devops")]
+    [ValidateSet("dev", "qa", "prd", "devops", "stage")]
     [string]
     $Source,
 
     [Parameter(Mandatory = $True)]
-    [ValidateSet("dev", "qa", "prd", "devops")]
+    [ValidateSet("dev", "qa", "prd", "devops", "stage")]
     [string]
     $Destination,
 
