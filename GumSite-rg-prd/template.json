@@ -10,9 +10,6 @@
         },
         "AdminPassword": {
             "type": "securestring"
-        },
-        "SQLRWPassword": {
-                "type": "securestring"
         }
     },
     "variables": {
@@ -51,7 +48,7 @@
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
             },
-            "sku": "[if(equals(parameters('Environnement'), 'prd'),json('{\"name\":\"B1\",\"tier\":\"Basic\",\"size\":\"B1\",\"family\":\"B\",\"capacity\": 1}'), json('{\"name\": \"D1\",\"tier\": \"Shared\",\"size\": \"D1\",\"family\": \"D\",\"capacity\": 0}'))]",
+            "sku": "[if(equals(parameters('Environnement'), 'prd'),json('{\"name\": \"S1\",\"tier\": \"Standard\",\"size\": \"S1\",\"family\": \"S\",\"capacity\": 1}'), json('{\"name\": \"D1\",\"tier\": \"Shared\",\"size\": \"D1\",\"family\": \"D\",\"capacity\": 0}'))]",
             "kind": "app",
             "properties": {
                 "name": "[variables('serverfarms_gummaster_name')]",
@@ -134,11 +131,11 @@
                         },
                         {
                             "name": "VeilleDeLien.UrlBase",
-                            "value": "[concat('https://veille-',parameters('Environnement'),'.azurewebsites.net/')]"
+                            "value": "[concat('veille-',parameters('Environnement'),'.azurewebsites.net')]"
                         },
                         {
                             "name": "VeilleDeLien.UrlApi",
-                            "value": "[concat('https://veille-',parameters('Environnement'),'.azurewebsites.net/api/')]"
+                            "value": "[concat('veille-',parameters('Environnement'),'.azurewebsites.net/api')]"
                         },
                         {
                             "name": "Serilog.EnvoyerLogErreurA",
@@ -168,7 +165,7 @@
                     "connectionStrings": [
                         {
                             "name": "umbracoDbDSN",
-                            "connectionString": "[concat('Server=tcp:SqlGum-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdGum-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqlrw', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('SQLRWPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\"')]",
+                            "connectionString": "[concat('Server=tcp:SqlGum-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdGum-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\"')]",
                             "type": "SQLAzure"
                         }
                     ]
@@ -238,11 +235,11 @@
                         },
                         {
                             "name": "VeilleDeLien.UrlBase",
-                            "value": "[concat('https://veille-',parameters('Environnement'),'.azurewebsites.net/')]"
+                            "value": "[concat('veille-',parameters('Environnement'),'.azurewebsites.net')]"
                         },
                         {
                             "name": "VeilleDeLien.UrlApi",
-                            "value": "[concat('https://veille-',parameters('Environnement'),'.azurewebsites.net/api/')]"
+                            "value": "[concat('veille-',parameters('Environnement'),'.azurewebsites.net/api')]"
                         },
                         {
                             "name": "Serilog.EnvoyerLogErreurA",
@@ -272,7 +269,7 @@
                     "connectionStrings": [
                         {
                             "name": "umbracoDbDSN",
-                            "connectionString": "[concat('Server=tcp:SqlGum-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdGum-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqlrw', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('SQLRWPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\"')]",
+                            "connectionString": "[concat('Server=tcp:SqlGum-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdGum-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\"')]",
                             "type": "SQLAzure"
                         }
                     ]
@@ -354,22 +351,23 @@
                 },
                 "localMySqlEnabled": "false",
                 "managedServiceIdentityId": "1284",
-                 "ipSecurityRestrictions": "[if(equals(parameters('Environnement'), 'prd'),json('[{
-                        \"ipAddress\": \"205.237.253.10/32\",
-                        \"name\": \"Allow_Soquij\",
-                        \"description\": \"Allow_Soquij\",
-                        \"priority\": 100
-                    },{
-                        \"ipAddress\": \"207.115.104.2/32\",
-                        \"name\": \"Allow_ADHoc\",
-                        \"description\": \"Allow_ADHoc pour test temporaire jusqu''au 20 fevrier 2020\",
-                        \"priority\": 150
-                    }]'),json('{ [
-                        \"ipAddress\": \"205.237.253.10/32\",
-                        \"name\": \"Allow_Soquij\",
-                        \"description\": \"Allow_Soquij\",
-                        \"priority\": 100
-                    ]}'))]",
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "205.237.253.10/32",
+                        "name": "AllowSoquij",
+                        "description": "AllowSoquij",
+                        "priority": "100"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": "true",
+                "http20Enabled": "true",
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": "0",
+                "fileChangeAuditEnabled": "false"
+            }
+        },
+        {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
             "name": "[concat(variables('sites_gummaster_name'), '/web')]",
@@ -439,8 +437,8 @@
                 "ipSecurityRestrictions": [
                     {
                         "ipAddress": "205.237.253.10/32",
-                        "name": "Allow_Soquij",
-                        "description": "Allow_Soquij",
+                        "name": "AllowSoquij",
+                        "description": "AllowSoquij",
                         "priority": "100"
                     }
                 ],
@@ -588,9 +586,7 @@
                 "ipSecurityRestrictions": [
                     {
                         "ipAddress": "205.237.253.10/32",
-                        "name": "Allow_Soquij",
-                        "description": "Allow_Soquij",
-                        "priority": "100"
+                        "name": "Allow_Soquij"
                     }
                 ],
                 "scmIpSecurityRestrictionsUseMain": "true",
