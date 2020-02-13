@@ -50,7 +50,7 @@ if ($Resourcegroup -like "Gum") {
     $databases = "BDGUM-" + $environnement 
 } else {
     $server = "sqlguminterne-$Environnement";  
-    $databases = ("BdAppsinterne-" + $environnement), ("BdbVeille-" + $Environnement)
+    $databases = ("BdAppsinterne-" + $environnement), ("BdVeille-" + $Environnement)
 }
 
 Foreach ( $Database in $databases) {

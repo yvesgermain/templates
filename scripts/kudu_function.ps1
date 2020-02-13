@@ -28,3 +28,4 @@ Foreach ($webappname in $webappnames) {
             Read-FilesFromWebApp -resourceGroupName $resourceGroupName -webAppName $webAppName -kuduPath $("$kuduPath$name") -localPath $("$localPath$webappname\$name") }
     }
 }
+
