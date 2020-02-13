@@ -3,6 +3,7 @@ param(
     [string]
     [ValidateSet("dev", "qa", "prd", "devops")] 
     $environnement,
+    [Parameter(Mandatory = $True)]
     [string]
     [ValidateSet("Gum","gummaster", "AppsInterne")] 
     $web,
@@ -17,5 +18,6 @@ $Result = try { Read-FilesFromWebApp -resourceGroupName $resourceGroupName -webA
 if (!$Result) {
     $Result | ForEach-Object {
         $name = $_.name;
-        Get-FileFromWebApp -resourceGroupName $resourceGroupName -webAppName $webAppName -kuduPath $("$kuduPath$name") -localPath $("$localPath\$webappname\$name") }
+        if (!( Test-path "$localPath$webappname\" )) {mkdir "$localPath$webappname"}
+        Read-FilesFromWebApp -resourceGroupName $resourceGroupName -webAppName $webAppName -kuduPath $("$kuduPath$name") -localPath $("$localPath$webappname\$name") }
 }

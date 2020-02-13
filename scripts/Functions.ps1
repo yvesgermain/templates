@@ -57,6 +57,7 @@ function Read-FilesFromWebApp($resourceGroupName, $webAppName, $slotName = "", $
     Invoke-RestMethod -Uri $kuduApiUrl `
         -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
         -Method GET `
+        -OutFile $localPath `
         -ContentType "multipart/form-data" 
 }
 
