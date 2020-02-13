@@ -51,7 +51,7 @@
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
             },
-            "sku": "[if(equals(parameters('Environnement'), 'prd'),json('{\"name\": \"S1\",\"tier\": \"Standard\",\"size\": \"S1\",\"family\": \"S\",\"capacity\": 1}'), json('{\"name\": \"D1\",\"tier\": \"Shared\",\"size\": \"D1\",\"family\": \"D\",\"capacity\": 0}'))]",
+            "sku": "[if(equals(parameters('Environnement'), 'prd'),json('{\"name\":\"B1\",\"tier\":\"Basic\",\"size\":\"B1\",\"family\":\"B\",\"capacity\": 1}'), json('{\"name\": \"D1\",\"tier\": \"Shared\",\"size\": \"D1\",\"family\": \"D\",\"capacity\": 0}'))]",
             "kind": "app",
             "properties": {
                 "name": "[variables('serverfarms_gummaster_name')]",
@@ -354,28 +354,22 @@
                 },
                 "localMySqlEnabled": "false",
                 "managedServiceIdentityId": "1284",
-                "ipSecurityRestrictions": [
-                    {
-                        "ipAddress": "205.237.253.10/32",
-                        "name": "Allow_Soquij",
-                        "description": "Allow_Soquij",
-                        "priority": "100"
+                 "ipSecurityRestrictions": "[if(equals(parameters('Environnement'), 'prd'),json('[{
+                        \"ipAddress\": \"205.237.253.10/32\",
+                        \"name\": \"Allow_Soquij\",
+                        \"description\": \"Allow_Soquij\",
+                        \"priority\": 100
                     },{
-                        "ipAddress": "207.115.104.2/32",
-                        "name": "Allow_ADHoc",
-                        "description": "Allow_ADHoc pour test temporaire jusqu'au 20 fevrier 2020",
-                        "priority": "150"
-                    }
-                ],
-                "scmIpSecurityRestrictionsUseMain": "true",
-                "http20Enabled": "true",
-                "minTlsVersion": "1.2",
-                "ftpsState": "AllAllowed",
-                "reservedInstanceCount": "0",
-                "fileChangeAuditEnabled": "false"
-            }
-        },
-        {
+                        \"ipAddress\": \"207.115.104.2/32\",
+                        \"name\": \"Allow_ADHoc\",
+                        \"description\": \"Allow_ADHoc pour test temporaire jusque 20 fevrier 2020\",
+                        \"priority\": 150
+                    }]'),json('{ [
+                        \"ipAddress\": \"205.237.253.10/32\",
+                        \"name\": \"Allow_Soquij\",
+                        \"description\": \"Allow_Soquij\",
+                        \"priority\": 100
+                    ]}'))]",
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
             "name": "[concat(variables('sites_gummaster_name'), '/web')]",
