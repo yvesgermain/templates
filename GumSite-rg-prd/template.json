@@ -360,6 +360,11 @@
                         "name": "Allow_Soquij",
                         "description": "Allow_Soquij",
                         "priority": "100"
+                    },{
+                        "ipAddress": "207.115.104.2/32",
+                        "name": "Allow_ADHoc",
+                        "description": "Allow_ADHoc pour test temporaire jusqu'au 20 fevrier 2020",
+                        "priority": "150"
                     }
                 ],
                 "scmIpSecurityRestrictionsUseMain": "true",
