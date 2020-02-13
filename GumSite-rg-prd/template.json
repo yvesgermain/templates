@@ -362,7 +362,7 @@
                     },{
                         \"ipAddress\": \"207.115.104.2/32\",
                         \"name\": \"Allow_ADHoc\",
-                        \"description\": \"Allow_ADHoc pour test temporaire jusque 20 fevrier 2020\",
+                        \"description\": \"Allow_ADHoc pour test temporaire jusqu''au 20 fevrier 2020\",
                         \"priority\": 150
                     }]'),json('{ [
                         \"ipAddress\": \"205.237.253.10/32\",
