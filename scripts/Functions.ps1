@@ -1,10 +1,10 @@
 <#
 .Synopsis
-Corriger le fichier dans les apps service par l<interface KUDU
+Pour charger les functions pour KUDU
 .DESCRIPTION
-On s'authentifie et on download le fichier security.config que l'on modifie et upload par restAPI
+Permet de garder dans un seul script tous les fonctions pour restAPI
 .EXAMPLE
-.\kudu.ps1 -environnement "dev"
+. .\functions.ps1 -environnement "dev"
 #>
 
 function Get-AzureRmWebAppPublishingCredentials($resourceGroupName, $webAppName, $slotName = $null) {
@@ -57,7 +57,7 @@ function Read-FilesFromWebApp($resourceGroupName, $webAppName, $slotName = "", $
     Invoke-RestMethod -Uri $kuduApiUrl `
         -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
         -Method GET `
-        -ContentType "multipart/form-data"
+        -ContentType "multipart/form-data" 
 }
 
 function Push-FileToWebApp($resourceGroupName, $webAppName, $slotName = "", $localPath, $kuduPath) {
