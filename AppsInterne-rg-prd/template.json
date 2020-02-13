@@ -26,8 +26,7 @@
         "serverfarms_ASP_Standard_name": "[concat('ASP-AppsStandard-', parameters('Environnement'))]",
         "serverfarms_FunctionApp_name": "[concat('ASP-FunctionApp-', parameters('Environnement'))]",
         "storageAccounts_veillefunc_name": "[concat('storveillefunc', parameters('Environnement'))]",
-        "storageAccounts_appsinterne_name": "[concat('storappsinterne', parameters('Environnement'))]",
-        "ExportationDesLiensRecensesVersAppVeille": "[concat('ExportationDesLiensRecensesVersAppVeille-', parameters('Environnement'))]"
+        "storageAccounts_appsinterne_name": "[concat('storappsinterne', parameters('Environnement'))]"
     },
     "resources": [
         {
@@ -560,44 +559,6 @@
             "properties": {
                 "siteName": "[concat('veille-' , parameters('Environnement'))]",
                 "hostNameType": "Verified"
-            }
-        },
-        {
-            "type": "Microsoft.Logic/workflows",
-            "apiVersion": "2017-07-01",
-            "name": "[variables('ExportationDesLiensRecensesVersAppVeille')]",
-            "location": "[variables('location')]",
-            "properties": {
-                "state": "Enabled",
-                "definition": {
-                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-                    "contentVersion": "1.0.0.0",
-                    "parameters": {
-                    },
-                    "triggers": {
-                        "Recurrence": {
-                            "recurrence": {
-                                "frequency": "Day",
-                                "interval": 1,
-                                "startTime": "2019-10-03T00:00:00Z"
-                            },
-                            "type": "Recurrence",
-                            "inputs": {
-                            }
-                        }
-                    },
-                    "actions": {
-                        "HTTP": {
-                            "runAfter": {
-                            },
-                            "type": "Http",
-                            "inputs": {
-                                "method": "GET",
-                                "uri": "[concat('https://gummaster-', parameters('Environnement'), '.azurewebsites.net/Umbraco/Api/VeilleDeLien/ExporterLiensRecensesVersAppVeilleContenu')]"
-                            }
-                        }
-                    }
-                }
             }
         }
     ],
