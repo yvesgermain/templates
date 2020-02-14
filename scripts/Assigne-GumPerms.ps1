@@ -27,7 +27,7 @@ function Add-IpPermsFunc {
      .PARAMETER Webip_name
         Le nom descriptif pour la regle a appliquer
     #>
-        param(
+    param(
         [Parameter(Mandatory = $True)]
         [string]
         [ValidateSet("AppsInterne", "Veille", "Gum", "GumMaster", "GumSolr")] 
@@ -62,8 +62,8 @@ function Add-IpPermsFunc {
     }
     
     switch ($IPs) {
-        "Logic_App" {$IP = $IP_logic_Apps}
-        "AppsInterne" {$IP = (Get-AzureRmwebapp -name ("$Ips-$environnement")).OutboundIpAddresses.split(",") }
+        "Logic_App" { $IP = $IP_logic_Apps }
+        "AppsInterne" { $IP = (Get-AzureRmwebapp -name ("$Ips-$environnement")).OutboundIpAddresses.split(",") }
         "Gum" { $IP = (Get-AzureRmwebapp -name ("$Ips-$environnement")).OutboundIpAddresses.split(",") }
         "GumMaster" { $IP = (Get-AzureRmwebapp -name ("$Ips-$environnement")).OutboundIpAddresses.split(",") }
         "GumSolr" { $IP = (Get-AzureRmwebapp -name ("$Ips-$environnement")).OutboundIpAddresses.split(",") }
@@ -75,7 +75,7 @@ function Add-IpPermsFunc {
     
     $APIVersion = ((Get-AzureRmResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
     $WebAppConfig = (Get-AzureRmResource -ResourceType Microsoft.Web/sites/config -ResourceName $site -ResourceGroupName $resourceGroupName -ApiVersion $APIVersion)
-    $priority = ($WebAppConfig.Properties.ipsecurityrestrictions.priority | Where-Object {$_ -lt 6500} | Sort-Object )[-1];
+    $priority = ($WebAppConfig.Properties.ipsecurityrestrictions.priority | Where-Object { $_ -lt 6500 } | Sort-Object )[-1];
     
     [System.Collections.ArrayList]$ArrayList = $WebAppConfig.Properties.ipsecurityrestrictions;
     
@@ -95,13 +95,13 @@ function Add-IpPermsFunc {
     $ArrayList | Format-Table -AutoSize
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
     Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
-    }
-    "Ajout des addresses ip sur Allow_Gum sur Environnement $Environnement pour site Gum-$Environnement"
-    Add-IpPermsFunc -WebSite Gum -Environnement $Environnement -Ips Gum -Webip_Name Allow_Gum
-    "Ajout des addresses ip sur Allow_GumMaster sur Environnement $Environnement pour site GumMaster-$Environnement"
-    Add-IpPermsFunc -WebSite GumMaster -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
-    Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
-    Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips Gum -Webip_Name Allow_Gum
+}
+"Ajout des addresses ip sur Allow_Gum sur Environnement $Environnement pour site Gum-$Environnement"
+Add-IpPermsFunc -WebSite Gum -Environnement $Environnement -Ips Gum -Webip_Name Allow_Gum
+"Ajout des addresses ip sur Allow_GumMaster sur Environnement $Environnement pour site GumMaster-$Environnement"
+Add-IpPermsFunc -WebSite GumMaster -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
+Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
+Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips Gum -Webip_Name Allow_Gum
 
 # Creer le baseline pour les regles de firewall
 $va2065 = @("AllowSoquij, 205.237.253.10, 205.237.253.10"; "AllowAllWindowsAzureIps, 0.0.0.0, 0.0.0.0")
