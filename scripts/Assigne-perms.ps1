@@ -103,6 +103,9 @@ function Add-IpPermsFunc {
     Add-IpPermsFunc -WebSite AppsInterne -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
     Add-IpPermsFunc -WebSite AppsInterne -Environnement $Environnement -Ips AppsInterne -Webip_Name Allow_AppsInterne
     Add-IpPermsFunc -WebSite Veille -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
+    Add-IpPermsFunc -WebSite GumMaster -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
+    Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
+    Add-IpPermsFunc -WebSite Gum -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
     Add-IpPermsFunc -WebSite Veille -Environnement $Environnement -Ips AppsInterne -Webip_Name Allow_AppsInterne
     Add-IpPermsFunc -WebSite Veille -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
 

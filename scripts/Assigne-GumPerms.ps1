@@ -98,10 +98,7 @@ function Add-IpPermsFunc {
     }
     
     Add-IpPermsFunc -WebSite Gum -Environnement $Environnement -Ips Gum -Webip_Name Allow_Gum
-    Add-IpPermsFunc -WebSite Gum -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
-    Add-IpPermsFunc -WebSite GumMaster -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
     Add-IpPermsFunc -WebSite GumMaster -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
-    Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
     Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
     Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips Gum -Webip_Name Allow_Gum
 
