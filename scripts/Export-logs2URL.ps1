@@ -32,9 +32,9 @@ Foreach ($webappname in $webappnames) {
 } else {"Rien a sauver!" }
 
 $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
-$key = (Get-AzStorageAccountKey -Name gumbackups -ResourceGroupName Infrastructure )[0].value
-$context = Get-AzStorageAccount -Name gumbackups -ResourceGroupName infrastructure
+$key = (Get-AzStorageAccountKey -Name gumlogs -ResourceGroupName Infrastructure )[0].value
+$context = Get-AzStorageAccount -Name gumlogs -ResourceGroupName infrastructure
 [string] $Container = "$webappname$(get-date -Format `"yyyy-MM-dd`")".ToLower()
 New-AzStorageContainer -Context $context.context -Name $Container
 
-& $AzCopyPath /Source:"$localPath$webappname" /Dest:"https://gumbackups.blob.core.windows.net/$Container" /DestKey:$key /S
+& $AzCopyPath /Source:"$localPath$webappname" /Dest:"https://gumlogs.blob.core.windows.net/$Container" /DestKey:$key /S
