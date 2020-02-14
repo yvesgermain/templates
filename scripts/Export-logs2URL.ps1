@@ -28,8 +28,8 @@ Foreach ($webappname in $webappnames) {
             if (!( Test-path "$localPath$webappname\" )) { mkdir "$localPath$webappname" }
             "Copying $name in $localPath$webappname"
             Read-FilesFromWebApp -resourceGroupName $resourceGroupName -webAppName $webAppName -kuduPath $("$kuduPath$name") -localPath $("$localPath$webappname\$name") }
-    }
-} else {"Rien a sauver!" }
+    } else {"Rien a sauver!"}
+} 
 
 $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 $key = (Get-AzStorageAccountKey -Name gumlogs -ResourceGroupName Infrastructure )[0].value
