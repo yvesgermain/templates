@@ -96,8 +96,9 @@ function Add-IpPermsFunc {
     $WebAppConfig.properties.ipSecurityRestrictions = $ArrayList
     Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
     }
-    
+    "Ajout des addresses ip sur Allow_Gum sur Environnement $Environnement pour site Gum-$Environnement"
     Add-IpPermsFunc -WebSite Gum -Environnement $Environnement -Ips Gum -Webip_Name Allow_Gum
+    "Ajout des addresses ip sur Allow_GumMaster sur Environnement $Environnement pour site GumMaster-$Environnement"
     Add-IpPermsFunc -WebSite GumMaster -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
     Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster
     Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips Gum -Webip_Name Allow_Gum

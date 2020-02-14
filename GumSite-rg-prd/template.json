@@ -132,11 +132,11 @@
                         },
                         {
                             "name": "VeilleDeLien.UrlBase",
-                            "value": "[concat('veille-',parameters('Environnement'),'.azurewebsites.net')]"
+                            "value": "[concat('https://veille-',parameters('Environnement'),'.azurewebsites.net/')]"
                         },
                         {
                             "name": "VeilleDeLien.UrlApi",
-                            "value": "[concat('veille-',parameters('Environnement'),'.azurewebsites.net/api')]"
+                            "value": "[concat('https://veille-',parameters('Environnement'),'.azurewebsites.net/api/')]"
                         },
                         {
                             "name": "Serilog.EnvoyerLogErreurA",
@@ -643,7 +643,7 @@
                             "type": "Http",
                             "inputs": {
                                 "method": "GET",
-                                "uri": "[concat('https://gummaster-', parameters('Environnement'), '.azurewebsites.net/Umbraco/Api/VeilleDeLien/ExporterLiensRecensesVersAppVeilleContenu')]"
+                                "uri": "[concat('https://gummaster-', parameters('Environnement'), '.azurewebsites.net/Umbraco/Api/VeilleDeLien/ExporterLiensExternesVersAppVeilleContenu')]"
                             }
                         }
                     }
