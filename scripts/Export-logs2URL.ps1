@@ -21,6 +21,8 @@ else {
 
 $kudupath = 'App_Data/Logs/' ; 
 $localpath = "c:\temp\logskudu\"; 
+
+if (! (Test-Path $localpath )) {mkdir $localpath}
 Foreach ($webappname in $webappnames) {
     $Result = try { Get-FileFromWebApp -resourceGroupName $resourceGroupName -webAppName $webAppName -kuduPath $kuduPath } catch [System.SystemException] { }; 
     if ($Result) {
@@ -44,3 +46,5 @@ if (! (New-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAcc
 }
 
 & $AzCopyPath /Source:"$localPath$webappname" /Dest:"https://gumlogs.blob.core.windows.net/$Container" /DestKey:$key /S /Y
+
+remove-item $localpath -Recurse -Force -Confirm:$false
