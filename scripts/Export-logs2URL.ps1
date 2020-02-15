@@ -26,7 +26,7 @@ Foreach ($webappname in $webappnames) {
         $Result | ForEach-Object {
             $name = $_.name;
             if (!( Test-path "$localPath$webappname\" )) { mkdir "$localPath$webappname" }
-            "Copying $name in $localPath$webappname"
+            # Copying $name in $localPath$webappname
             Read-FilesFromWebApp -resourceGroupName $resourceGroupName -webAppName $webAppName -kuduPath $("$kuduPath$name") -localPath $("$localPath$webappname\$name") }
     } else {"Rien a sauver!"}
 } 
