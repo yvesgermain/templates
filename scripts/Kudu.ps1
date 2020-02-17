@@ -91,15 +91,17 @@ function Push-FileToWebApp($resourceGroupName, $webAppName, $slotName = "", $loc
 if ($domaine -like "GUM") {
 $resourceGroupName = "gumsite-rg-$environnement"
 $webAppNames = "gummaster-$environnement", "gum-$environnement"
+$storage= "storgum$environnement"
 } else {
 $resourceGroupName = "AppsInterne-rg-$environnement"
 $webAppNames = "AppsInterne-$environnement"
+$storage = "appsinterne$environnement"
 }
 $kuduPath = "config/imageprocessor/security.config"
 $localPath = "C:\temp\security.config.$Environnement"
 
 foreach ( $webAppName in $webAppNames) { 
     Get-FileFromWebApp -resourceGroupName $resourceGroupName -webAppName  $webAppName -kuduPath $kuduPath -localPath $localPath
-    (get-content $localPath ).replace("umbracomediaateamdev", "storgum$Environnement") | set-content -Path $localPath -Encoding utf8
+    (get-content $localPath ).replace("umbracomediaateamdev", $storage) | set-content -Path $localPath -Encoding utf8
     Push-FileToWebApp -resourceGroupName $resourceGroupName -webAppName  $webAppName -kuduPath $kuduPath -localPath $localPath
 }
