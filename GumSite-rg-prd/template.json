@@ -20,7 +20,7 @@
         "sites_Solrwebapp_name": "[concat('GumSolr-', parameters('Environnement'))]",
         "serverfarms_gumfrontend_name": "[concat('ASP-FrontEnd-', parameters('Environnement'))]",
         "serverfarms_gumSolrfrontend_name": "[concat('ASP-SolrFrontEnd-', parameters('Environnement'))]",
-        "ExportationDesLiensRecensesVersAppVeille": "[concat('ExportationDesLiensRecensesVersAppVeille-', parameters('Environnement'))]"
+        "ExportationDesLiensVersAppVeille": "[concat('ExportationDesLiensVersAppVeille-', parameters('Environnement'))]"
     },
     "resources": [
         {
@@ -615,7 +615,7 @@
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[variables('ExportationDesLiensRecensesVersAppVeille')]",
+            "name": "[variables('ExportationDesLiensVersAppVeille')]",
             "location": "[variables('location')]",
             "properties": {
                 "state": "Enabled",
@@ -629,7 +629,7 @@
                             "recurrence": {
                                 "frequency": "Day",
                                 "interval": 1,
-                                "startTime": "2019-10-03T00:00:00Z"
+                                "startTime": "2019-10-03T12:00:00Z"
                             },
                             "type": "Recurrence",
                             "inputs": {
