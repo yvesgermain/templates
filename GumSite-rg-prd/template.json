@@ -236,11 +236,11 @@
                         },
                         {
                             "name": "VeilleDeLien.UrlBase",
-                            "value": "[concat('veille-',parameters('Environnement'),'.azurewebsites.net')]"
+                            "value": "[concat('https://veille-',parameters('Environnement'),'.azurewebsites.net/')]"
                         },
                         {
                             "name": "VeilleDeLien.UrlApi",
-                            "value": "[concat('veille-',parameters('Environnement'),'.azurewebsites.net/api')]"
+                            "value": "[concat('https://veille-',parameters('Environnement'),'.azurewebsites.net/api/')]"
                         },
                         {
                             "name": "Serilog.EnvoyerLogErreurA",
