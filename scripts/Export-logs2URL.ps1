@@ -21,9 +21,9 @@ else {
 
 $kudupath = 'App_Data/Logs/' ; 
 $localpath = "c:\temp\logskudu\"; 
-remove-item $localpath -Recurse -Force -Confirm:$false
+if ( Test-path $localpath) {remove-item $localpath -Recurse -Force -Confirm:$false }
 mkdir $localpath
-if (! (Test-Path $localpath )) {mkdir $localpath}
+
 Foreach ($webappname in $webappnames) {
     $Result = try { Get-FileFromWebApp -resourceGroupName $resourceGroupName -webAppName $webAppName -kuduPath $kuduPath } catch [System.SystemException] { }; 
     if ($Result) {
