@@ -159,7 +159,7 @@ function Add-IpPermsFunc {
     
     "Donner acces a $Target_site sur $Source_Site"
     
-    $APIVersion = ((Get-AzureRmResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
+    [array] $APIVersion = ((Get-AzureRmResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
     $WebAppConfig = (Get-AzureRmResource -ResourceType Microsoft.Web/sites/config -ResourceName $Target_site -ResourceGroupName $Target_ResourceGroupName -ApiVersion $APIVersion)
     $WebAppConfig.Properties.ipsecurityrestrictions
     [System.Collections.ArrayList]$ArrayList = $WebAppConfig.Properties.ipsecurityrestrictions;
