@@ -156,14 +156,14 @@ function Add-IpPermsFunc {
         $IP = (get-azurermwebappslot -Name $Source_Site -ResourceGroupName $Source_ResourceGroupName -slot $slot).OutboundIpAddresses.split(",") ; 
         $Name = $Source_Name + "_$Slot"
     }
-    # Mettre les restrictions sur l'app de Veille
+    
+    "Donner acces a $Target_site sur $Source_Site"
     
     $APIVersion = ((Get-AzureRmResourceProvider -ProviderNamespace Microsoft.Web).ResourceTypes | Where-Object ResourceTypeName -eq sites).ApiVersions[0]
     $WebAppConfig = (Get-AzureRmResource -ResourceType Microsoft.Web/sites/config -ResourceName $Target_site -ResourceGroupName $Target_ResourceGroupName -ApiVersion $APIVersion)
     $WebAppConfig.Properties.ipsecurityrestrictions
     [System.Collections.ArrayList]$ArrayList = $WebAppConfig.Properties.ipsecurityrestrictions;
     $priority = ($WebAppConfig.properties.ipsecurityrestrictions.priority | Where-Object { $_ -lt 6500 } | Sort-Object )[-1];
-
 
     $IP | ForEach-Object { 
         $Ip = $_;

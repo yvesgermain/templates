@@ -11,7 +11,7 @@ param(
     [string]
     $DefaultWorkingDirectory
 )
-. $DefaultWorkingDirectory/DevOps/scripts/Functions.ps1;
+if ($env:COMPUTERNAME -like "srvtfs01") {. $DefaultWorkingDirectory/DevOps/scripts/Functions.ps1}  else {. C:\templates\DevOps\scripts\Functions.ps1}
 if ($Domaine -like "AppsInterne") {
     $ResourceGroupName = "AppsInterne-rg-$environnement"; $webappnames = "Appsinterne-$environnement"
 }
