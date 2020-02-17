@@ -21,7 +21,8 @@ else {
 
 $kudupath = 'App_Data/Logs/' ; 
 $localpath = "c:\temp\logskudu\"; 
-
+remove-item $localpath -Recurse -Force -Confirm:$false
+mkdir $localpath
 if (! (Test-Path $localpath )) {mkdir $localpath}
 Foreach ($webappname in $webappnames) {
     $Result = try { Get-FileFromWebApp -resourceGroupName $resourceGroupName -webAppName $webAppName -kuduPath $kuduPath } catch [System.SystemException] { }; 
@@ -41,7 +42,6 @@ $key = (Get-AzureRmStorageAccountKey -Name gumlogs -ResourceGroupName Infrastruc
 # $context = Get-AzureRmStorageAccount -Name gumlogs -ResourceGroupName infrastructure
 [string] $Container = "$webappname$(get-date -Format `"yyyy-MM-dd`")".ToLower()
 # New-AzureRmStorageContainer -Context $context.context -Name $Container
-remove-item $localpath -Recurse -Force -Confirm:$false
 
 New-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumlogs -Name $Container
 
