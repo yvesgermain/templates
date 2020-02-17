@@ -41,9 +41,9 @@ $key = (Get-AzureRmStorageAccountKey -Name gumlogs -ResourceGroupName Infrastruc
 # $context = Get-AzureRmStorageAccount -Name gumlogs -ResourceGroupName infrastructure
 [string] $Container = "$webappname$(get-date -Format `"yyyy-MM-dd`")".ToLower()
 # New-AzureRmStorageContainer -Context $context.context -Name $Container
-if (! (New-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumlogs -Name $Container)) {
-    New-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumlogs -Name $Container
-}
+remove-item $localpath -Recurse -Force -Confirm:$false
+
+New-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumlogs -Name $Container
 
 & $AzCopyPath /Source:"$localPath$webappname" /Dest:"https://gumlogs.blob.core.windows.net/$Container" /DestKey:$key /S /Y
 
