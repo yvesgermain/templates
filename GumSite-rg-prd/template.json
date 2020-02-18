@@ -19,7 +19,6 @@
         "serverfarms_gummaster_name": "[concat('ASP-Standard-', parameters('Environnement'))]",
         "sites_Solrwebapp_name": "[concat('GumSolr-', parameters('Environnement'))]",
         "serverfarms_gumfrontend_name": "[concat('ASP-FrontEnd-', parameters('Environnement'))]",
-        "serverfarms_gumSolrfrontend_name": "[concat('ASP-SolrFrontEnd-', parameters('Environnement'))]",
         "ExportationDesLiensVersAppVeille": "[concat('ExportationDesLiensVersAppVeille-', parameters('Environnement'))]"
     },
     "resources": [
@@ -53,24 +52,6 @@
             "kind": "app",
             "properties": {
                 "name": "[variables('serverfarms_gummaster_name')]",
-                "perSiteScaling": false,
-                "reserved": false,
-                "targetWorkerCount": 0,
-                "targetWorkerSizeId": 0
-            }
-        },
-        {
-            "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2016-09-01",
-            "name": "[variables('serverfarms_gumSolrfrontend_name')]",
-            "location": "[variables('location')]",
-            "tags": {
-                "Environnement": "[parameters('Environnement')]"
-            },
-            "sku": "[if(equals(parameters('Environnement'), 'prd'),json('{\"name\":\"B1\",\"tier\":\"Basic\",\"size\":\"B1\",\"family\":\"B\",\"capacity\": 1}'),json('{\"name\":\"F1\",\"tier\":\"Free\",\"size\":\"F1\",\"family\":\"F\",\"capacity\": 0}'))]",
-            "kind": "app",
-            "properties": {
-                "name": "[variables('serverfarms_gumSolrfrontend_name')]",
                 "perSiteScaling": false,
                 "reserved": false,
                 "targetWorkerCount": 0,
@@ -483,7 +464,7 @@
             "name": "[variables('sites_Solrwebapp_name')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gumSolrfrontend_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gumfrontend_name'))]"
             ],
             "kind": "app",
             "properties": {
@@ -500,7 +481,7 @@
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[variables('serverfarms_gumSolrfrontend_name')]",
+                "serverFarmId": "[variables('serverfarms_gumfrontend_name')]",
                 "siteConfig": {
                     "appSettings": [
                         {
