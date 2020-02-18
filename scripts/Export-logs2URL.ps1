@@ -11,7 +11,7 @@ param(
     [string]
     $DefaultWorkingDirectory
 )
-if ($env:COMPUTERNAME -like "srvtfs01") {. $DefaultWorkingDirectory/DevOps/scripts/Functions.ps1}  else {. C:\templates\DevOps\scripts\Functions.ps1}
+if ($env:COMPUTERNAME -like "srvtfs01") { . "$DefaultWorkingDirectory/DevOps/scripts/Functions.ps1" }  else { . C:\templates\DevOps\scripts\Functions.ps1 }
 if ($Domaine -like "AppsInterne") {
     $ResourceGroupName = "AppsInterne-rg-$environnement"; $webappnames = "Appsinterne-$environnement"
 }
@@ -21,7 +21,7 @@ else {
 
 $kudupath = 'App_Data/Logs/' ; 
 $localpath = "c:\temp\logskudu\"; 
-if ( Test-path $localpath) {remove-item $localpath -Recurse -Force -Confirm:$false }
+if ( Test-path $localpath) { remove-item $localpath -Recurse -Force -Confirm:$false }
 mkdir $localpath
 
 Foreach ($webappname in $webappnames) {
@@ -34,17 +34,17 @@ Foreach ($webappname in $webappnames) {
             Read-FilesFromWebApp -resourceGroupName $resourceGroupName -webAppName $webAppName -kuduPath $("$kuduPath$name") -localPath $("$localPath$webappname\$name") }
     }
     else { "Rien a sauver!" }
-} 
 
-$AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
-"Getting Azure Gumlogs key"
-$key = (Get-AzureRmStorageAccountKey -Name gumlogs -ResourceGroupName Infrastructure )[0].value
-# $context = Get-AzureRmStorageAccount -Name gumlogs -ResourceGroupName infrastructure
-[string] $Container = "$webappname$(get-date -Format `"yyyy-MM-dd`")".ToLower()
-"New-AzureRmStorageContainer -Context $context.context -Name $Container"
 
-New-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumlogs -Name $Container
+    $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
+    "Getting Azure Gumlogs key"
+    $key = (Get-AzureRmStorageAccountKey -Name gumlogs -ResourceGroupName Infrastructure )[0].value
+    # $context = Get-AzureRmStorageAccount -Name gumlogs -ResourceGroupName infrastructure
+    [string] $Container = "$webappname$(get-date -Format `"yyyy-MM-dd`")".ToLower()
+    "New-AzureRmStorageContainer -Context $context.context -Name $Container"
 
-& $AzCopyPath /Source:"$localPath$webappname" /Dest:"https://gumlogs.blob.core.windows.net/$Container" /DestKey:$key /S /Y
+    New-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumlogs -Name $Container
 
+    & $AzCopyPath /Source:"$localPath$webappname" /Dest:"https://gumlogs.blob.core.windows.net/$Container" /DestKey:$key /S /Y
+}
 remove-item $localpath -Recurse -Force -Confirm:$false
