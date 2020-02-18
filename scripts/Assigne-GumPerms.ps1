@@ -5,6 +5,7 @@ param(
     $Environnement
 )
 
+"$env:Default.WorkingDirectory\DevOps\scripts\Functions.ps1"
 if ($env:COMPUTERNAME -like "srvtfs01") {. "$env:Default.WorkingDirectory\DevOps\scripts\Functions.ps1"}  else {. C:\templates\DevOps\scripts\Functions.ps1}
 
 "Ajout des addresses ip sur Allow_Gum sur Environnement $Environnement pour site Gum-$Environnement"
