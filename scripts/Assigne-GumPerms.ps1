@@ -8,7 +8,7 @@ param(
     $DefaultWorkingDirectory
 )
 
-"$env:Default.WorkingDirectory\DevOps\scripts\Functions.ps1"
+"DefaultWorkingDirectory\DevOps\scripts\Functions.ps1"
 if ($env:COMPUTERNAME -like "srvtfs01") {. "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1"}  else {. C:\templates\DevOps\scripts\Functions.ps1}
 
 "Ajout des addresses ip sur Allow_Gum sur Environnement $Environnement pour site Gum-$Environnement"
