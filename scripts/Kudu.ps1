@@ -95,7 +95,7 @@ $storage= "storgum$environnement"
 } else {
 $resourceGroupName = "AppsInterne-rg-$environnement"
 $webAppNames = "AppsInterne-$environnement"
-$storage = "appsinterne$environnement"
+$storage = "storappsinterne$environnement"
 }
 $kuduPath = "config/imageprocessor/security.config"
 $localPath = "C:\temp\security.config.$Environnement"
