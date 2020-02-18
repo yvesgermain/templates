@@ -12,15 +12,10 @@ param(
 if ($env:COMPUTERNAME -like "srvtfs01") {. "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1"}  else {. C:\templates\DevOps\scripts\Functions.ps1}
 
 "Ajout des addresses ip sur Allow_Gum sur Environnement $Environnement pour site Gum-$Environnement"
-" Add-IpPermsFunc -WebSite Gum -Environnement $Environnement -Ips Gum -Webip_Name Allow_Gum"
 Add-IpPermsFunc -Target_WebSite Gum -Environnement $Environnement -Source_WebSite Gum -Source_Name Allow_GUM
-"Ajout des addresses ip sur Allow_GumMaster sur Environnement $Environnement pour site GumMaster-$Environnement"" Add-IpPermsFunc -WebSite GumMaster -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster"
+"Ajout des addresses ip sur Allow_GumMaster sur Environnement $Environnement pour site GumMaster-$Environnement"
 Add-IpPermsFunc -Target_WebSite GumMaster -Environnement $Environnement -Source_WebSite GumMaster -Source_Name Allow_GumMaster
-
-"Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips GumMaster -Webip_Name Allow_GumMaster"
 Add-IpPermsFunc -Target_WebSite GumSolr -Environnement $Environnement -Source_WebSite GumMaster -Source_Name Allow_GumMaster
-
-"Add-IpPermsFunc -WebSite GumSolr -Environnement $Environnement -Ips Gum -Webip_Name Allow_Gum"
 Add-IpPermsFunc -Target_WebSite GumSolr -Environnement $Environnement -Source_WebSite Gum -Source_Name Allow_GUM
 
 # Creer le baseline pour les regles de firewall
