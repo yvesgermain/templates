@@ -23,6 +23,9 @@ $kudupath = 'App_Data/Logs/' ;
 $localpath = "c:\temp\logskudu\"; 
 if ( Test-path $localpath) { remove-item $localpath -Recurse -Force -Confirm:$false }
 mkdir $localpath
+$AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
+"Getting Azure Gumlogs key"
+$key = (Get-AzureRmStorageAccountKey -Name gumlogs -ResourceGroupName Infrastructure )[0].value
 
 Foreach ($webappname in $webappnames) {
     $Result = try { Get-FileFromWebApp -resourceGroupName $resourceGroupName -webAppName $webAppName -kuduPath $kuduPath } catch [System.SystemException] { }; 
@@ -35,12 +38,7 @@ Foreach ($webappname in $webappnames) {
     }
     else { "Rien a sauver!" }
 
-
-    $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
-    "Getting Azure Gumlogs key"
-    $key = (Get-AzureRmStorageAccountKey -Name gumlogs -ResourceGroupName Infrastructure )[0].value
-    # $context = Get-AzureRmStorageAccount -Name gumlogs -ResourceGroupName infrastructure
-    [string] $Container = "$webappname$(get-date -Format `"yyyy-MM-dd`")".ToLower()
+    $Container = "$webappname$(get-date -Format `"yyyy-MM-dd`")".ToLower()
     "New-AzureRmStorageContainer -Context $context.context -Name $Container"
 
     New-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumlogs -Name $Container
