@@ -88,10 +88,10 @@ function Add-IpPermsFunc {
         Modifie les access Resrictions dans l'onglet Networking des sites web avec toutes les addresses
     
      .EXAMPLE
-        ./Add-IPPermsFunc.ps1 -WebSite AppsInterne -Environnement $Environnement -Ips logic_App -Webip_Name Allow_Logic_App
+        ./Add-IpPermsFunc -Target_WebSite GumSolr -Environnement $Environnement -Source_WebSite Gum -Source_Name Allow_GUM
     
      .PARAMETER WebSite
-        Le parametre WebSite est le site que l'on veut modifier en ajoutant les adresses IP 
+        Le parametre $Target_WebSite est le site que l'on veut modifier en ajoutant les adresses IP 
     
      .PARAMETER Environnement
         Le parametre Environnement indique l'Environnement du site web a modifier
