@@ -11,8 +11,7 @@ function Get-AzureRmWebAppPublishingCredentials($resourceGroupName, $webAppName,
     if ([string]::IsNullOrWhiteSpace($slotName)) {
         $resourceType = "Microsoft.Web/sites/config"
         $resourceName = "$webAppName/publishingcredentials"
-    }
-    else {
+    }  else {
         $resourceType = "Microsoft.Web/sites/slots/config"
         $resourceName = "$webAppName/$slotName/publishingcredentials"
     }
@@ -26,10 +25,9 @@ function Get-KuduApiAuthorisationHeaderValue($resourceGroupName, $webAppName, $s
 function Get-FileFromWebApp($resourceGroupName, $webAppName, $slotName = "", $kuduPath, $localPath) {
 
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $resourceGroupName $webAppName $slotName
-    if ($slotName -eq "") {
+    if ($slotName -eq $null) {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
-    }
-    else {
+    } else {
         $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/vfs/site/wwwroot", "")
@@ -47,8 +45,7 @@ function Read-FilesFromWebApp($resourceGroupName, $webAppName, $slotName = "", $
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $resourceGroupName $webAppName $slotName
     if ($slotName -eq "") {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
-    }
-    else {
+    } else {
         $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/vfs/site/wwwroot", "")
@@ -65,8 +62,7 @@ function Push-FileToWebApp($resourceGroupName, $webAppName, $slotName = "", $loc
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
     if ($slotName -eq "") {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
-    }
-    else {
+    } else {
         $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/vfs/site/wwwroot", "")

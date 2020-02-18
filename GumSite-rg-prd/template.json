@@ -609,14 +609,21 @@
                     },
                     "triggers": {
                         "Recurrence": {
+                            "inputs": {
+                            },
                             "recurrence": {
                                 "frequency": "Day",
                                 "interval": 1,
-                                "startTime": "2019-10-03T12:00:00Z"
+                                "schedule": {
+                                    "hours": [
+                                        "12"
+                                    ],
+                                    "minutes": [
+                                        0
+                                    ]
+                                }
                             },
-                            "type": "Recurrence",
-                            "inputs": {
-                            }
+                            "type": "Recurrence"
                         }
                     },
                     "actions": {
