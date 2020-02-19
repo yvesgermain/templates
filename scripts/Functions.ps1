@@ -204,8 +204,9 @@ On s'authentifie et on download le fichier security.config que l'on modifie et u
         $kuduPath = "server/solr/",
         $OutFile = "c:\temp\gumsolr-$environnement.zip",
         $InFile = "c:\temp\gumsolr-$environnement.zip",
+        [Parameter(Mandatory = $True)]
         [string]
-        $DefaultWorkingDirectory = "C:\Templates"
+        $DefaultWorkingDirectory 
     )
     . "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1"
      # Debut du script
