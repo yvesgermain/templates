@@ -179,3 +179,55 @@ function Add-IpPermsFunc {
     Set-AzureRmResource -resourceid $webAppConfig.ResourceId -Properties $WebAppConfig.properties -ApiVersion $APIVersion -Force
 }
 
+function Compress-kudufolder {
+
+    <#
+.Synopsis
+Recupere (Get) ou pousse (Put) un fichier .zip dans un site Web
+.DESCRIPTION
+On s'authentifie et on download le fichier security.config que l'on modifie et upload par restAPI
+.EXAMPLE
+.\kudu.ps1 -environnement "dev"
+#>
+    param(
+        [Parameter(Mandatory = $True)]
+        [string]
+        [ValidateSet("dev", "qa", "prd", "devops")] 
+        $Environnement,
+        [Parameter(Mandatory = $True)]
+        [string]
+        [ValidateSet("Get", "Put")] 
+        $Method,
+        [string]
+        [ValidateSet("GumSolr", "Gum" , "GumMaster" , "Veille", "Appsinterne")] 
+        $SiteWeb = "GumSolr",
+        $kuduPath = "server/solr/",
+        $OutFile = "c:\temp\gumsolr-$environnement.zip",
+        $InFile = "c:\temp\gumsolr-$environnement.zip",
+        [string]
+        $DefaultWorkingDirectory = "C:\Templates"
+    )
+    if ($env:COMPUTERNAME -like "srvtfs01") { . "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1" }  else { . C:\templates\DevOps\scripts\Functions.ps1 }
+     # Debut du script
+    $resourceGroupName = "gumsite-rg-$environnement"
+    $webAppName = "$SiteWeb-$environnement"
+    $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/zip/site/wwwroot/" + $kuduPath
+    # $localPath = "C:\temp\solr_index_$Environnement\"
+
+    # if (!(Test-Path $localPath)) { mkdir $localPath }
+    $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $resourceGroupName $webAppName 
+
+    if ($method -eq "Get"){
+    Invoke-RestMethod -Uri $kuduApiUrl `
+        -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
+        -Method $Method `
+        -OutFile $OutFile `
+        -ContentType "multipart/form-data"
+    } else {
+        Invoke-RestMethod -Uri $kuduApiUrl `
+        -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
+        -Method $Method `
+        -InFile $InFile `
+        -ContentType "multipart/form-data"
+    }
+}
