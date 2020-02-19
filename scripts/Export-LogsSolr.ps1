@@ -15,7 +15,7 @@ param(
     $InFile = "c:\temp\gumsolr-$environnement.zip",
     [Parameter(Mandatory = $True)]
     [string]
-    $DefaultWorkingDirectory
+    $DefaultWorkingDirectory = "c:\templates"
 )
 . "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1"
-Compress-kudufolder -Environnement prd -Method $method -SiteWeb GumSolr -kuduPath "server/solr/"
+Compress-kudufolder -Environnement prd -Method $method -SiteWeb GumSolr -kuduPath "server/solr/" -DefaultWorkingDirectory $DefaultWorkingDirectory
