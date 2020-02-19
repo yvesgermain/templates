@@ -17,5 +17,5 @@ param(
     [string]
     $DefaultWorkingDirectory
 )
-. "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1" } 
+. "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1"
 Compress-kudufolder -Environnement prd -Method $method -SiteWeb GumSolr -kuduPath "server/solr/"
