@@ -207,7 +207,7 @@ On s'authentifie et on download le fichier security.config que l'on modifie et u
         [string]
         $DefaultWorkingDirectory = "C:\Templates"
     )
-    if ($env:COMPUTERNAME -like "srvtfs01") { . "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1" }  else { . C:\templates\DevOps\scripts\Functions.ps1 }
+    . "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1"
      # Debut du script
     $resourceGroupName = "gumsite-rg-$environnement"
     $webAppName = "$SiteWeb-$environnement"
