@@ -11,7 +11,8 @@ function Get-AzureRmWebAppPublishingCredentials($resourceGroupName, $webAppName,
     if ([string]::IsNullOrWhiteSpace($slotName)) {
         $resourceType = "Microsoft.Web/sites/config"
         $resourceName = "$webAppName/publishingcredentials"
-    }  else {
+    }
+    else {
         $resourceType = "Microsoft.Web/sites/slots/config"
         $resourceName = "$webAppName/$slotName/publishingcredentials"
     }
@@ -27,7 +28,8 @@ function Get-FileFromWebApp($resourceGroupName, $webAppName, $slotName = "", $ku
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $resourceGroupName $webAppName $slotName
     if ($slotName -eq $null) {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
-    } else {
+    }
+    else {
         $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/vfs/site/wwwroot", "")
@@ -45,7 +47,8 @@ function Read-FilesFromWebApp($resourceGroupName, $webAppName, $slotName = "", $
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $resourceGroupName $webAppName $slotName
     if ($slotName -eq "") {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
-    } else {
+    }
+    else {
         $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/vfs/site/wwwroot", "")
@@ -62,7 +65,8 @@ function Push-FileToWebApp($resourceGroupName, $webAppName, $slotName = "", $loc
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
     if ($slotName -eq "") {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
-    } else {
+    }
+    else {
         $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/vfs/site/wwwroot", "")
@@ -72,6 +76,42 @@ function Push-FileToWebApp($resourceGroupName, $webAppName, $slotName = "", $loc
         -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
         -Method PUT `
         -InFile $localPath `
+        -ContentType "multipart/form-data"
+}
+
+function Compress-KuduFolderToZipFile($resourceGroupName, $webAppName, $slotName = "", $ZipFilePath, $kuduPath) {
+    $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
+    if ($slotName -eq "") {
+        $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
+    }
+    else {
+        $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
+    }
+    $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/zip/site/wwwroot", "")
+    Write-Host "Downloading WebApp to ZipFile. Source: '$virtualPath'. Target: '$ZipFilepath'..."  -ForegroundColor DarkGray
+
+    Invoke-RestMethod -Uri $kuduApiUrl `
+        -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
+        -Method Get `
+        -OutFile $ZipFilepath `
+        -ContentType "multipart/form-data"
+}
+
+function Compress-KuduFolderFromZipFile($resourceGroupName, $webAppName, $slotName = "", $ZipFilePath, $kuduPath) {
+    $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
+    if ($slotName -eq "") {
+        $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
+    }
+    else {
+        $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
+    }
+    $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/zip/site/wwwroot", "")
+    Write-Host "Uploading ZipFile to WebApp.  Source: '$ZipFilepath'. Target: '$virtualPath'..."  -ForegroundColor DarkGray
+
+    Invoke-RestMethod -Uri $kuduApiUrl `
+        -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
+        -Method Put `
+        -InFile $ZipFilepath `
         -ContentType "multipart/form-data"
 }
 
@@ -209,7 +249,7 @@ On s'authentifie et on download le fichier security.config que l'on modifie et u
         $DefaultWorkingDirectory 
     )
     . "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1"
-     # Debut du script
+    # Debut du script
     $resourceGroupName = "gumsite-rg-$environnement"
     $webAppName = "$SiteWeb-$environnement"
     $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/zip/site/wwwroot/" + $kuduPath
@@ -218,17 +258,91 @@ On s'authentifie et on download le fichier security.config que l'on modifie et u
     # if (!(Test-Path $localPath)) { mkdir $localPath }
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $resourceGroupName $webAppName 
 
-    if ($method -eq "Get"){
+    if ($method -eq "Get") {
+        Invoke-RestMethod -Uri $kuduApiUrl `
+            -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
+            -Method $Method `
+            -OutFile $OutFile `
+            -ContentType "multipart/form-data"
+    }
+    else {
+        Invoke-RestMethod -Uri $kuduApiUrl `
+            -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
+            -Method $Method `
+            -InFile $InFile `
+            -ContentType "multipart/form-data"
+    }
+}
+
+function New-AzDrive (        
+    [string]
+    [ValidateSet("gumbackups", "gumlogs")] 
+    $Account = "gumbackups",
+    [string]
+    [ValidateSet("solr")] 
+    $Share = "solr",
+    $DriveLetter = "Z") {
+    $key = ( Get-AzureRmStorageAccountKey Infrastructure -Name $Account)[0].value
+    $Secure = ConvertTo-SecureString -String $key -AsPlainText -force
+    $azcred = [pscredential]::new( "azure\$account", $Secure)
+    New-PSDrive -Name Z -PSProvider FileSystem -Root "\\$Account.file.core.windows.net\$Share" -Credential $AzCred
+}
+
+function Compress-KuduFolderToZipFile(
+    $resourceGroupName, 
+    $webAppName, 
+    $slotName = "", 
+    $ZipFilePath, 
+    $kuduPath,
+    [Parameter(Mandatory = $True)]
+    [string]
+    [ValidateSet("dev", "qa", "prd", "devops")] 
+    $Environnement
+    ) 
+    {
+    $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
+    if ($slotName -eq "") {
+        $kuduApiUrl = "https://$webAppName`-$environnement.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
+    }
+    else {
+        $kuduApiUrl = "https://$webAppName`-$environnement`-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
+    }
+    $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/zip/site/wwwroot", "")
+    Write-Host "Downloading WebApp to ZipFile. Source: '$virtualPath-$Environnement'. Target: '$ZipFilepath'..."  -ForegroundColor DarkGray
+
     Invoke-RestMethod -Uri $kuduApiUrl `
         -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
-        -Method $Method `
-        -OutFile $OutFile `
+        -Method Get `
+        -OutFile "$ZipFilepath\$Environnement\gumsolr.zip" `
         -ContentType "multipart/form-data"
-    } else {
-        Invoke-RestMethod -Uri $kuduApiUrl `
-        -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
-        -Method $Method `
-        -InFile $InFile `
-        -ContentType "multipart/form-data"
+}
+
+function Compress-KuduFolderFromZipFile(
+    $resourceGroupName, 
+    $webAppName, 
+    $slotName = "", 
+    $ZipFilePath, 
+    
+    $kuduPath,
+    [Parameter(Mandatory = $True)]
+    [string]
+    [ValidateSet("dev", "qa", "prd", "devops")] 
+    $Environnement
+    ) 
+    {
+    $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
+    if ($slotName -eq "") {
+        $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
     }
+    else {
+        $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
+    }
+    $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/zip/site/wwwroot", "")
+    Write-Host "Uploading ZipFile to WebApp.  Source: '$ZipFilepath'. Target: '$virtualPath'..."  -ForegroundColor DarkGray
+
+    Invoke-RestMethod -Uri $kuduApiUrl `
+        -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
+        -Method Put `
+        -InFile "$ZipFilepath\$Environnement\gumsolr.zip" `
+        -ContentType "multipart/form-data"
 }

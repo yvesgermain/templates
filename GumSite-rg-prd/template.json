@@ -595,7 +595,7 @@
                 "hostNameType": "Verified"
             }
         },
-{
+        {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
             "name": "[variables('ExportationDesLiensVersAppVeille')]",
@@ -612,7 +612,15 @@
                             "recurrence": {
                                 "frequency": "Day",
                                 "interval": 1,
-                                "startTime": "2019-10-03T12:00:00Z"
+                                "schedule": {
+                                    "hours": [
+                                        "12"
+                                    ],
+                                    "minutes": [
+                                        0
+                                    ]
+                                },
+                                "timeZone": "Eastern Standard Time"
                             },
                             "type": "Recurrence",
                             "inputs": {
