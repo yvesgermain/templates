@@ -25,4 +25,5 @@ $resourceGroupName = (get-azureRmwebapp -name $webAppName ).resourcegroup
 $ZipFilePath = ($ZipFolder + ":\" + $environnement + "\" + $webAppName + (get-date -Format "yyyy-MM-dd") +  ".zip") 
 
 Compress-KuduFolderToZipFile -Environnement $environnement -resourceGroupName $resourceGroupName -webAppName $webAppName -ZipFilePath $ZipFilePath -kuduPath $kuduPath 
+Get-ChildItem ($ZipFolder + ":\" + $environnement) | Where-Object {$_.LastWriteTime -lt (get-date).adddays(-10)} | remove-item
 remove-psdrive -name $ZipFolder
