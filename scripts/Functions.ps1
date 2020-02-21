@@ -274,7 +274,7 @@ On s'authentifie et on download le fichier security.config que l'on modifie et u
     }
 }
 
-function New-AzDrive (        
+function Global:New-AzDrive  (        
     [string]
     [ValidateSet("gumbackups", "gumlogs")] 
     $Account = "gumbackups",
