@@ -285,7 +285,7 @@ function New-AzDrive (
     $key = ( Get-AzureRmStorageAccountKey Infrastructure -Name $Account)[0].value
     $Secure = ConvertTo-SecureString -String $key -AsPlainText -force
     $azcred = [pscredential]::new( "azure\$account", $Secure)
-    New-PSDrive -Name Z -PSProvider FileSystem -Root "\\$Account.file.core.windows.net\$Share" -Credential $AzCred
+    New-PSDrive -Name $DriveLetter -PSProvider FileSystem -Root ("\\" + $Account + ".file.core.windows.net\" + $Share) -Credential $AzCred -Persist
 }
 
 function Compress-KuduFolderToZipFile(
@@ -302,18 +302,19 @@ function Compress-KuduFolderToZipFile(
     {
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
     if ($slotName -eq "") {
-        $kuduApiUrl = "https://$webAppName`-$environnement.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
+        $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
     }
     else {
-        $kuduApiUrl = "https://$webAppName`-$environnement`-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
+        $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/zip/site/wwwroot", "")
-    Write-Host "Downloading WebApp to ZipFile. Source: '$virtualPath-$Environnement'. Target: '$ZipFilepath'..."  -ForegroundColor DarkGray
-
+    Write-Host "Downloading WebApp to ZipFile. Source: '$virtualPath'. Target: '$ZipFilepath'..."  -ForegroundColor DarkGray
+    New-AzDrive
+    $kuduApiUrl
     Invoke-RestMethod -Uri $kuduApiUrl `
         -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
         -Method Get `
-        -OutFile "$ZipFilepath\$Environnement\gumsolr.zip" `
+        -OutFile ($ZipFilepath + '\' + $Environnement + "\gumsolr.zip") `
         -ContentType "multipart/form-data"
 }
 
@@ -339,7 +340,8 @@ function Compress-KuduFolderFromZipFile(
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/zip/site/wwwroot", "")
     Write-Host "Uploading ZipFile to WebApp.  Source: '$ZipFilepath'. Target: '$virtualPath'..."  -ForegroundColor DarkGray
-
+    New-AzDrive
+    $kuduApiUrl
     Invoke-RestMethod -Uri $kuduApiUrl `
         -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
         -Method Put `
