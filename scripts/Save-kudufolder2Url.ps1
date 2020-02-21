@@ -24,8 +24,5 @@ $WebappName = "$webapp-$Environnement"
 $resourceGroupName = (get-azwebapp -name $webAppName ).resourcegroup
 $ZipFilePath = ($ZipFolder + ":\" + $environnement + "\" + $webAppName + (get-date -Format "yyyy-MM-dd") +  ".zip") 
 
-# Creation du psdrive vers \\Gumbackups.file.core.windows.net\dev
-
-# if (!( Get-PSDrive -name $ZipFolder -ErrorAction SilentlyContinue)) {new-azdrive}
 Compress-KuduFolderToZipFile -Environnement $environnement -resourceGroupName $resourceGroupName -webAppName $webAppName -ZipFilePath $ZipFilePath -kuduPath $kuduPath 
 remove-psdrive -name $ZipFolder
