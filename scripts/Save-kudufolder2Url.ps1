@@ -21,7 +21,7 @@ param(
 if ($env:COMPUTERNAME -like "srvtfs01") { . "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1" }  else { . C:\templates\DevOps\scripts\Functions.ps1 }
 if ($webApp -like "Gumsolr") { $kuduPath = "server/solr/" } Else {$kuduPath = "app_data/logs/"} 
 $WebappName = "$webapp-$Environnement"
-$resourceGroupName = (get-azwebapp -name $webAppName ).resourcegroup
+$resourceGroupName = (get-azureRmwebapp -name $webAppName ).resourcegroup
 $ZipFilePath = ($ZipFolder + ":\" + $environnement + "\" + $webAppName + (get-date -Format "yyyy-MM-dd") +  ".zip") 
 
 Compress-KuduFolderToZipFile -Environnement $environnement -resourceGroupName $resourceGroupName -webAppName $webAppName -ZipFilePath $ZipFilePath -kuduPath $kuduPath 
