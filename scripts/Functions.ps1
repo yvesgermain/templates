@@ -315,17 +315,20 @@ function Compress-KuduFolderToZipFile(
         -OutFile $ZipFilepath `
         -Verbose `
         -ContentType "multipart/form-data"
-        
+
     $rest | format-list *
     Return $rest
 }
 
-function Compress-KuduFolderFromZipFile(
+function Restore-KuduFolderFromZipFile(
+    [string]
     $resourceGroupName, 
+    [string]
     $webAppName, 
-    $slotName = "", 
+    $slotName = "",
+    [string]
     $ZipFilePath, 
-    
+    [string]
     $kuduPath,
     [Parameter(Mandatory = $True)]
     [string]
@@ -347,6 +350,6 @@ function Compress-KuduFolderFromZipFile(
     Invoke-RestMethod -Uri $kuduApiUrl `
         -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
         -Method Put `
-        -InFile "$ZipFilepath\$Environnement\gumsolr.zip" `
+        -InFile $ZipFilepath `
         -ContentType "multipart/form-data"
 }
