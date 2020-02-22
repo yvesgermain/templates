@@ -313,7 +313,7 @@ function Compress-KuduFolderToZipFile(
         -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
         -Method Get `
         -OutFile $ZipFilepath `
-        -Resume `
+        -verbose `
         -ContentType "multipart/form-data"
 }
 
