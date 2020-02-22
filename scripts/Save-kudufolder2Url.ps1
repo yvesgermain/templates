@@ -20,6 +20,7 @@ param(
 # Declaration de variables:
 if ($env:COMPUTERNAME -like "srvtfs01") { . "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1" }  else { . C:\templates\DevOps\scripts\Functions.ps1 }
 if ($webApp -like "Gumsolr") { $kuduPath = "server/solr/" } Else {$kuduPath = "app_data/logs/"} 
+if (!( Get-PSDrive -name z -ErrorAction SilentlyContinue)) {new-azdrive}
 $WebappName = "$webapp-$Environnement"
 $resourceGroupName = (get-azureRmwebapp -name $webAppName ).resourcegroup
 $ZipFilePath = ($ZipFolder + ":\" + $environnement + "\" + $webAppName + (get-date -Format "yyyy-MM-dd") +  ".zip") 
