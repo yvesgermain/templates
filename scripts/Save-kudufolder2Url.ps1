@@ -30,3 +30,4 @@ Compress-KuduFolderToZipFile -Environnement $environnement -resourceGroupName $r
 copy-item -Path $ZipFilePath  -Destination $Destination
 Get-ChildItem ($ZipFolder + ":\" + $environnement) | Where-Object {$_.LastWriteTime -lt (get-date).adddays(-10)} | remove-item
 remove-psdrive -name $ZipFolder
+Remove-Item -path $ZipFilePath -Confirm:$false
