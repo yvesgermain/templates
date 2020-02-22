@@ -23,8 +23,10 @@ if ($webApp -like "Gumsolr") { $kuduPath = "server/solr/index/" } Else {$kuduPat
 if (!( Get-PSDrive -name z -ErrorAction SilentlyContinue)) {new-azdrive}
 $WebappName = "$webapp-$Environnement"
 $resourceGroupName = (get-azureRmwebapp -name $webAppName ).resourcegroup
-$ZipFilePath = ($ZipFolder + ":\" + $environnement + "\" + $webAppName + (get-date -Format "yyyy-MM-dd") +  ".zip") 
-# stop-azurermwebapp -resourceGroupName $resourceGroupName -name $WebappName 
+$ZipFilePath = ("c:\temp\" + $environnement + "\" + $webAppName + (get-date -Format "yyyy-MM-dd") +  ".zip") 
+$Destination= ($ZipFolder + ":\" + $environnement + "\" + $webAppName + (get-date -Format "yyyy-MM-dd") +  ".zip") 
+
 Compress-KuduFolderToZipFile -Environnement $environnement -resourceGroupName $resourceGroupName -webAppName $webAppName -ZipFilePath $ZipFilePath -kuduPath $kuduPath 
+copy-item -Path $ZipFilePath  -Destination $Destination
 Get-ChildItem ($ZipFolder + ":\" + $environnement) | Where-Object {$_.LastWriteTime -lt (get-date).adddays(-10)} | remove-item
 remove-psdrive -name $ZipFolder
