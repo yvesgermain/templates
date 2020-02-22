@@ -309,12 +309,15 @@ function Compress-KuduFolderToZipFile(
     Write-Host "Downloading $WebAppName to ZipFile. Source: '$virtualPath'. Target: '$ZipFilepath'..."  -ForegroundColor DarkGray
     $kuduApiUrl
     if (!( Get-PSDrive -name z -ErrorAction SilentlyContinue)) {new-azdrive}
-    Invoke-RestMethod -Uri $kuduApiUrl `
+    $rest= Invoke-RestMethod -Uri $kuduApiUrl `
         -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
         -Method Get `
         -OutFile $ZipFilepath `
-        -Debug `
+        -Verbose `
         -ContentType "multipart/form-data"
+        
+    $rest | format-list *
+    Return $rest
 }
 
 function Compress-KuduFolderFromZipFile(
