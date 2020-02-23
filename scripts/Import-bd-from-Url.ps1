@@ -46,7 +46,7 @@ if ( $site -eq "AppsInterne") {
    $Bds = "BdGum-$destination"
 }
 
-Write-output " Le serveur = $server `n Resourcegroup = $resourcegroup `n Les Bds = $bds"
+Write-output "Le serveur = $server `nResourcegroup = $resourcegroup `nLes Bds = $bds"
 
 [string] $Storagekey = (Get-azureRMStorageAccountKey -ResourceGroupName infrastructure -Name gumbackups ).value[0]
 $StorageAccessKey = [Microsoft.Azure.Commands.Sql.ImportExport.Model.StorageKeyType]::StorageAccessKey
