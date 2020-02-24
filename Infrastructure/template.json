@@ -7,7 +7,6 @@
         }
     },
     "variables": {
-        "location": "CanadaCentral",
         "sites_GumSolr_name": "GumSolr-IC",
         "Environnement": "Infrastructure",
         "serverfarms_standard_infra": "ASP-standard-infra"
@@ -17,7 +16,7 @@
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
             "name": "[variables('serverfarms_standard_infra')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "tags": {
                 "Environnement": "[variables('Environnement')]"
             },
@@ -41,7 +40,7 @@
             "name": "[parameters('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-04-01",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "accessTier": "Hot",
                 "supportsHttpsTrafficOnly": true
@@ -69,7 +68,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "name": "[variables('sites_GumSolr_name')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "kind": "app",
             "tags": {
                 "Environnement": "[variables('Environnement')]"
@@ -106,7 +105,7 @@
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_GumSolr_name'), '/web')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_GumSolr_name'))]"
             ],
@@ -181,7 +180,7 @@
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_GumSolr_name'), '/', variables('sites_GumSolr_name'), '.azurewebsites.net')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_GumSolr_name'))]"
             ],

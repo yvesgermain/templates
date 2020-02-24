@@ -19,7 +19,6 @@
         }
     },
     "variables": {
-        "location": "CanadaCentral",
         "sites_Veille_name": "[concat('Veille-', parameters('Environnement'))]",
         "sites_AppsInterne_name": "[concat('AppsInterne-', parameters('Environnement'))]",
         "sites_Veille_func_name": "[concat('Veille-func-', parameters('Environnement'))]",
@@ -33,7 +32,7 @@
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
             "name": "[variables('Serverfarms_ASP_Standard_name')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "sku": "[if(equals(parameters('Environnement'), 'prd'),json('{\"name\":\"B1\",\"tier\":\"Basic\",\"size\":\"B1\",\"family\":\"B\",\"capacity\": 1}'),json('{\"name\":\"F1\",\"tier\":\"Free\",\"size\":\"F1\",\"family\":\"F\",\"capacity\": 0}'))]",
             "kind": "app",
             "properties": {
@@ -51,7 +50,7 @@
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
             "name": "[variables('Serverfarms_FunctionApp_name')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "sku": {
                 "name": "Y1",
                 "tier": "Dynamic",
@@ -75,7 +74,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "name": "[variables('Sites_AppsInterne_name')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "Identity": {
                 "type": "SystemAssigned"
             },
@@ -174,7 +173,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "name": "[variables('Sites_Veille_func_name')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_FunctionApp_name'))]"
             ],
@@ -230,7 +229,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "name": "[variables('Sites_Veille_name')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "Identity": {
                 "type": "SystemAssigned"
             },
@@ -283,7 +282,7 @@
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
             "name": "[concat(variables('sites_AppsInterne_name'), '/web')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_AppsInterne_name'))]"
             ],
@@ -362,7 +361,7 @@
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
             "name": "[concat(variables('sites_Veille_func_name'), '/web')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_Veille_func_name'))]"
             ],
@@ -447,7 +446,7 @@
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
             "name": "[concat( variables('sites_Veille_name'), '/web')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_Veille_name'))]"
             ],
@@ -526,7 +525,7 @@
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_AppsInterne_name'), '/', variables('sites_AppsInterne_name'), '.azurewebsites.net')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_AppsInterne_name'))]"
             ],
@@ -539,7 +538,7 @@
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_Veille_func_name'), '/', variables('sites_Veille_func_name'), '.azurewebsites.net')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_Veille_func_name'))]"
             ],
@@ -552,7 +551,7 @@
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
             "name": "[concat(variables('sites_Veille_name'), '/', variables('sites_Veille_name'), '.azurewebsites.net')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', variables('sites_Veille_name'))]"
             ],
