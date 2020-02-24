@@ -10,7 +10,7 @@ param(
     [string]
     [ValidateSet("GumSolr", "Gum" , "GumMaster" , "Veille", "Appsinterne")] 
     $SiteWeb = "GumSolr",
-    $kuduPath = "server/solr/",
+    $kuduPath = "server/solr/index/",
     $OutFile = "c:\temp\gumsolr-$environnement.zip",
     $InFile = "c:\temp\gumsolr-$environnement.zip",
     [Parameter(Mandatory = $True)]
@@ -18,7 +18,7 @@ param(
     $DefaultWorkingDirectory = "c:\templates"
 )
 . "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1"
-Compress-kudufolder -Environnement prd -Method $method -SiteWeb GumSolr -kuduPath "server/solr/" -DefaultWorkingDirectory $DefaultWorkingDirectory
+Compress-kudufolder -Environnement prd -Method $method -SiteWeb GumSolr -kuduPath $kuduPath -DefaultWorkingDirectory $DefaultWorkingDirectory
 
 $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
 "Getting Azure Gumlogs key"

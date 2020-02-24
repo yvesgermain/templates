@@ -26,7 +26,7 @@ function Get-KuduApiAuthorisationHeaderValue($resourceGroupName, $webAppName, $s
 function Get-FileFromWebApp($resourceGroupName, $webAppName, $slotName = "", $kuduPath, $localPath) {
 
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $resourceGroupName $webAppName $slotName
-    if ($slotName -eq $null) {
+    if ($slotName -like "") {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
     }
     else {
@@ -45,7 +45,7 @@ function Get-FileFromWebApp($resourceGroupName, $webAppName, $slotName = "", $ku
 function Read-FilesFromWebApp($resourceGroupName, $webAppName, $slotName = "", $kuduPath, $localPath) {
 
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $resourceGroupName $webAppName $slotName
-    if ($slotName -eq "") {
+    if ($slotName -like "") {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
     }
     else {
