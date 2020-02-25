@@ -5,9 +5,6 @@
         "Environnement": {
             "type": "string"
         },
-        "AccountKey": {
-            "type": "securestring"
-        },
         "AdminPassword": {
             "type": "securestring"
         }
@@ -91,7 +88,7 @@
                     "appSettings": [
                         {
                             "name": "AzureBlobFileSystem.ConnectionString:media",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=storgum', parameters('Environnement'), ';AccountKey=', variables('SasAccountstorgum'))]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=storgum', parameters('Environnement'), ';AccountKey=', listKeys(resourceId( variables('Resourcegroup'),'Microsoft.Storage/storageAccounts', variables('Accountstorgum')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
                         },
                         {
                             "name": "AzureBlobFileSystem.RootUrl:media",
@@ -195,7 +192,7 @@
                     "appSettings": [
                         {
                             "name": "AzureBlobFileSystem.ConnectionString:media",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=storgum', parameters('Environnement'), ';AccountKey=', variables('SasAccountstorgum'))]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=storgum', parameters('Environnement'), ';AccountKey=', listKeys(resourceId( variables('Resourcegroup'),'Microsoft.Storage/storageAccounts', variables('Accountstorgum')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
                         },
                         {
                             "name": "AzureBlobFileSystem.RootUrl:media",
