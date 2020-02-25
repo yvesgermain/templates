@@ -5,65 +5,81 @@
         "Environnement": {
             "type": "string"
         },
+        "storappsinterneAccountKey": {
+            "type": "securestring"
+        },
+        "storveillefuncAccountKey": {
+            "type": "securestring"
+        },
+        "AdminPassword": {
+            "type": "securestring"
+        },
         "SQLRWPassword": {
             "type": "securestring"
         }
     },
     "variables": {
-        "Accountstorgum": "[concat('storgum', parameters('Environnement'))]",
-        "Resourcegroup": "[concat('gumstorage-rg-', parameters('Environnement'))]",
-        "storgumAccountKey": "[listKeys(resourceId( variables('Resourcegroup'),'Microsoft.Storage/storageAccounts', variables('Accountstorgum')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
-        "sites_gummaster_name": "[concat('GumMaster-', parameters('Environnement'))]",
-        "sites_gumfrontend_name": "[concat('Gum-', parameters('Environnement'))]",
-        "serverfarms_gummaster_name": "[concat('ASP-Standard-', parameters('Environnement'))]",
-        "sites_Solrwebapp_name": "[concat('GumSolr-', parameters('Environnement'))]",
-        "serverfarms_gumfrontend_name": "[concat('ASP-FrontEnd-', parameters('Environnement'))]",
-        "ExportationDesLiensVersAppVeille": "[concat('ExportationDesLiensVersAppVeille-', parameters('Environnement'))]"
+        "sites_Veille_name": "[concat('Veille-', parameters('Environnement'))]",
+        "sites_AppsInterne_name": "[concat('AppsInterne-', parameters('Environnement'))]",
+        "sites_Veille_func_name": "[concat('Veille-func-', parameters('Environnement'))]",
+        "serverfarms_ASP_Standard_name": "[concat('ASP-AppsStandard-', parameters('Environnement'))]",
+        "serverfarms_FunctionApp_name": "[concat('ASP-FunctionApp-', parameters('Environnement'))]",
+        "storageAccounts_veillefunc_name": "[concat('storveillefunc', parameters('Environnement'))]",
+        "storageAccounts_appsinterne_name": "[concat('storappsinterne', parameters('Environnement'))]"
     },
     "resources": [
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
-            "name": "[variables('serverfarms_gumfrontend_name')]",
+            "name": "[variables('Serverfarms_ASP_Standard_name')]",
             "location": "[resourceGroup().location]",
-            "tags": {
-                "Environnement": "[parameters('Environnement')]"
-            },
             "sku": "[if(equals(parameters('Environnement'), 'prd'),json('{\"name\":\"B1\",\"tier\":\"Basic\",\"size\":\"B1\",\"family\":\"B\",\"capacity\": 1}'),json('{\"name\":\"F1\",\"tier\":\"Free\",\"size\":\"F1\",\"family\":\"F\",\"capacity\": 0}'))]",
             "kind": "app",
             "properties": {
-                "name": "[variables('serverfarms_gumfrontend_name')]",
+                "name": "[variables('Serverfarms_ASP_Standard_name')]",
                 "perSiteScaling": false,
                 "reserved": false,
                 "targetWorkerCount": 0,
                 "targetWorkerSizeId": 0
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2016-09-01",
-            "name": "[variables('serverfarms_gummaster_name')]",
+            "name": "[variables('Serverfarms_FunctionApp_name')]",
             "location": "[resourceGroup().location]",
-            "tags": {
-                "Environnement": "[parameters('Environnement')]"
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
             },
-            "sku": "[if(equals(parameters('Environnement'), 'prd'),json('{\"name\": \"S1\",\"tier\": \"Standard\",\"size\": \"S1\",\"family\": \"S\",\"capacity\": 1}'), json('{\"name\": \"D1\",\"tier\": \"Shared\",\"size\": \"D1\",\"family\": \"D\",\"capacity\": 0}'))]",
-            "kind": "app",
+            "kind": "functionapp",
             "properties": {
-                "name": "[variables('serverfarms_gummaster_name')]",
+                "name": "[variables('serverfarms_FunctionApp_name')]",
                 "perSiteScaling": false,
                 "reserved": false,
                 "targetWorkerCount": 0,
                 "targetWorkerSizeId": 0
+            },
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
             }
         },
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
-            "name": "[variables('sites_gumfrontend_name')]",
+            "name": "[variables('Sites_AppsInterne_name')]",
             "location": "[resourceGroup().location]",
+            "Identity": {
+                "type": "SystemAssigned"
+            },
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gumfrontend_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]"
             ],
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
@@ -73,66 +89,58 @@
                 "enabled": true,
                 "hostNameSslStates": [
                     {
-                        "name": "[concat(variables('sites_gumfrontend_name'), '.azurewebsites.net')]",
+                        "name": "[concat('appsinterne-',  parameters('Environnement'), '.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Standard"
                     },
                     {
-                        "name": "[concat(variables('sites_gumfrontend_name'), '.scm.azurewebsites.net')]",
+                        "name": "[concat('appsinterne-',  parameters('Environnement'), '.scm.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gumfrontend_name'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]",
                 "siteConfig": {
                     "appSettings": [
                         {
                             "name": "AzureBlobFileSystem.ConnectionString:media",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=storgum', parameters('Environnement'), ';AccountKey=', variables('storgumAccountKey'))]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_appsinterne_name') ,';AccountKey=' , parameters('storappsinterneAccountKey'), ';EndpointSuffix=core.windows.net')]"
                         },
                         {
                             "name": "AzureBlobFileSystem.RootUrl:media",
-                            "value": "[concat('https://storgum' , parameters('Environnement'), '.blob.core.windows.net')]"
+                            "value": "[concat( 'https://' , variables('storageAccounts_appsinterne_name'), '.blob.core.windows.net')]"
                         },
                         {
-                            "Name": "masterServerUrl",
-                            "value": "[concat('https://gum-' , parameters('Environnement'), '.azurewebsites.net')]"
+                            "Name": "AzureBlobFileSystem.ContainerName:media",
+                            "value": "appsinterne"
                         },
                         {
-                            "name": "serverRole",
-                            "value": "frontend"
+                            "name": "VeilleDeLien.UrlBase",
+                            "value": "[concat('https://veille-', parameters('Environnement'), '.azurewebsites.net')]"
+                        },
+                        {
+                            "name": "GuichetUnique.UrlBase",
+                            "value": "[concat('https://gummaster-', parameters('environnement'), '.azurewebsites.net/umbraco')]"
                         },
                         {
                             "name": "WEBSITE_DISABLE_OVERLAPPED_RECYCLING",
                             "value": "1"
                         },
                         {
-                            "name": "VeilleDeLien.CodeSource",
-                            "value": "SITEGUM"
-                        },
-                        {
-                            "name": "VeilleDeLien.UrlBase",
-                            "value": "[concat('https://veille-',parameters('Environnement'),'.azurewebsites.net/')]"
-                        },
-                        {
-                            "name": "VeilleDeLien.UrlApi",
-                            "value": "[concat('https://veille-',parameters('Environnement'),'.azurewebsites.net/api/')]"
-                        },
-                        {
                             "name": "Serilog.EnvoyerLogErreurA",
                             "value": "ateam@soquij.qc.ca"
                         },
                         {
+                            "name": "VeilleDeLien.CodeSource",
+                            "value": "SITEGUM"
+                        },
+                        {
                             "name": "Serilog.CurrentUrl",
-                            "value": "[variables('sites_gumfrontend_name')]"
+                            "value": "[variables('sites_AppsInterne_name')]"
                         },
                         {
                             "name": "Serilog.ErrorLevel",
                             "value": "Error"
-                        },
-                        {
-                            "name": "UrlMoteurRecherche",
-                            "value": "[concat('https://gumsolr-', parameters('environnement'), '.azurewebsites.net/solr/index')]"
                         },
                         {
                             "name": "Serilog.MessageTemplate",
@@ -146,7 +154,7 @@
                     "connectionStrings": [
                         {
                             "name": "umbracoDbDSN",
-                            "connectionString": "[concat('Server=tcp:SqlGum-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdGum-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('SQLRWPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\"')]",
+                            "connectionString": "[concat( 'Server=tcp:sqlguminterne-', parameters('environnement'), '.database.windows.net,1433;Initial Catalog=BdAppsInterne-', parameters('environnement'), ';Persist Security Info=False;User ID=sqlrw', parameters('environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('SQLRWPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=180;App=EntityFramework;Authentication=\"Active Directory Password\"')]",
                             "type": "SQLAzure"
                         }
                     ]
@@ -164,94 +172,99 @@
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
-            "name": "[variables('sites_gummaster_name')]",
+            "name": "[variables('Sites_Veille_func_name')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gummaster_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_FunctionApp_name'))]"
             ],
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
             },
-            "kind": "app",
+            "kind": "functionapp",
             "properties": {
                 "enabled": true,
                 "hostNameSslStates": [
                     {
-                        "name": "[concat(variables('sites_gummaster_name'), '.azurewebsites.net')]",
+                        "name": "[concat('veille-func-',  parameters('Environnement'), '.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Standard"
                     },
                     {
-                        "name": "[concat(variables('sites_gummaster_name'), '.scm.azurewebsites.net')]",
+                        "name": "[concat('veille-func-',  parameters('Environnement'), '.scm.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gummaster_name'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_FunctionApp_name'))]",
                 "siteConfig": {
                     "appSettings": [
                         {
-                            "name": "AzureBlobFileSystem.ConnectionString:media",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=storgum', parameters('Environnement'), ';AccountKey=', variables('storgumAccountKey'))]"
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', parameters('storveillefuncAccountKey'))]"
                         },
                         {
-                            "name": "AzureBlobFileSystem.RootUrl:media",
-                            "value": "[concat('https://storgum' , parameters('Environnement'), '.blob.core.windows.net')]"
-                        },
-                        {
-                            "Name": "masterServerUrl",
-                            "value": "[concat('https://gummaster-' , parameters('Environnement'), '.azurewebsites.net')]"
-                        },
-                        {
-                            "name": "serverRole",
-                            "value": "master"
-                        },
-                        {
-                            "name": "WEBSITE_DISABLE_OVERLAPPED_RECYCLING",
-                            "value": "1"
-                        },
-                        {
-                            "name": "VeilleDeLien.CodeSource",
-                            "value": "SITEGUM"
-                        },
-                        {
-                            "name": "VeilleDeLien.UrlBase",
-                            "value": "[concat('https://veille-',parameters('Environnement'),'.azurewebsites.net/')]"
-                        },
-                        {
-                            "name": "VeilleDeLien.UrlApi",
-                            "value": "[concat('https://veille-',parameters('Environnement'),'.azurewebsites.net/api/')]"
-                        },
-                        {
-                            "name": "Serilog.EnvoyerLogErreurA",
-                            "value": "ateam@soquij.qc.ca"
-                        },
-                        {
-                            "name": "Serilog.CurrentUrl",
-                            "value": "[variables('sites_gummaster_name')]"
-                        },
-                        {
-                            "name": "Serilog.ErrorLevel",
-                            "value": "Error"
-                        },
-                        {
-                            "name": "UrlMoteurRecherche",
-                            "value": "[concat('https://gumsolr-', parameters('environnement'), '.azurewebsites.net/solr/index')]"
-                        },
-                        {
-                            "name": "Serilog.MessageTemplate",
-                            "value": "Heure de l'erreur : {Timestamp:yyyy-MM-dd  HH:mm:ss} {NewLine}{NewLine}Endroit ou l'erreur s'est produite : {NewLine}{NewLine}{SourceContext}{NewLine}{NewLine}Message de l'erreur : {NewLine}{Message}{NewLine}{NewLine}Message détaillé : {NewLine}{Exception}"
-                        },
-                        {
-                            "name": "WEBSITE_TIME_ZONE",
-                            "value": "Eastern Standard Time"
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', parameters('storveillefuncAccountKey'))]"
                         }
                     ],
                     "connectionStrings": [
                         {
-                            "name": "umbracoDbDSN",
-                            "connectionString": "[concat('Server=tcp:SqlGum-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdGum-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('SQLRWPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=180;Authentication=\"Active Directory Password\"')]",
-                            "type": "SQLAzure"
+                            "name": "bd_VeilleContenuExterneEntities",
+                            "value": "[concat( 'Server=tcp:sqlguminterne-',  parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-',  parameters('Environnement'), ';Persist Security Info=False;User ID=sqlrw',  parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=',  parameters('SQLRWPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework;Authentication=\"Active Directory Password\"')]",
+                            "type": "SQLserver"
+                        }
+                    ]
+                },
+                "reserved": false,
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": false,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 1536,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "name": "[variables('Sites_Veille_name')]",
+            "location": "[resourceGroup().location]",
+            "Identity": {
+                "type": "SystemAssigned"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]"
+            ],
+            "kind": "app",
+            "tags": {
+                "Environnement": "[parameters('Environnement')]"
+            },
+            "properties": {
+                "enabled": true,
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]",
+                "siteConfig": {
+                    "connectionStrings": [
+                        {
+                            "name": "bd_VeilleContenuExterneEntities",
+                            "connectionString": "[concat( 'Server=tcp:sqlguminterne-',  parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-',  parameters('Environnement'), ';Persist Security Info=False;User ID=SQLrw',  parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=',  parameters('SQLRWPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\";')]",
+                            "type": "SQLServer"
+                        },
+                        {
+                        "name": "usagers",
+                        "value":"Invité;Alexandre Locas;Anne-Claire Dalmont;Anne-Marie Santorineos;Anne Laurence Boulanger;Annie Mongeon;David Ardoin;Joëlle Duranleau;Michelle-Andrée Hogue;Philippe Charbonneau;Pierre Bourgeois;Salim Boudjemia;Wassila Djaid"
+                        }
+                    ],
+                    "hostNameSslStates": [
+                        {
+                            "name": "[concat('veille-' , parameters('Environnement'), '.azurewebsites.net')]",
+                            "sslState": "Disabled",
+                            "hostType": "Standard"
+                        },
+                        {
+                            "name": "[concat('veille-' , parameters('Environnement'), '.scm.azurewebsites.net')]",
+                            "sslState": "Disabled",
+                            "hostType": "Repository"
                         }
                     ]
                 },
@@ -268,14 +281,11 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
-            "name": "[concat(variables('sites_gumfrontend_name'), '/web')]",
+            "name": "[concat(variables('sites_AppsInterne_name'), '/web')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('sites_gumfrontend_name'))]"
+                "[resourceId('Microsoft.Web/sites', variables('sites_AppsInterne_name'))]"
             ],
-            "tags": {
-                "Environnement": "[parameters('Environnement')]"
-            },
             "properties": {
                 "numberOfWorkers": "1",
                 "defaultDocuments": [
@@ -296,21 +306,22 @@
                 "linuxFxVersion": "",
                 "requestTracingEnabled": "false",
                 "remoteDebuggingEnabled": "false",
+                "remoteDebuggingVersion": "VS2017",
                 "httpLoggingEnabled": "false",
                 "logsDirectorySizeLimit": "35",
                 "detailedErrorLoggingEnabled": "false",
-                "publishingUsername": "[concat('$', variables('sites_gumfrontend_name'), '-', parameters('Environnement'))]",
-                "scmType": "VSTSRM",
+                "publishingUsername": "[concat('$AppsInterne-',  parameters('Environnement'))]",
+                "scmType": "None",
                 "use32BitWorkerProcess": "true",
                 "webSocketsEnabled": "false",
-                "alwaysOn": "[if(equals(parameters('Environnement'), 'prd'), 'true', 'false')]",
+                "alwaysOn": "false",
                 "appCommandLine": "",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
                     {
                         "virtualPath": "/",
                         "physicalPath": "site\\wwwroot",
-                        "preloadEnabled": false,
+                        "preloadEnabled": "true",
                         "virtualDirectories": null
                     }
                 ],
@@ -331,34 +342,29 @@
                 "siteAuthSettings": {
                 },
                 "localMySqlEnabled": "false",
-                "managedServiceIdentityId": "1284",
                 "ipSecurityRestrictions": [
                     {
                         "ipAddress": "205.237.253.10/32",
-                        "name": "AllowSoquij",
-                        "description": "AllowSoquij",
+                        "name": "Allow_Soquij",
+                        "description": "Allow_Soquij",
                         "priority": "100"
                     }
                 ],
                 "scmIpSecurityRestrictionsUseMain": "true",
-                "http20Enabled": "true",
+                "http20Enabled": "false",
                 "minTlsVersion": "1.2",
                 "ftpsState": "AllAllowed",
-                "reservedInstanceCount": "0",
-                "fileChangeAuditEnabled": "false"
+                "reservedInstanceCount": "0"
             }
         },
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
-            "name": "[concat(variables('sites_gummaster_name'), '/web')]",
+            "name": "[concat(variables('sites_Veille_func_name'), '/web')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('sites_gummaster_name'))]"
+                "[resourceId('Microsoft.Web/sites', variables('sites_Veille_func_name'))]"
             ],
-            "tags": {
-                "Environnement": "[parameters('Environnement')]"
-            },
             "properties": {
                 "numberOfWorkers": "1",
                 "defaultDocuments": [
@@ -369,8 +375,7 @@
                     "index.html",
                     "iisstart.htm",
                     "default.aspx",
-                    "index.php",
-                    "hostingstart.html"
+                    "index.php"
                 ],
                 "netFrameworkVersion": "v4.0",
                 "phpVersion": "5.6",
@@ -382,11 +387,11 @@
                 "httpLoggingEnabled": "false",
                 "logsDirectorySizeLimit": "35",
                 "detailedErrorLoggingEnabled": "false",
-                "publishingUsername": "[concat('$', variables('sites_gumfrontend_name'), '-', parameters('Environnement'))]",
-                "scmType": "VSTSRM",
+                "publishingUsername": "[concat('$Veille-' , parameters('Environnement'))]",
+                "scmType": "None",
                 "use32BitWorkerProcess": "true",
                 "webSocketsEnabled": "false",
-                "alwaysOn": "[if(equals(parameters('Environnement'), 'prd'), 'true', 'false')]",
+                "alwaysOn": "false",
                 "appCommandLine": "",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
@@ -413,102 +418,40 @@
                 "siteAuthEnabled": "false",
                 "siteAuthSettings": {
                 },
+                "cors": {
+                    "allowedOrigins": [
+                        "https://functions.azure.com",
+                        "https://functions-staging.azure.com",
+                        "https://functions-next.azure.com"
+                    ],
+                    "supportCredentials": "false"
+                },
                 "localMySqlEnabled": "false",
-                "managedServiceIdentityId": "1285",
                 "ipSecurityRestrictions": [
                     {
                         "ipAddress": "205.237.253.10/32",
-                        "name": "AllowSoquij",
-                        "description": "AllowSoquij",
+                        "name": "Allow_Soquij",
+                        "description": "Allow_Soquij",
                         "priority": "100"
                     }
                 ],
                 "scmIpSecurityRestrictionsUseMain": "true",
-                "http20Enabled": "true",
+                "http20Enabled": "false",
                 "minTlsVersion": "1.2",
                 "ftpsState": "AllAllowed",
-                "reservedInstanceCount": "0",
-                "fileChangeAuditEnabled": "false"
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/hostNameBindings",
-            "apiVersion": "2016-08-01",
-            "name": "[concat(variables('sites_gumfrontend_name'), '/', variables('sites_gumfrontend_name'), '.azurewebsites.net')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('sites_gumfrontend_name'))]"
-            ],
-            "properties": {
-                "siteName": "[concat(variables('sites_gumfrontend_name'), parameters('Environnement'))]",
-                "hostNameType": "Verified"
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/hostNameBindings",
-            "apiVersion": "2016-08-01",
-            "name": "[concat(variables('sites_gummaster_name'), '/', variables('sites_gummaster_name'), '.azurewebsites.net')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('sites_gummaster_name'))]"
-            ],
-            "properties": {
-                "siteName": "[concat(variables('sites_gummaster_name'), parameters('Environnement'))]",
-                "hostNameType": "Verified"
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites",
-            "apiVersion": "2016-08-01",
-            "name": "[variables('sites_Solrwebapp_name')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_gumfrontend_name'))]"
-            ],
-            "kind": "app",
-            "properties": {
-                "enabled": true,
-                "hostNameSslStates": [
-                    {
-                        "name": "[concat( variables('sites_Solrwebapp_name') , '.azurewebsites.net')]",
-                        "sslState": "Disabled",
-                        "hostType": "Standard"
-                    },
-                    {
-                        "name": "[concat( variables('sites_Solrwebapp_name') , 'scm.azurewebsites.net')]",
-                        "sslState": "Disabled",
-                        "hostType": "Repository"
-                    }
-                ],
-                "serverFarmId": "[variables('serverfarms_gumfrontend_name')]",
-                "siteConfig": {
-                    "appSettings": [
-                        {
-                            "name": "WEBSITE_TIME_ZONE",
-                            "value": "Eastern Standard Time"
-                        }
-                    ]
-                },
-                "reserved": false,
-                "scmSiteAlsoStopped": false,
-                "clientAffinityEnabled": true,
-                "clientCertEnabled": false,
-                "hostNamesDisabled": false,
-                "containerSize": 0,
-                "dailyMemoryTimeQuota": 0,
-                "httpsOnly": true
+                "reservedInstanceCount": "0"
             }
         },
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-02-01",
-            "name": "[concat(variables('sites_Solrwebapp_name'), '/web')]",
+            "name": "[concat( variables('sites_Veille_name'), '/web')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('sites_Solrwebapp_name'))]"
+                "[resourceId('Microsoft.Web/sites', variables('sites_Veille_name'))]"
             ],
             "properties": {
-                "numberOfWorkers": 1,
+                "numberOfWorkers": "1",
                 "defaultDocuments": [
                     "Default.htm",
                     "Default.html",
@@ -525,34 +468,31 @@
                 "pythonVersion": "",
                 "nodeVersion": "",
                 "linuxFxVersion": "",
-                "requestTracingEnabled": false,
-                "remoteDebuggingEnabled": false,
+                "requestTracingEnabled": "false",
+                "remoteDebuggingEnabled": "false",
                 "remoteDebuggingVersion": "VS2017",
-                "httpLoggingEnabled": false,
+                "httpLoggingEnabled": "false",
                 "logsDirectorySizeLimit": 35,
-                "detailedErrorLoggingEnabled": false,
-                "publishingUsername": "[variables('sites_Solrwebapp_name')]",
+                "detailedErrorLoggingEnabled": "false",
+                "publishingUsername": "[concat('$Veille-' , parameters('Environnement'))]",
                 "scmType": "None",
                 "use32BitWorkerProcess": "true",
-                "webSocketsEnabled": false,
-                "alwaysOn": "[if(equals(parameters('Environnement'), 'prd'), 'true', 'false')]",
-                "javaVersion": "1.8",
-                "javaContainer": "JETTY",
-                "javaContainerVersion": "9.3",
+                "webSocketsEnabled": "false",
+                "alwaysOn": "false",
                 "appCommandLine": "",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
                     {
                         "virtualPath": "/",
                         "physicalPath": "site\\wwwroot",
-                        "preloadEnabled": true,
+                        "preloadEnabled": "true",
                         "virtualDirectories": null
                     }
                 ],
-                "winAuthAdminState": 0,
-                "winAuthTenantState": 0,
-                "customAppPoolIdentityAdminState": false,
-                "customAppPoolIdentityTenantState": false,
+                "winAuthAdminState": "0",
+                "winAuthTenantState": "0",
+                "customAppPoolIdentityAdminState": "false",
+                "customAppPoolIdentityTenantState": "false",
                 "loadBalancing": "LeastRequests",
                 "routingRules": [
                 ],
@@ -560,85 +500,91 @@
                     "rampUpRules": [
                     ]
                 },
-                "autoHealEnabled": false,
+                "autoHealEnabled": "false",
                 "vnetName": "",
-                "siteAuthEnabled": false,
-                "localMySqlEnabled": false,
+                "siteAuthEnabled": "false",
+                "siteAuthSettings": {
+                },
+                "localMySqlEnabled": "false",
                 "ipSecurityRestrictions": [
                     {
                         "ipAddress": "205.237.253.10/32",
-                        "name": "AllowSoquij",
-                        "description": "AllowSoquij",
+                        "name": "Allow_Soquij",
+                        "description": "Allow_Soquij",
                         "priority": "100"
                     }
                 ],
                 "scmIpSecurityRestrictionsUseMain": "true",
-                "http20Enabled": false,
+                "http20Enabled": "false",
                 "minTlsVersion": "1.2",
                 "ftpsState": "AllAllowed",
-                "reservedInstanceCount": 0,
-                "fileChangeAuditEnabled": false,
-                "functionsRuntimeScaleMonitoringEnabled": false
+                "reservedInstanceCount": "0"
             }
         },
         {
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
-            "name": "[concat(variables('sites_Solrwebapp_name'), '/', variables('sites_Solrwebapp_name'), '.azurewebsites.net')]",
+            "name": "[concat(variables('sites_AppsInterne_name'), '/', variables('sites_AppsInterne_name'), '.azurewebsites.net')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('sites_Solrwebapp_name'))]"
+                "[resourceId('Microsoft.Web/sites', variables('sites_AppsInterne_name'))]"
             ],
             "properties": {
-                "siteName": "[variables('sites_Solrwebapp_name')]",
+                "siteName": "[concat('appsinterne-',  parameters('environnement'))]",
                 "hostNameType": "Verified"
             }
         },
         {
-            "type": "Microsoft.Logic/workflows",
-            "apiVersion": "2017-07-01",
-            "name": "[variables('ExportationDesLiensVersAppVeille')]",
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2016-08-01",
+            "name": "[concat(variables('sites_Veille_func_name'), '/', variables('sites_Veille_func_name'), '.azurewebsites.net')]",
             "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('sites_Veille_func_name'))]"
+            ],
             "properties": {
-                "state": "Enabled",
-                "definition": {
-                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-                    "contentVersion": "1.0.0.0",
-                    "parameters": {
-                    },
-                    "triggers": {
-                        "Recurrence": {
-                            "recurrence": {
-                                "frequency": "Day",
-                                "interval": 1,
-                                "schedule": {
-                                    "hours": [
-                                        "12"
-                                    ],
-                                    "minutes": [
-                                        0
-                                    ]
-                                },
-                                "timeZone": "Eastern Standard Time"
-                            },
-                            "type": "Recurrence",
-                            "inputs": {
-                            }
-                        }
-                    },
-                    "actions": {
-                        "HTTP": {
-                            "runAfter": {
-                            },
-                            "type": "Http",
-                            "inputs": {
-                                "method": "GET",
-                                "uri": "[concat('https://gummaster-', parameters('Environnement'), '.azurewebsites.net/Umbraco/Api/VeilleDeLien/ExporterLiensExternesVersAppVeilleContenu')]"
-                            }
-                        }
-                    }
-                }
+                "siteName": "[concat('veille-func-' , parameters('Environnement'))]",
+                "hostNameType": "Verified"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2016-08-01",
+            "name": "[concat(variables('sites_Veille_name'), '/', variables('sites_Veille_name'), '.azurewebsites.net')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('sites_Veille_name'))]"
+            ],
+            "properties": {
+                "siteName": "[concat('veille-' , parameters('Environnement'))]",
+                "hostNameType": "Verified"
             }
         }
-    ]
+    ],
+    "outputs": {
+        "AzureBlobFileSystem.ConnectionString:media": {
+            "type": "string",
+            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_appsinterne_name' ) ,';AccountKey=' , parameters('storappsinterneAccountKey'), ';EndpointSuffix=core.windows.net')]"
+        },
+        "AzureBlobFileSystem.RootUrl:media": {
+            "type": "string",
+            "value": "[concat( 'https://' , variables('storageAccounts_appsinterne_name'), '.blob.core.windows.net')]"
+        },
+        "VeilleDeLien.UrlBase": {
+            "type": "string",
+            "value": "[concat('https://veille-', parameters('Environnement'), '.azurewebsites.net')]"
+        },
+        "GuichetUnique.UrlBase": {
+            "type": "string",
+            "value": "[concat('https://gummaster-', parameters('environnement'), '.azurewebsites.net/umbraco')]"
+        },
+        "AzureWebJobsStorage": {
+            "type": "string",
+            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', parameters('storveillefuncAccountKey'))]"
+        },
+        "bd_VeilleContenuExterneEntities": {
+            "type": "string",
+            "value": "[concat('Data Source=sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin' , parameters('Environnement'), ';Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework')]"
+        }
+    }
 }
