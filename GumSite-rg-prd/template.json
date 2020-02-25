@@ -28,7 +28,13 @@
             "tags": {
                 "Environnement": "[parameters('Environnement')]"
             },
-            "sku": "[if(equals(parameters('Environnement'), 'prd'),json('{\"name\":\"B1\",\"tier\":\"Basic\",\"size\":\"B1\",\"family\":\"B\",\"capacity\": 1}'),json('{\"name\":\"F1\",\"tier\":\"Free\",\"size\":\"F1\",\"family\":\"F\",\"capacity\": 0}'))]",
+            "sku": {
+                "name": "B1",
+                "tier": "Basic",
+                "size": "B1",
+                "family": "B",
+                "capacity": 1
+            },
             "kind": "app",
             "properties": {
                 "name": "[variables('serverfarms_gumfrontend_name')]",
