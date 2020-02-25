@@ -5,9 +5,6 @@
         "Environnement": {
             "type": "string"
         },
-        "AdminPassword": {
-            "type": "securestring"
-        },
         "SQLRWPassword": {
             "type": "securestring"
         }
