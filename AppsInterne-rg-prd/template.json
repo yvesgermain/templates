@@ -5,21 +5,13 @@
         "Environnement": {
             "type": "string"
         },
-        "storappsinterneAccountKey": {
-            "type": "securestring"
-        },
-        "storveillefuncAccountKey": {
-            "type": "securestring"
-        },
-        "AdminPassword": {
-            "type": "securestring"
-        },
-        "SQLRWPassword": {
+        "SQLadminPassword": {
             "type": "securestring"
         }
     },
     "variables": {
         "sites_Veille_name": "[concat('Veille-', parameters('Environnement'))]",
+        "StorResourcegroup": "[concat('appsstorage-rg-', parameters('Environnement'))]",
         "sites_AppsInterne_name": "[concat('AppsInterne-', parameters('Environnement'))]",
         "sites_Veille_func_name": "[concat('Veille-func-', parameters('Environnement'))]",
         "serverfarms_ASP_Standard_name": "[concat('ASP-AppsStandard-', parameters('Environnement'))]",
@@ -104,7 +96,7 @@
                     "appSettings": [
                         {
                             "name": "AzureBlobFileSystem.ConnectionString:media",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_appsinterne_name') ,';AccountKey=' , parameters('storappsinterneAccountKey'), ';EndpointSuffix=core.windows.net')]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_appsinterne_name') ,';AccountKey=' , listKeys(resourceId( variables('StorResourceGroup'),'Microsoft.Storage/storageAccounts', variables('storageAccounts_appsinterne_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value, ';EndpointSuffix=core.windows.net')]"
                         },
                         {
                             "name": "AzureBlobFileSystem.RootUrl:media",
@@ -154,7 +146,7 @@
                     "connectionStrings": [
                         {
                             "name": "umbracoDbDSN",
-                            "connectionString": "[concat( 'Server=tcp:sqlguminterne-', parameters('environnement'), '.database.windows.net,1433;Initial Catalog=BdAppsInterne-', parameters('environnement'), ';Persist Security Info=False;User ID=sqlrw', parameters('environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('SQLRWPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=180;App=EntityFramework;Authentication=\"Active Directory Password\"')]",
+                            "connectionString": "[concat( 'Server=tcp:sqlguminterne-', parameters('environnement'), '.database.windows.net,1433;Initial Catalog=BdAppsInterne-', parameters('environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('sqladminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=180;App=EntityFramework;Authentication=\"Active Directory Password\"')]",
                             "type": "SQLAzure"
                         }
                     ]
@@ -200,17 +192,17 @@
                     "appSettings": [
                         {
                             "name": "AzureWebJobsDashboard",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', parameters('storveillefuncAccountKey'))]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId( variables('StorResourceGroup'),'Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
                         },
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', parameters('storveillefuncAccountKey'))]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', listKeys(resourceId( variables('StorResourceGroup'),'Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
                         }
                     ],
                     "connectionStrings": [
                         {
                             "name": "bd_VeilleContenuExterneEntities",
-                            "value": "[concat( 'Server=tcp:sqlguminterne-',  parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-',  parameters('Environnement'), ';Persist Security Info=False;User ID=sqlrw',  parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=',  parameters('SQLRWPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework;Authentication=\"Active Directory Password\"')]",
+                            "value": "[concat( 'Server=tcp:sqlguminterne-',  parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-',  parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin',  parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=',  parameters('sqladminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework;Authentication=\"Active Directory Password\"')]",
                             "type": "SQLserver"
                         }
                     ]
@@ -247,7 +239,7 @@
                     "connectionStrings": [
                         {
                             "name": "bd_VeilleContenuExterneEntities",
-                            "connectionString": "[concat( 'Server=tcp:sqlguminterne-',  parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-',  parameters('Environnement'), ';Persist Security Info=False;User ID=SQLrw',  parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=',  parameters('SQLRWPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\";')]",
+                            "connectionString": "[concat( 'Server=tcp:sqlguminterne-',  parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-',  parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin',  parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=',  parameters('sqladminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\";')]",
                             "type": "SQLServer"
                         },
                         {
@@ -564,7 +556,7 @@
     "outputs": {
         "AzureBlobFileSystem.ConnectionString:media": {
             "type": "string",
-            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_appsinterne_name' ) ,';AccountKey=' , parameters('storappsinterneAccountKey'), ';EndpointSuffix=core.windows.net')]"
+            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_appsinterne_name' ) ,';AccountKey=' , listKeys(resourceId( variables('StorResourceGroup'),'Microsoft.Storage/storageAccounts', variables('storageAccounts_appsinterne_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
         },
         "AzureBlobFileSystem.RootUrl:media": {
             "type": "string",
@@ -580,11 +572,11 @@
         },
         "AzureWebJobsStorage": {
             "type": "string",
-            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=', parameters('storveillefuncAccountKey'))]"
+            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=', variables('storageAccounts_veillefunc_name'), ';AccountKey=',listKeys(resourceId( variables('StorResourceGroup'),'Microsoft.Storage/storageAccounts', variables('storageAccounts_veillefunc_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
         },
         "bd_VeilleContenuExterneEntities": {
             "type": "string",
-            "value": "[concat('Data Source=sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin' , parameters('Environnement'), ';Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework')]"
+            "value": "[concat('Data Source=sqlguminterne-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin' , parameters('Environnement'), ';Password=', parameters('sqladminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;App=EntityFramework')]"
         }
     }
 }
