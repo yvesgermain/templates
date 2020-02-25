@@ -7,6 +7,9 @@
         },
         "AdminPassword": {
             "type": "securestring"
+        },
+        "SQLRWPassword": {
+            "type": "securestring"
         }
     },
     "variables": {
@@ -145,7 +148,7 @@
                     "connectionStrings": [
                         {
                             "name": "umbracoDbDSN",
-                            "connectionString": "[concat('Server=tcp:SqlGum-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdGum-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\"')]",
+                            "connectionString": "[concat('Server=tcp:SqlGum-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdGum-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqlrw', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('SQLRWPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\"')]",
                             "type": "SQLAzure"
                         }
                     ]
@@ -249,7 +252,7 @@
                     "connectionStrings": [
                         {
                             "name": "umbracoDbDSN",
-                            "connectionString": "[concat('Server=tcp:SqlGum-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdGum-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('AdminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=180;Authentication=\"Active Directory Password\"')]",
+                            "connectionString": "[concat('Server=tcp:SqlGum-', parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdGum-', parameters('Environnement'), ';Persist Security Info=False;User ID=sqlrw', parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=', parameters('SQLRWPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=180;Authentication=\"Active Directory Password\"')]",
                             "type": "SQLAzure"
                         }
                     ]
