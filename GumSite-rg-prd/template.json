@@ -13,6 +13,9 @@
         }
     },
     "variables": {
+        "Accountstorgum": "[concat('storgum', parameters('Environnement'))]",
+        "Resourcegroup": "[concat('gumstorage-rg-', parameters('Environnement'))]",
+        "SasAccountstorgum": "[listKeys(resourceId( variables('Resourcegroup'),'Microsoft.Storage/storageAccounts', variables('Accountstorgum')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
         "sites_gummaster_name": "[concat('GumMaster-', parameters('Environnement'))]",
         "sites_gumfrontend_name": "[concat('Gum-', parameters('Environnement'))]",
         "serverfarms_gummaster_name": "[concat('ASP-Standard-', parameters('Environnement'))]",
@@ -88,7 +91,7 @@
                     "appSettings": [
                         {
                             "name": "AzureBlobFileSystem.ConnectionString:media",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=storgum', parameters('Environnement'), ';AccountKey=', parameters('AccountKey'))]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=storgum', parameters('Environnement'), ';AccountKey=', variables('SasAccountstorgum'))]"
                         },
                         {
                             "name": "AzureBlobFileSystem.RootUrl:media",
@@ -192,7 +195,7 @@
                     "appSettings": [
                         {
                             "name": "AzureBlobFileSystem.ConnectionString:media",
-                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=storgum', parameters('Environnement'), ';AccountKey=', parameters('AccountKey'))]"
+                            "value": "[concat( 'DefaultEndpointsProtocol=https;AccountName=storgum', parameters('Environnement'), ';AccountKey=', variables('SasAccountstorgum'))]"
                         },
                         {
                             "name": "AzureBlobFileSystem.RootUrl:media",
