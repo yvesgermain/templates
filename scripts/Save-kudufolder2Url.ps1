@@ -7,7 +7,7 @@ param(
     $DefaultWorkingDirectory,
     [Parameter(Mandatory = $True)]
     [string]
-    [ValidateSet("Gum", "GumSolr", "Veille", "AppsInterne")] 
+    [ValidateSet("Gum", "Gummaster", "GumSolr", "Veille", "AppsInterne")] 
     [string]
     $WebApp,
     [string] 
@@ -27,7 +27,8 @@ $ZipFilePath = ("c:\temp\" + $environnement + "\" + $webAppName + (get-date -For
 $Destination = ($ZipFolder + ":\" + $environnement + "\" + $webAppName + (get-date -Format "yyyy-MM-dd") + ".zip") 
 
 $scrap = Compress-KuduFolderToZipFile -Environnement $environnement -resourceGroupName $resourceGroupName -webAppName $webAppName -ZipFilePath $ZipFilePath -kuduPath $kuduPath
-if ($scrap -notlike "false") {
+"Scrap = " + $scrap
+if ($scrap -notlike "*false*") {
     copy-item -Path $ZipFilePath  -Destination $Destination
     Get-ChildItem ($ZipFolder + ":\" + $environnement) | Where-Object { $_.LastWriteTime -lt (get-date).adddays(-10) } | remove-item
     remove-psdrive -name $ZipFolder

@@ -89,10 +89,10 @@ function Compress-KuduFolderToZipFile($resourceGroupName, $webAppName, $slotName
             -OutFile $ZipFilepath `
             -erroraction Stop `
             -ContentType "multipart/form-data" 
-    }
-    catch { return $false }
+    }  catch [exception] { return $false }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/zip/site/wwwroot", "")
     Write-Host "Downloading WebApp to ZipFile. Source: '$virtualPath'. Target: '$ZipFilepath'..."  -ForegroundColor DarkGray
+    return $true
 }
 
 function Compress-KuduFolderFromZipFile($resourceGroupName, $webAppName, $slotName = "", $ZipFilePath, $kuduPath) {
@@ -108,10 +108,10 @@ function Compress-KuduFolderFromZipFile($resourceGroupName, $webAppName, $slotNa
             -Method Put `
             -InFile $ZipFilepath `
             -ContentType "multipart/form-data" 
-    }
-    catch { return $false }
+    } catch [exception] { return $false }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/zip/site/wwwroot", "")
-    Write-Host "Uploading ZipFile to WebApp.  Source: '$ZipFilepath'. Target: '$virtualPath'..."  -ForegroundColor DarkGray    
+    Write-Host "Uploading ZipFile to WebApp.  Source: '$ZipFilepath'. Target: '$virtualPath'..."  -ForegroundColor DarkGray  
+    return $true  
 }
 
 function Add-IpPermsFunc {
