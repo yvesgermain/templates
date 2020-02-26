@@ -11,8 +11,7 @@ function Get-AzureRmWebAppPublishingCredentials($resourceGroupName, $webAppName,
     if ([string]::IsNullOrWhiteSpace($slotName)) {
         $resourceType = "Microsoft.Web/sites/config"
         $resourceName = "$webAppName/publishingcredentials"
-    }
-    else {
+    }  else {
         $resourceType = "Microsoft.Web/sites/slots/config"
         $resourceName = "$webAppName/$slotName/publishingcredentials"
     }
@@ -28,8 +27,7 @@ function Get-FileFromWebApp($resourceGroupName, $webAppName, $slotName = "", $ku
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $resourceGroupName $webAppName $slotName
     if ($slotName -like "") {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
-    }
-    else {
+    } else {
         $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/vfs/site/wwwroot", "")
@@ -47,8 +45,7 @@ function Read-FilesFromWebApp($resourceGroupName, $webAppName, $slotName = "", $
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $resourceGroupName $webAppName $slotName
     if ($slotName -like "") {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
-    }
-    else {
+    } else {
         $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/vfs/site/wwwroot", "")
@@ -65,8 +62,7 @@ function Push-FileToWebApp($resourceGroupName, $webAppName, $slotName = "", $loc
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
     if ($slotName -eq "") {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
-    }
-    else {
+    } else {
         $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/vfs/site/wwwroot", "")
@@ -101,8 +97,7 @@ function Compress-KuduFolderFromZipFile($resourceGroupName, $webAppName, $slotNa
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
     if ($slotName -eq "") {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
-    }
-    else {
+    } else {
         $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/zip/site/wwwroot", "")
@@ -264,8 +259,7 @@ On s'authentifie et on download le fichier security.config que l'on modifie et u
             -Method $Method `
             -OutFile $OutFile `
             -ContentType "multipart/form-data"
-    }
-    else {
+    } else {
         Invoke-RestMethod -Uri $kuduApiUrl `
             -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
             -Method $Method `
@@ -338,8 +332,7 @@ function Restore-KuduFolderFromZipFile(
     $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
     if ($slotName -eq "") {
         $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
-    }
-    else {
+    } else {
         $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/zip/site/wwwroot", "")
