@@ -19,7 +19,7 @@ param(
 
 # Declaration de variables:
 if ($env:COMPUTERNAME -like "srvtfs01") { . "$DefaultWorkingDirectory\DevOps\scripts\Functions.ps1" }  else { . C:\templates\DevOps\scripts\Functions.ps1 }
-if ($webApp -like "Gumsolr") { $kuduPath = "server/solr/index/" } Else {$kuduPath = "app_data/logs/"} 
+if ($webApp -like "Gumsolr") { $kuduPath = "server/solr/index/" } Else {$kuduPath = "App_Data/Logs/"} 
 if (!( Get-PSDrive -name z -ErrorAction SilentlyContinue)) {new-azdrive}
 $WebappName = "$webapp-$Environnement"
 $resourceGroupName = (get-azureRmwebapp -name $webAppName ).resourcegroup
