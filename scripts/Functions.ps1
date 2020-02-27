@@ -89,7 +89,8 @@ function Compress-KuduFolderToZipFile($resourceGroupName, $webAppName, $slotName
             -OutFile $ZipFilepath `
             -erroraction Stop `
             -ContentType "multipart/form-data" 
-    }  catch [exception] { return $false }
+    }
+    catch [exception] { return $false }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/zip/site/wwwroot", "")
     Write-Host "Downloading WebApp to ZipFile. Source: '$virtualPath'. Target: '$ZipFilepath'..."  -ForegroundColor DarkGray
     return $true
@@ -108,7 +109,8 @@ function Compress-KuduFolderFromZipFile($resourceGroupName, $webAppName, $slotNa
             -Method Put `
             -InFile $ZipFilepath `
             -ContentType "multipart/form-data" 
-    } catch [exception] { return $false }
+    }
+    catch [exception] { return $false }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/zip/site/wwwroot", "")
     Write-Host "Uploading ZipFile to WebApp.  Source: '$ZipFilepath'. Target: '$virtualPath'..."  -ForegroundColor DarkGray  
     return $true  
@@ -308,7 +310,7 @@ function Restore-KuduFolderFromZipFile(
         $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
     }
     $virtualPath = $kuduApiUrl.Replace(".scm.azurewebsites.", ".azurewebsites.").Replace("/api/zip/site/wwwroot", "")
-    Write-Host "Uploading ZipFile to WebApp.  Source: '$ZipFilepath'. Target: '$virtualPath'..."  -ForegroundColor DarkGray
+    Write-Host "Uploading ZipFile to WebApp.  Source: '$ZipFilepath'. Target: $virtualPath..."  -ForegroundColor DarkGray
     if (!( Get-PSDrive -name $ZipFolder -ErrorAction SilentlyContinue)) { new-azdrive }
     $kuduApiUrl
     Invoke-RestMethod -Uri $kuduApiUrl `
@@ -316,4 +318,36 @@ function Restore-KuduFolderFromZipFile(
         -Method Put `
         -InFile $ZipFilepath `
         -ContentType "multipart/form-data"
+}
+
+function remove-kududirectory(
+    [string]
+    $resourceGroupName, 
+    [string]
+    $webAppName, 
+    $slotName = "",
+    [Parameter(Mandatory = $True)]
+    [string]
+    [ValidateSet("dev", "qa", "prd", "devops")] 
+    $Environnement
+) {
+    $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
+    if ($slotName -eq "") {
+        $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/command"
+    } else {
+        $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/command"
+    }
+$json = @"
+{
+"command": 'powershell.exe -command `"rd index -recurse -force`"',
+"dir":'site\\wwwroot\\server\\solr'
+}
+"@
+    Write-Host "Deleting folder https://$webAppName.scm.azurewebsites.net/site/wwwroot/server/solr/index"  -ForegroundColor DarkGray
+    $kuduApiUrl
+    Invoke-RestMethod -Uri $kuduApiUrl `
+        -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
+        -Method Post `
+        -Body $json `
+        -ContentType "application/json"
 }
