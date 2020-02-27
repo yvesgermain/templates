@@ -397,7 +397,7 @@ function set-kuduFileContent(
     }
 $json = @"
 {
-"command": 'powershell.exe -command `"(get-content web.config).replace(\'startupTimeLimit=\"20\"\',\'startupTimeLimit=\"180\"\') | set-content -path web.config -encoding utf8`"',
+"command": 'powershell.exe -command `"(get-content web.config).replace(\'\"20\"\',\'\"180\"\') | set-content -path web.config -encoding utf8`"',
 "dir":'site\\wwwroot'
 }
 "@
