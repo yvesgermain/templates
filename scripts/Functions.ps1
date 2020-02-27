@@ -351,3 +351,61 @@ $json = @"
         -Body $json `
         -ContentType "application/json"
 }
+
+function Remove-kudufile(
+    [string]
+    [ValidateSet("dev", "qa", "prd", "devops")] 
+    $Environnement,
+    [string]
+    $resourceGroupName, 
+    [string]
+    $webAppName, 
+    $slotName = "",
+    [string]
+    $kuduPath
+){
+    $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
+    if ($slotName -eq "") {
+        $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/$kuduPath"
+    } else {
+        $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/$kuduPath"
+    }
+    Write-Host "Deleting ZipFile...$ZipFilePath"  -ForegroundColor DarkGray
+    $kuduApiUrl
+    Invoke-RestMethod -Uri $kuduApiUrl `
+        -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
+        -Method Delete `
+        -ContentType "multipart/form-data"
+}
+
+function set-kuduFileContent(
+    [string]
+    $resourceGroupName, 
+    [string]
+    $webAppName, 
+    $slotName = "",
+    [Parameter(Mandatory = $True)]
+    [string]
+    [ValidateSet("dev", "qa", "prd", "devops")] 
+    $Environnement
+) {
+    $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue -resourceGroupName $resourceGroupName -WebAppName $webAppName -slotName $slotName
+    if ($slotName -eq "") {
+        $kuduApiUrl = "https://$webAppName.scm.azurewebsites.net/api/command"
+    } else {
+        $kuduApiUrl = "https://$webAppName`-$slotName.scm.azurewebsites.net/api/command"
+    }
+$json = @"
+{
+"command": 'powershell.exe -command `"(get-content web.config).replace(\'startupTimeLimit=\"20\"\',\'startupTimeLimit=\"180\"\') | set-content -path web.config -encoding utf8`"',
+"dir":'site\\wwwroot'
+}
+"@
+    Write-Host "Set Content https://$webAppName.scm.azurewebsites.net/site/wwwroot/web.config"  -ForegroundColor DarkGray
+    $kuduApiUrl
+    Invoke-RestMethod -Uri $kuduApiUrl `
+        -Headers @{"Authorization" = $kuduApiAuthorisationToken; "If-Match" = "*" } `
+        -Method Post `
+        -Body $json `
+        -ContentType "application/json"
+}

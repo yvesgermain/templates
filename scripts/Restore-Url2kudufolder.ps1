@@ -33,6 +33,10 @@ if ( $removekududirectory) {
     remove-kududirectory -Environnement $environnement -resourceGroupName $resourceGroupName -webAppName $webAppName
     }
 Restore-KuduFolderFromZipFile -Environnement $environnement -resourceGroupName $resourceGroupName -webAppName $webAppName -ZipFilePath $ZipFilePath -kuduPath $kuduPath 
+
 Get-ChildItem ($ZipFolder + ":\" + $environnement) | Where-Object { $_.LastWriteTime -lt (get-date).adddays(-10) } | remove-item
 remove-psdrive -name $ZipFolder
 Remove-Item -path $ZipFilePath -Confirm:$false
+
+# Changer le startupTimeLimit de 20 seconde a 180
+set-kuduFileContent -resourceGroupName gumsite-rg-$Environnement -webAppName gumsolr-$Environnement -Environnement $environnement
