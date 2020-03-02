@@ -33,8 +33,8 @@ function copy-storage {
     $GumBackupKey = (get-azureRMstorageaccountkey -Name gumbackups -ResourceGroupName infrastructure | where-object { $_.keyname -eq "key1" }).value
 
     $date = get-date -Format "yyyyMMdd"
-
-    if (!( get-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumbackups -name "$container-$Environnement-$date" -ErrorAction SilentlyContinue) ) {
+    $context = get-Azstorageaccount -ResourceGroupName infrastructure -StorageAccountName gumbackups
+    if (!( get-AzStorageContainer -context $context.Context -ErrorAction SilentlyContinue) ) {
         New-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumbackups -Name "$container-$Environnement-$date" 
     }
 
@@ -59,5 +59,5 @@ foreach ($storage in $Store) {
 
 # Enlever les container de plus de 10 jours
 foreach ($app in "appsinterne*", "guichetunique*" ) {
-    Get-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumbackups | where-object { $_.name -like "$app*" -and $_.LastModifiedTime -lt (get-date).adddays(-10) } | remove-AzureRmStorageContainer -force
+    Get-AzStorageContainer -context $Context.Context | where-object { $_.name -like "$app*" -and $_.LastModifiedTime -lt (get-date).adddays(-10) } | remove-AzureRmStorageContainer -force
 }

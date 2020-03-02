@@ -23,6 +23,7 @@ $localpath = "c:\temp\logskudu\";
 if ( Test-path $localpath) { remove-item $localpath -Recurse -Force -Confirm:$false }
 mkdir $localpath
 $AzCopyPath = "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe"
+$context = get-Azstorageaccount -ResourceGroupName infrastructure -StorageAccountName Gumlogs
 "Getting Azure Gumlogs key"
 $key = (Get-AzureRmStorageAccountKey -Name gumlogs -ResourceGroupName Infrastructure )[0].value
 
@@ -36,7 +37,7 @@ Foreach ($webappname in $webappnames) {
             Read-FilesFromWebApp -resourceGroupName $resourceGroupName -webAppName $webAppName -kuduPath $("$kuduPath$name") -localPath $("$localPath$webappname\$name") }
         $Container = "$webappname$(get-date -Format `"yyyy-MM-dd`")".ToLower()
         "New-AzureRmStorageContainer -Context $context.context -Name $Container"
-        if (!(get-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumlogs -Name $Container -ErrorAction SilentlyContinue)) {
+        if (!(get-AzStorageContainer -context $Context.context -Name $Container -ErrorAction SilentlyContinue)) {
             New-AzureRmStorageContainer -resourcegroupName Infrastructure -StorageAccountName gumlogs -Name $Container
         }
         & $AzCopyPath /Source:"$localPath$webappname" /Dest:"https://gumlogs.blob.core.windows.net/$Container" /DestKey:$key /S /Y
