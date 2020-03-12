@@ -200,7 +200,7 @@ function Add-IpPermsFunc {
     $WebAppConfig = (Get-AzureRmResource -ResourceType Microsoft.Web/sites/config -ResourceName $Target_site -ResourceGroupName $Target_ResourceGroupName -ApiVersion $APIVersion)
     $WebAppConfig.Properties.ipsecurityrestrictions
     [System.Collections.ArrayList]$ArrayList = $WebAppConfig.Properties.ipsecurityrestrictions;
-    $priority = ($WebAppConfig.properties.ipsecurityrestrictions.priority | Where-Object { $_ -lt 6500 } | Sort-Object )[-1];
+    try {$priority = ($WebAppConfig[0].properties.ipsecurityrestrictions.priority | Where-Object { $_ -lt 65000 } | Sort-Object )[-1]} catch [Exception] {$priority +=20}
 
     $IP | ForEach-Object { 
         $Ip = $_;
