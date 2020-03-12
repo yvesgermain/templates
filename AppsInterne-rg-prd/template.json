@@ -236,15 +236,17 @@
                 "enabled": true,
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_ASP_Standard_name'))]",
                 "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "usagers",
+                            "value": "Invité;Alexandre Locas;Anne-Claire Dalmont;Anne-Marie Santorineos;Anne Laurence Boulanger;Annie Mongeon;David Ardoin;Joëlle Duranleau;Michelle-Andrée Hogue;Philippe Charbonneau;Pierre Bourgeois;Salim Boudjemia;Wassila Djaid;Yves Germain"
+                        }
+                    ],                  
                     "connectionStrings": [
                         {
                             "name": "bd_VeilleContenuExterneEntities",
                             "connectionString": "[concat( 'Server=tcp:sqlguminterne-',  parameters('Environnement'), '.database.windows.net,1433;Initial Catalog=BdVeille-',  parameters('Environnement'), ';Persist Security Info=False;User ID=sqladmin',  parameters('Environnement'), '@gumqc.OnMicrosoft.com;Password=',  parameters('sqladminPassword'), ';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Authentication=\"Active Directory Password\";')]",
                             "type": "SQLServer"
-                        },
-                        {
-                        "name": "usagers",
-                        "value":"Invité;Alexandre Locas;Anne-Claire Dalmont;Anne-Marie Santorineos;Anne Laurence Boulanger;Annie Mongeon;David Ardoin;Joëlle Duranleau;Michelle-Andrée Hogue;Philippe Charbonneau;Pierre Bourgeois;Salim Boudjemia;Wassila Djaid"
                         }
                     ],
                     "hostNameSslStates": [
