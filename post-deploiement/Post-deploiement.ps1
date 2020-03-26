@@ -8,58 +8,50 @@ $SQL = @(
     @{Serveur = "sqlguminterne-" ; ResourceGroupName = "SQLApps-rg-"; BD = "BdAppsInterne-" }
     @{Serveur = "sqlguminterne-" ; ResourceGroupName = "SQLApps-rg-"; BD = "BdVeille-" }
 )
+$WebApp = @(
+    @{App = "Gum-"        ; ResourceGroupName = "GumSite-rg-"; Kind = "App" }
+    @{App = "GumMaster-"  ; ResourceGroupName = "GumSite-rg-"; Kind = "App"}
+    @{App = "GumSolr-"    ; ResourceGroupName = "GumSite-rg-"; Kind = "App"}
+    @{App = "AppsInterne-"; ResourceGroupName = "AppsInterne-rg-"; Kind = "App" }
+    @{App = "Veille-"     ; ResourceGroupName = "AppsInterne-rg-"; Kind = "App" }
+    @{App = "Veille-func-"; ResourceGroupName = "AppsInterne-rg-"; Kind = "AppFunction" }
+)
 function Test-azstorageaccount (
-    [Parameter(Mandatory = $True)]
-    [string]
-    [ValidateSet("dev", "qa", "prd", "devops")] 
-    $Environnement,
-    [Parameter(Mandatory = $True)]
     [string]
     $Storage,
     $ResourceGroupName,
     $Account,
     $container
 ){
-    $Context = get-azstorageaccount -resourcegroupName $ResourceGroupName$Environnement -name $Account$Environnement -ErrorAction SilentlyContinue
+    $Context = get-azstorageaccount -resourcegroupName $ResourceGroupName -name $Account -ErrorAction SilentlyContinue
     if ( $null -ne $Context) { $true } else { $false }
 }
 function Test-azstorageContainer (
-    [Parameter(Mandatory = $True)]
-    [string]
-    [ValidateSet("dev", "qa", "prd", "devops")] 
-    $Environnement,
-    [Parameter(Mandatory = $True)]
     [string]
     $Storage,
     $ResourceGroupName,
     $Account,
     $container
 ) {    
-    $Context = get-azstorageaccount -resourcegroupName $ResourceGroupName$Environnement -name $Account$Environnement -ErrorAction SilentlyContinue
+    $Context = get-azstorageaccount -resourcegroupName $ResourceGroupName -name $Account -ErrorAction SilentlyContinue
     if ( get-AzStorageContainer -context $Context.context -container $container -ErrorAction SilentlyContinue) { $true } else { $false }
 }
 
 function Test-azStorageBlob (
-    [Parameter(Mandatory = $True)]
     [string]
-    [ValidateSet("dev", "qa", "prd", "devops")] 
-    $Environnement,
-    [Parameter(Mandatory = $True)]
-    [string]
+    $Environnement, 
     $Storage,
     $ResourceGroupName,
     $Account,
     $container
 ) {    
-    "get-azstorageaccount -resourcegroupName ($ResourceGroupName + $Environnement) -name $Account"
-    $Context = get-azstorageaccount -resourcegroupName $ResourceGroupName$Environnement -name $Account$Environnement -ErrorAction SilentlyContinue
+    "get-azstorageaccount -resourcegroupName $ResourceGroupName -name $Account"
+    $Context = get-azstorageaccount -resourcegroupName $ResourceGroupName -name $Account -ErrorAction SilentlyContinue
     if ( get-AzStorageBlob -context $Context.context -container $Container -ErrorAction SilentlyContinue) { $true } else { $false }
 }
 
 function Test-azSqlTables(
-    [Parameter(Mandatory = $True)]
     [string]
-    [ValidateSet("dev", "qa", "prd", "devops")] 
     $Environnement, 
     $Serveur, 
     $ResourceGroupName, 
